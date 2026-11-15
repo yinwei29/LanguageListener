@@ -26,6 +26,7 @@ interface ListenerDao {
     @Query("SELECT COUNT(*) FROM queue") fun observeQueueSize(): Flow<Int>
     @Query("DELETE FROM queue") suspend fun clearQueue()
     @Query("SELECT * FROM items WHERE sourceId=:source AND itemId=:id") suspend fun item(source: String, id: String): Item?
+    @Query("SELECT * FROM items WHERE sourceId=:source AND itemId IN (:ids)") suspend fun itemsByIds(source: String, ids: List<String>): List<Item>
     @Query("SELECT * FROM progress WHERE sourceId=:source AND itemId=:id") suspend fun progress(source: String, id: String): Progress?
     @Query("SELECT * FROM progress WHERE sourceId=:source AND itemId=:id") fun observeProgress(source: String, id: String): Flow<Progress?>
     @Query("SELECT * FROM items ORDER BY sourceId,itemId LIMIT :limit OFFSET :offset") suspend fun itemPage(limit: Int, offset: Int): List<Item>

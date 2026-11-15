@@ -32,6 +32,11 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     val settings=repo.dao.observeSettings().map { it ?: Settings() }.stateIn(viewModelScope,SharingStarted.Eagerly,Settings())
     val stats=repo.dao.stats().stateIn(viewModelScope,SharingStarted.Eagerly,Stats(0,0,0))
     val sources=repo.dao.observeSources().stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
+    val syncStatus=androidx.work.WorkManager.getInstance(app).getWorkInfosForUniqueWorkFlow(SyncWorker.WORK_NAME)
+        .map { jobs -> jobs.maxByOrNull { job ->
+            job.tags.mapNotNull { it.removePrefix("scheduled-at:").toLongOrNull() }.maxOrNull() ?: 0L
+        }?.state }
+        .stateIn(viewModelScope,SharingStarted.Eagerly,null)
     val categories=repo.dao.categories().stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val streak=repo.dao.playedDays().map { Repository.streakDays(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,0)
     val session=repo.dao.observeSession().stateIn(viewModelScope,SharingStarted.Eagerly,null)
@@ -72,7 +77,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             repo.seed()
             val config=repo.dao.settings() ?: Settings()
-            if(config.syncOnLaunch) sync()
+            if(config.syncOnLaunch) SyncWorker.enqueue(getApplication(),config.wifiOnly)
             session.collect { saved ->
                 if(controller?.mediaItemCount==0) {
                     index.value=saved?.position ?: 0
@@ -109,7 +114,11 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
             finally { busy.value=false }
         }
     }
-    fun saveSettings(value: Settings) = runTask { repo.saveSettings(value) }
+    fun saveSettings(value: Settings) = runTask {
+        val previous=repo.dao.settings()
+        repo.saveSettings(value)
+        if(previous?.wifiOnly!=value.wifiOnly) SyncWorker.enqueue(getApplication(),value.wifiOnly,replace=true)
+    }
     fun start(options: PlaybackOptions=settings.value.playback) = runTask {
         controller?.pause(); controller?.stop()
         val count=repo.createSession(options)
@@ -152,8 +161,15 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         if(action in listOf("learned","7","30")) next()
     }
     fun sync() { SyncWorker.enqueue(getApplication(),settings.value.wifiOnly); message.value="已排入同步工作；離線時會等待網路" }
-    fun addSource(name: String, url: String) = runTask { repo.addSource(name,url); sync() }
-    fun removeSource(id: String) = runTask { repo.removeSource(id) }
+    fun addSource(name: String, url: String) = runTask {
+        repo.addSource(name,url)
+        SyncWorker.enqueue(getApplication(),(repo.dao.settings() ?: Settings()).wifiOnly,replace=true)
+        message.value="已新增來源並重新排程同步"
+    }
+    fun removeSource(id: String) = runTask {
+        repo.removeSource(id)
+        SyncWorker.enqueue(getApplication(),(repo.dao.settings() ?: Settings()).wifiOnly,replace=true)
+    }
     fun checkVoices() = runTask { voiceStatus.value=(getApplication<Application>() as ListenerApp).speech.checkVoices() }
     fun search(query: String, category: String, more: Boolean=false) = runTask {
         val offset=if(more) library.value.size else 0

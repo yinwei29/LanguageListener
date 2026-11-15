@@ -283,6 +283,7 @@ private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Uni
 
 @UnstableApi @Composable
 private fun LibraryScreen(vm: ListenerViewModel) {
+    val syncStatus by vm.syncStatus.collectAsStateWithLifecycle()
     val sources by vm.sources.collectAsStateWithLifecycle()
     val categories by vm.categories.collectAsStateWithLifecycle()
     val items by vm.library.collectAsStateWithLifecycle()
@@ -294,6 +295,14 @@ private fun LibraryScreen(vm: ListenerViewModel) {
     var remove by remember { mutableStateOf<Source?>(null) }
     LaunchedEffect(Unit) { vm.search(query,category) }
     Panel("Google Sheets 來源") {
+        Text(when(syncStatus) {
+            androidx.work.WorkInfo.State.ENQUEUED -> "同步已排程，等待符合條件的網路"
+            androidx.work.WorkInfo.State.RUNNING -> "同步中，離線教材仍可使用"
+            androidx.work.WorkInfo.State.SUCCEEDED -> "上次同步工作已完成"
+            androidx.work.WorkInfo.State.FAILED -> "上次同步失敗，請查看來源錯誤"
+            androidx.work.WorkInfo.State.CANCELLED -> "同步已取消"
+            else -> "尚未排程同步"
+        })
         Text("使用公開試算表網址或發布為 CSV 的網址；教材需有穩定 ID 與 zh-TW、en-US、id-ID 欄位。")
         OutlinedTextField(name,{ name=it },label={ Text("來源名稱") },modifier=Modifier.fillMaxWidth())
         OutlinedTextField(url,{ url=it },label={ Text("Google Sheets URL") },modifier=Modifier.fillMaxWidth())
@@ -372,6 +381,7 @@ private fun SettingsScreen(vm: ListenerViewModel) {
         Toggle("深色模式",settings.dark) { vm.saveSettings(settings.copy(dark=it)) }
         Toggle("啟動時同步",settings.syncOnLaunch) { vm.saveSettings(settings.copy(syncOnLaunch=it)) }
         Toggle("同步僅使用 Wi-Fi",settings.wifiOnly) { vm.saveSettings(settings.copy(wifiOnly=it)) }
+        Text("變更同步網路政策會取消舊工作並重新排程；僅 Wi-Fi 模式也要求網路非計量。")
         Text("介面語言：臺灣繁體中文。English／Bahasa Indonesia 介面於 Phase 2 開放；三語教材與朗讀已支援。")
     }
 }
