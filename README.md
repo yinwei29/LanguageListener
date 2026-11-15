@@ -21,9 +21,9 @@ Android 8.0（API 26）以上，compile／target SDK 35，JDK 17。
 ./gradlew testDebugUnitTest lintDebug assembleDebug
 ```
 
-APK 位於 `app/build/outputs/apk/debug/app-debug.apk`。GitHub Actions 在 PR、`main`、`feat/**` push 與手動執行時進行上述檢查，成功後上傳 `LanguageListener-debug-<commit SHA>` artifact，保存 14 天；測試與 lint 報告也保存 14 天。
+APK 位於 `app/build/outputs/apk/debug/app-debug.apk`。主要 CI 改用 CircleCI，以單一工作執行測試、lint 與 APK 建置，並快取依賴；需先完成 [CircleCI 一次性連接](docs/CI.md)。GitHub Actions 只保留手動備援，不再因 push／PR 自動執行。
 
-在儲存庫 **Actions → Android debug APK → 成功的 run → Artifacts** 下載並解壓縮，將 APK 傳至手機安裝。GitHub 下載 artifact 需登入；debug APK 不是 Play Store 正式發行版。不同 runner 產生的 debug 簽章可能不同，若無法直接更新，先匯出 ZIP 備份再重新安裝。
+CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.apk** 下載安裝；測試結果在 Tests，lint 與測試報告在 Artifacts。保存期限依 CircleCI 帳號方案。若手動使用 GitHub 備援，在 **Actions → Android debug APK (manual fallback) → 成功的 run → Artifacts** 下載，保存 14 天。debug APK 不是 Play Store 正式發行版；不同 runner 的 debug 簽章可能不同，若無法直接更新，先匯出 ZIP 備份再重新安裝。
 
 ## 首次使用
 

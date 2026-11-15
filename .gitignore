@@ -1,5 +1,6 @@
 .gradle/
 .kotlin/
+ci-artifacts/
 **/build/
 local.properties
 .idea/
