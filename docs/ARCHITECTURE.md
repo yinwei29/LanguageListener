@@ -4,7 +4,7 @@
 
 Room schema 1 保存 sources、items、progress、queue、study_days、session、settings；資料表的 schema JSON 納入版本控制。尚無舊版資料庫，下一次 schema 變更須新增 Migration，不使用 destructive migration。
 
-教材與學習狀態以 `(sourceId, itemId)` 分開儲存。來源以標準 CSV 網址衍生穩定 UUID；移除後重新加入相同網址可沿用進度。同步只改教材與來源資訊，刪除教材採軟刪除。公開 CSV 逐行解析、每 250 筆 upsert，整份來源快照在單一交易內更新；任何一列驗證失敗都回復舊快取。相同 ID 以 CSV 最後一列為準。Phase 1 每次下載完整 CSV，不使用私人 OAuth，也不把下載成功冒稱為伺服器增量 API。
+教材與學習狀態以 `(sourceId, itemId)` 分開儲存。來源以標準 CSV 網址衍生穩定 UUID；移除後重新加入相同網址可沿用進度。同步只改教材與來源資訊，刪除教材採軟刪除。公開 CSV 逐行解析，每 250 列批次比對，僅 upsert 有變更的教材；TEMP 表記錄當次已見 ID，完整解析成功後只軟刪除缺少的教材。整份來源快照在單一交易內更新，任何一列驗證失敗都回復舊快取。相同 ID 以 CSV 最後一列為準。目前每次仍下載完整 CSV，不使用私人 OAuth，也不把資料庫差異更新冒稱為伺服器增量 API。
 
 場次以 SQL 篩選、排序、限額，僅將穩定鍵放入佇列。Media3 保留佇列索引與簡短標題；音訊載入時才讀取單筆完整教材。教材庫每次查詢 100 筆，備份每次讀取 250 筆。SQLite 的自然容量及可用手機記憶體仍限制超大型佇列，未宣稱無限容量。
 

@@ -10,6 +10,8 @@ class Repository(val db: ListenerDatabase) {
     val dao = db.dao()
     // Shared by sync, restore, session creation and player state writes.
     val mutation = Mutex()
+    // In-flight requests cannot outlive a source removal/re-add or backup restore.
+    val syncEpoch = java.util.concurrent.atomic.AtomicLong(0)
     suspend fun seed() = mutation.withLock {
         db.withTransaction {
             if (dao.settings() == null) {
@@ -67,9 +69,11 @@ class Repository(val db: ListenerDatabase) {
         val normalized = tw.language.listener.sync.SheetUrl.normalize(url)
         require(dao.sources().none { it.url == normalized }) { "此來源已存在" }
         dao.putSources(listOf(Source(UUID.nameUUIDFromBytes(normalized.toByteArray(Charsets.UTF_8)).toString(),name.ifBlank { "Google Sheets" },normalized)))
+        syncEpoch.incrementAndGet()
     }
     suspend fun removeSource(id: String) = mutation.withLock {
         db.withTransaction { dao.softDeleteSource(id); dao.deleteSource(id) }
+        syncEpoch.incrementAndGet()
     }
     companion object {
         fun streakDays(days: List<Long>, today: LocalDate = LocalDate.now()): Int {

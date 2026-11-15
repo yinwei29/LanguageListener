@@ -11,6 +11,8 @@ Android 離線多語言聽力學習 APP（臺灣繁體中文優先）。
 
 **目前狀態：Phase 1 Android MVP 已實作；硬體相關功能仍需依實機驗收表確認。**
 
+Phase 2 的同步可靠性與效能改進見 [本階段進度](docs/PHASE2_PROGRESS.md)：批次差異更新、精確軟刪除、過期回應拒絕、可取消 HTTPS 下載、網路政策重新排程與一萬筆資料測試。私人 OAuth 與三語介面仍待後續交付。
+
 ## 取得與建置 APK
 
 Android 8.0（API 26）以上，compile／target SDK 35，JDK 17。

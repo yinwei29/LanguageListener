@@ -73,7 +73,9 @@ class RepositoryBackupTest {
         manager.restore(preview,false)
         assertFalse(repo.dao.progress("demo","hello")!!.learned)
         assertEquals(8,repo.dao.progress("demo","hello")!!.playCount)
+        val epoch=repo.syncEpoch.get()
         manager.restore(preview,true)
+        assertTrue(repo.syncEpoch.get()>epoch)
         assertTrue(repo.dao.progress("demo","hello")!!.learned)
         assertEquals(4,repo.dao.progress("demo","hello")!!.playCount)
         assertEquals(5,repo.dao.itemPage(100,0).size)
@@ -92,7 +94,7 @@ class RepositoryBackupTest {
         assertTrue(repo.dao.item("demo","thanks")!!.deleted)
         assertTrue(repo.dao.sources().single().lastSync>0)
         try {
-            SheetImporter(repo).import(source,"ID,zh-TW,en-US,id-ID\nnew,新,Overwrite,Baru\n,空白 ID,Invalid,Salah\n".reader())
+            SheetImporter(repo).import(repo.dao.sources().single(),"ID,zh-TW,en-US,id-ID\nnew,新,Overwrite,Baru\n,空白 ID,Invalid,Salah\n".reader())
             fail("invalid row accepted")
         } catch(_: IllegalArgumentException) { }
         assertEquals("New",repo.dao.item("demo","new")!!.en)

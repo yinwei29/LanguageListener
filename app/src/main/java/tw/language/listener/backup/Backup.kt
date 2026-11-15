@@ -201,6 +201,7 @@ class BackupManager(private val repo: Repository, private val cache: File) {
                     }
                 }
             }
+            repo.syncEpoch.incrementAndGet()
         }
     }
     private inline fun <reified T> write(dir: File, name: String, values: List<T>) {
