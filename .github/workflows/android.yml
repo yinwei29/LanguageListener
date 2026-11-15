@@ -1,8 +1,5 @@
-name: Android debug APK
+name: Android debug APK (manual fallback)
 on:
-  push:
-    branches: [main, 'feat/**']
-  pull_request:
   workflow_dispatch:
 permissions:
   contents: read

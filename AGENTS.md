@@ -10,3 +10,5 @@
 - 無加密 ZIP 備份不得包含憑證；匯入需防 Zip Slip、Zip Bomb，檢查版本、完整性與資料合法性。
 - Android 系統限制須如實標註，例如不同廠牌耳機手勢與 TTS 離線語音包支援差異。
 - 使用可用的 Gradle test、lint、assembleDebug 驗證，不可虛報通過。
+- CI 優先使用 CircleCI，GitHub 僅用於程式碼、PR 與必要的手動備援；不要重新加入 Actions 的 push／PR 自動建置。細節見 docs/CI.md。
+- 開發時先做本機的必要驗證，將可一起審查的改動整理成提交，避免為每個小改動重複觸發雲端 Android 建置。

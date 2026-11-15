@@ -26,7 +26,7 @@
 **驗收：** 演算法有單元測試，教材同步不丟失進度。
 
 ## Phase 5 — CI 與交付
-- GitHub Actions：Gradle test/lint/assembleDebug，提供 APK artifact，設定合理保存天數。
+- CircleCI 為主要 CI：Gradle test/lint/assembleDebug，提供 APK artifact 與依賴快取；GitHub Actions 僅留手動備援，避免重複建置。保存天數依各平台帳號政策，連接方式見 docs/CI.md。
 - Android 實機測試：背景播放、離線 TTS、耳機媒體鍵、換機匯入。
 - 更新 README、資料庫遷移、公開儲存庫安全掃描。
 
