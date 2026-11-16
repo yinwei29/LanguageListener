@@ -123,7 +123,7 @@ private fun NetworkStatus() {
 }
 
 @Composable
-private fun Panel(title: String, content: @Composable ColumnScope.()->Unit) {
+internal fun Panel(title: String, content: @Composable ColumnScope.()->Unit) {
     Card(Modifier.fillMaxWidth(),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.primaryContainer)) {
         Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Text(title,style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
@@ -134,7 +134,7 @@ private fun Panel(title: String, content: @Composable ColumnScope.()->Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Actions(content: @Composable FlowRowScope.()->Unit) {
+internal fun Actions(content: @Composable FlowRowScope.()->Unit) {
     FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(4.dp),content=content)
 }
 
@@ -214,7 +214,7 @@ private fun PlayerScreen(vm: ListenerViewModel) {
 private fun directionLabel(value: String)=when(value) { "target-native"->"目標語 → 母語"; "target"->"僅目標語"; else->"母語 → 目標語" }
 
 @Composable
-private fun Choice(label: String, value: String, choices: List<Pair<String,String>>, onChange: (String)->Unit) {
+internal fun Choice(label: String, value: String, choices: List<Pair<String,String>>, onChange: (String)->Unit) {
     var open by remember { mutableStateOf(false) }
     Column {
         Text(label,style=MaterialTheme.typography.labelLarge)
@@ -294,7 +294,8 @@ private fun LibraryScreen(vm: ListenerViewModel) {
     var category by rememberSaveable { mutableStateOf("") }
     var remove by remember { mutableStateOf<Source?>(null) }
     LaunchedEffect(Unit) { vm.search(query,category) }
-    Panel("Google Sheets 來源") {
+    GoogleAuthoringPanel(report={ vm.message.value=it })
+    Panel("教材來源與同步（公開來源可直接唯讀加入）") {
         Text(when(syncStatus) {
             androidx.work.WorkInfo.State.ENQUEUED -> "同步已排程，等待符合條件的網路"
             androidx.work.WorkInfo.State.RUNNING -> "同步中，離線教材仍可使用"
@@ -307,12 +308,13 @@ private fun LibraryScreen(vm: ListenerViewModel) {
         OutlinedTextField(name,{ name=it },label={ Text("來源名稱") },modifier=Modifier.fillMaxWidth())
         OutlinedTextField(url,{ url=it },label={ Text("Google Sheets URL") },modifier=Modifier.fillMaxWidth())
         Actions {
-            Button(onClick={ vm.addSource(name,url) },enabled=url.isNotBlank()) { Text("新增來源") }
+            Button(onClick={ vm.addSource(name,url) },enabled=url.isNotBlank()) { Text("新增公開唯讀來源") }
             OutlinedButton(onClick=vm::sync) { Text("同步全部來源") }
         }
         sources.forEach { source ->
             HorizontalDivider()
             Text(source.name,style=MaterialTheme.typography.titleMedium)
+            Text(if(source.access=="google") "Google 連接來源，寫回需有效授權" else "公開唯讀來源")
             Text(if(source.url.isEmpty()) "離線示範教材" else source.url)
             Text("最後同步：${if(source.lastSync==0L) "尚未同步" else date(source.lastSync)}")
             source.error?.let { Text("同步失敗（保留快取）：$it",color=MaterialTheme.colorScheme.error) }
@@ -338,7 +340,7 @@ private fun LibraryScreen(vm: ListenerViewModel) {
         }
         if(more) OutlinedButton(onClick={ vm.search(query,category,true) }) { Text("載入下 100 筆") }
     }
-    Panel("AI 教材") { Text("尚未開放（Phase 3）：供應商、BYOK、產生教材、人工審核及授權寫回 Sheets。") }
+    AiAuthoringPanel(sources)
     remove?.let { source -> AlertDialog(onDismissRequest={ remove=null },title={ Text("移除來源？") },
         text={ Text("${source.name} 的教材將軟刪除；保留學習紀錄及既有場次，未來以相同穩定鍵還原可繼續使用。") },
         confirmButton={ TextButton(onClick={ vm.removeSource(source.sourceId); remove=null }) { Text("移除") } },

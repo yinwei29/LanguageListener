@@ -31,7 +31,7 @@ class Repository(val db: ListenerDatabase) {
     }
     suspend fun saveSettings(settings: Settings) = mutation.withLock {
         settings.playback.validate()
-        dao.putSettings(settings.copy(modifiedAt=System.currentTimeMillis()))
+        dao.putSettings(settings.copy(modifiedAt=System.currentTimeMillis(),aiProfile=dao.settings()?.aiProfile ?: settings.aiProfile))
     }
     suspend fun createSession(options: PlaybackOptions): Int = mutation.withLock {
         options.validate()

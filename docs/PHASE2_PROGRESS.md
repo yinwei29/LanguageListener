@@ -1,6 +1,6 @@
 # Phase 2 第一部分：同步可靠性與效能
 
-此階段以 Phase 1 PR 為基底，獨立 PR 交付。未宣稱私人 OAuth、介面本地化或實機驗收已完成。
+本文件記錄同步可靠性 PR 的交付範圍。後續已加入私人 OAuth 與 AI 審核寫回，見 [Google／AI 設定](GOOGLE_AI_SETUP.md)；介面本地化及實機驗收仍未完成。
 
 ## 已實作
 
@@ -21,7 +21,7 @@
 
 ## 尚待後續交付
 
-- 私人 Google Sheets OAuth 唯讀授權與 Google Cloud Android OAuth 設定、實際帳號授權驗收。
+- 私人 Google Sheets OAuth 已在後續功能加入，Google Cloud 與真實帳號授權仍需依設定文件驗收。
 - 繁中／英文／印尼文完整介面本地化。
 - HTTP ETag／Last-Modified 等網路傳輸層增量（本次為資料庫差異更新，不冒稱減少每次完整 CSV 下載量）。
 - Android 實機大量資料、飛航模式首次 TTS、鎖屏、耳機、來電及換機測試。
