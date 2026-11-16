@@ -30,7 +30,11 @@ class SyncWorker(context: Context, parameters: WorkerParameters) : CoroutineWork
             val epoch=repo.syncEpoch.get()
             val temporary=File.createTempFile("sheet", ".csv",applicationContext.cacheDir)
             try {
-                downloadSheet(client,SheetUrl.normalize(source.url),temporary,::networkAllowed)
+                if(source.access=="google") {
+                    val app=applicationContext as ListenerApp
+                    try { app.sheets.download(source,app.google.token(),temporary,::networkAllowed) }
+                    catch(e: tw.language.listener.authoring.RemoteError) { if(e.status==401) app.google.clear(); throw e }
+                } else downloadSheet(client,SheetUrl.normalize(source.url),temporary,::networkAllowed)
                 if(!networkAllowed()) return@withContext Result.retry()
                 temporary.bufferedReader(Charsets.UTF_8).use { SheetImporter(repo).import(source,it,epoch) }
             } catch(e: CancellationException) { throw e }

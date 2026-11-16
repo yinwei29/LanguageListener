@@ -12,11 +12,20 @@ android {
         applicationId = "tw.language.listener"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
+    // Optional stable debug identity for Google OAuth; no credentials are stored in source.
+    System.getenv("LL_DEBUG_KEYSTORE_PATH")?.takeIf { it.isNotBlank() }?.let { path ->
+        signingConfigs.getByName("debug") {
+            storeFile = file(path)
+            storePassword = requireNotNull(System.getenv("LL_DEBUG_STORE_PASSWORD")) { "Missing LL_DEBUG_STORE_PASSWORD" }
+            keyAlias = requireNotNull(System.getenv("LL_DEBUG_KEY_ALIAS")) { "Missing LL_DEBUG_KEY_ALIAS" }
+            keyPassword = requireNotNull(System.getenv("LL_DEBUG_KEY_PASSWORD")) { "Missing LL_DEBUG_KEY_PASSWORD" }
+        }
+    }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     testOptions {
@@ -30,6 +39,7 @@ android {
         }
     }
     lint { abortOnError = true }
+    sourceSets["test"].resources.srcDir("schemas")
 }
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 dependencies {
@@ -49,6 +59,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("com.squareup.okhttp3:okhttp-tls:4.12.0")

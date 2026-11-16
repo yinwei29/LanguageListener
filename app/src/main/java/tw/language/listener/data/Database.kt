@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ListenerDao {
+    @Upsert suspend fun putDraft(value: DraftRecord)
+    @Query("SELECT * FROM ai_drafts WHERE singleton=1") fun observeDraft(): Flow<DraftRecord?>
+    @Query("DELETE FROM ai_drafts") suspend fun clearDraft()
     @Query("SELECT * FROM sources ORDER BY name") fun observeSources(): Flow<List<Source>>
     @Query("SELECT * FROM sources ORDER BY name") suspend fun sources(): List<Source>
     @Upsert suspend fun putSources(values: List<Source>)
@@ -30,6 +33,7 @@ interface ListenerDao {
     @Query("SELECT * FROM progress WHERE sourceId=:source AND itemId=:id") suspend fun progress(source: String, id: String): Progress?
     @Query("SELECT * FROM progress WHERE sourceId=:source AND itemId=:id") fun observeProgress(source: String, id: String): Flow<Progress?>
     @Query("SELECT * FROM items ORDER BY sourceId,itemId LIMIT :limit OFFSET :offset") suspend fun itemPage(limit: Int, offset: Int): List<Item>
+    @Query("SELECT * FROM items WHERE sourceId=:source AND (:after IS NULL OR itemId>:after) ORDER BY itemId LIMIT :limit") suspend fun sourcePage(source: String, after: String?, limit: Int): List<Item>
     @Query("SELECT * FROM progress ORDER BY sourceId,itemId LIMIT :limit OFFSET :offset") suspend fun progressPage(limit: Int, offset: Int): List<Progress>
     @Query("SELECT COUNT(*) AS total, COALESCE(SUM(COALESCE(p.learned,0)),0) AS learned, COALESCE(SUM(COALESCE(p.favorite,0)),0) AS favorite FROM items i LEFT JOIN progress p USING(sourceId,itemId) WHERE i.enabled=1 AND i.deleted=0") fun stats(): Flow<Stats>
     @Query("SELECT epochDay FROM study_days ORDER BY epochDay DESC") fun playedDays(): Flow<List<Long>>
@@ -63,6 +67,6 @@ interface ListenerDao {
     @Query("DELETE FROM settings") suspend fun clearSettings()
 }
 
-@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class], version = 1, exportSchema = true)
+@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class, DraftRecord::class], version = 2, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class ListenerDatabase : RoomDatabase() { abstract fun dao(): ListenerDao }

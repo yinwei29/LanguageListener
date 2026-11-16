@@ -5,7 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable @Entity(tableName = "sources")
 data class Source(@PrimaryKey val sourceId: String, val name: String, val url: String,
-    val lastSync: Long = 0, val error: String? = null)
+    val lastSync: Long = 0, val error: String? = null,
+    @ColumnInfo(defaultValue = "'public'") val access: String = "public")
+
+@Entity(tableName = "ai_drafts")
+data class DraftRecord(@PrimaryKey val singleton: Int = 1, val payload: String)
 
 @Serializable @Entity(tableName = "items", primaryKeys = ["sourceId", "itemId"],
     indices = [Index("category"), Index("type"), Index("sourceId")])
@@ -36,7 +40,7 @@ data class Session(@PrimaryKey val singleton: Int = 1, val position: Int = 0,
 @Serializable @Entity(tableName = "settings")
 data class Settings(@PrimaryKey val singleton: Int = 1, val playback: PlaybackOptions = PlaybackOptions(),
     val wifiOnly: Boolean = false, val syncOnLaunch: Boolean = true,
-    val dark: Boolean = false, val modifiedAt: Long = 0)
+    val dark: Boolean = false, val modifiedAt: Long = 0, val aiProfile: tw.language.listener.authoring.AiProfile? = null)
 
 @Serializable
 data class PlaybackOptions(val native: String = "zh-TW", val target: String = "en-US",
@@ -63,6 +67,8 @@ data class PlaybackOptions(val native: String = "zh-TW", val target: String = "e
 }
 
 class Converters {
+    @TypeConverter fun encodeProfile(value: tw.language.listener.authoring.AiProfile?): String? = value?.let { JsonCodec.json.encodeToString(tw.language.listener.authoring.AiProfile.serializer(),it) }
+    @TypeConverter fun decodeProfile(value: String?): tw.language.listener.authoring.AiProfile? = value?.let { JsonCodec.json.decodeFromString(tw.language.listener.authoring.AiProfile.serializer(),it) }
     @TypeConverter fun encode(value: PlaybackOptions): String = JsonCodec.json.encodeToString(PlaybackOptions.serializer(), value)
     @TypeConverter fun decode(value: String): PlaybackOptions = JsonCodec.json.decodeFromString(PlaybackOptions.serializer(), value)
 }

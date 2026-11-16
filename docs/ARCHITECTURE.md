@@ -1,10 +1,10 @@
-# Phase 1 架構
+# 架構與資料相容性
 
 ## 資料與持久化
 
-Room schema 1 保存 sources、items、progress、queue、study_days、session、settings；資料表的 schema JSON 納入版本控制。尚無舊版資料庫，下一次 schema 變更須新增 Migration，不使用 destructive migration。
+Room schema 2 保存 sources、items、progress、queue、study_days、session、settings、ai_drafts。schema 1／2 JSON 與 1→2 Migration 納入版本控制，不使用 destructive migration。來源增加公開／Google 授權模式，非機密 AI 模型設定可備份，未審核草稿保存在獨立資料表；金鑰與 token 只放在 Keystore 加密的 noBackupFilesDir。
 
-教材與學習狀態以 `(sourceId, itemId)` 分開儲存。來源以標準 CSV 網址衍生穩定 UUID；移除後重新加入相同網址可沿用進度。同步只改教材與來源資訊，刪除教材採軟刪除。公開 CSV 逐行解析，每 250 列批次比對，僅 upsert 有變更的教材；TEMP 表記錄當次已見 ID，完整解析成功後只軟刪除缺少的教材。整份來源快照在單一交易內更新，任何一列驗證失敗都回復舊快取。相同 ID 以 CSV 最後一列為準。目前每次仍下載完整 CSV，不使用私人 OAuth，也不把資料庫差異更新冒稱為伺服器增量 API。
+教材與學習狀態以 `(sourceId, itemId)` 分開儲存。來源以標準 CSV 網址衍生穩定 UUID；移除後重新加入相同網址可沿用進度。同步只改教材與來源資訊，刪除教材採軟刪除。公開 CSV 逐行解析，每 250 列批次比對，僅 upsert 有變更的教材；TEMP 表記錄當次已見 ID，完整解析成功後只軟刪除缺少的教材。整份來源快照在單一交易內更新，任何一列驗證失敗都回復舊快取。相同 ID 以 CSV 最後一列為準。公開來源每次仍下載完整 CSV；授權來源以 Google Sheets API 讀取範圍後交給同一匯入器，不把資料庫差異更新冒稱為伺服器增量 API。
 
 場次以 SQL 篩選、排序、限額，僅將穩定鍵放入佇列。Media3 保留佇列索引與簡短標題；音訊載入時才讀取單筆完整教材。教材庫每次查詢 100 筆，備份每次讀取 250 筆。SQLite 的自然容量及可用手機記憶體仍限制超大型佇列，未宣稱無限容量。
 
@@ -33,3 +33,7 @@ SAF 選擇輸出位置與輸入檔案，無需全檔案存取權限。ZIP 只允
 完整覆蓋在單一 Room 交易中取代資料；智慧合併以進度 modifiedAt 較新者為準，相同時間保留本機。已有教材文字與來源保留本機資料，缺少者才加入；設定採較新修改時間，本機非空佇列保留。不同來源 ID 即使教材文字相同也不混為同一筆。
 
 輕量備份保留來源、設定、佇列與進度，不含教材。還原後可先保留孤立進度，待同來源 ID 的教材同步後接續使用；內建公開示範教材可重新建立。完整備份可在完全離線時恢復教材與進度。憑證、API 金鑰及 OAuth token 沒有資料欄位，不會被備份。
+
+## Google／AI 教材流程
+
+Google 原生授權、非破壞式初始化、AI BYOK、人工審核與附加寫回見 [Google／AI 設定](GOOGLE_AI_SETUP.md)。ZIP schema 2 可讀 schema 1，保存非機密模型設定及來源存取模式；未審核草稿不匯出，完整覆蓋會清除本機草稿。金鑰、短期 token 與簽章檔均不在備份或 CI 快取範圍。
