@@ -25,9 +25,13 @@ APK 位於 `app/build/outputs/apk/debug/app-debug.apk`。主要 CI 改用 Circle
 
 CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.apk** 下載安裝；測試結果在 Tests，lint 與測試報告在 Artifacts。保存期限依 CircleCI 帳號方案。若手動使用 GitHub 備援，在 **Actions → Android debug APK (manual fallback) → 成功的 run → Artifacts** 下載，保存 14 天。debug APK 不是 Play Store 正式發行版；不同 runner 的 debug 簽章可能不同，若無法直接更新，先匯出 ZIP 備份再重新安裝。
 
+0.4.0 優先使用本機 Excel／CSV：建立初始 CSV、選取 .xlsx／CSV、欄位與 ID 初始化、離線教材編輯、本機合併及選用的 Google Sheets 同步，見 [操作說明](docs/LOCAL_DOCUMENTS.md)。
+
 ## 首次使用
 
-建立教材可直接在 App 完成：**貼上原始 Sheets 網址 → Google 授權 → 預覽並初始化缺少欄位 → 設定自己的 AI API key → 產生 → 分頁審核／修改／選取 → 確認寫回 → 依政策同步 → 離線播放**。首次 Google 連接需開發者在 Cloud 啟用 Sheets API、登記 APK 套件及簽章，詳見 [必要設定](docs/GOOGLE_AI_SETUP.md)。AI 產生不等於已搜尋或查證，未審核不寫回。
+建議先從「教材庫 → 本機 Excel／CSV」建立 CSV 或選取檔案，不需 Google 授權就能新增教材與離線播放。需要雲端時，再連接原本的 Sheets。
+
+雲端教材也可直接在 App 完成：**貼上原始 Sheets 網址 → Google 授權 → 預覽並初始化缺少欄位 → 設定自己的 AI API key → 產生 → 分頁審核／修改／選取 → 確認寫回 → 依政策同步 → 離線播放**。首次 Google 連接需開發者在 Cloud 啟用 Sheets API、登記 APK 套件及簽章，詳見 [必要設定](docs/GOOGLE_AI_SETUP.md)。AI 產生不等於已搜尋或查證，未審核不寫回。
 
 1. 設定頁檢查離線語音包；缺少時安裝所需的繁中、英文或印尼文 voice。不同 Android TTS 引擎及裝置支援不同。
 2. 可用內建三語示範教材、授權連接並初始化 Sheets，或新增公開 CSV 來源後同步。格式見 [Sheets 格式](docs/SHEETS_FORMAT.md)。
@@ -53,4 +57,4 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 - [實機驗收表](docs/DEVICE_ACCEPTANCE.md)：斷網初次合成、鎖屏持續播放、耳機、來電中斷及換機 SAF 還原需實機確認，不能以 UI 原型或 JVM 測試代替。
 - 自動化涵蓋 CSV 引號／多行／BOM／格式錯誤、來源網址、同步去重與交易回復、穩定鍵進度、場次排除／去重／舊位置寫入、Room 重開、ZIP 來回／合併／輕量、惡意路徑／重複項目／校驗／版本／解壓超限，以及 PCM 音訊與靜音。
 
-未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3 與 1→2→3 migration 已納入版本控制；ZIP schema 3 保留來源模式、模型設定與介面語言，並可讀取舊版 schema 1／2。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。
+未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3／4 與 1→2→3→4 migration 已納入版本控制；ZIP schema 4 保留來源模式、模型設定與介面語言，並可讀取舊版 schema 1／2／3。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。

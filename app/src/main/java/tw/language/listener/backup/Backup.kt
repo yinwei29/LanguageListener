@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 @Serializable
-data class Manifest(val schemaVersion: Int = 3, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
+data class Manifest(val schemaVersion: Int = 4, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
     val full: Boolean, val itemCount: Int, val progressCount: Int, val sourceCount: Int,
     val checksum: Map<String,String>, val dayCount: Int = 0)
 class BackupPreview(val directory: File, val manifest: Manifest, val sources: List<Source>) : Closeable {
@@ -61,7 +61,7 @@ object BackupArchive {
             }
             require(seen==payloadNames+"manifest.json") { "備份檔案不完整" }
             val manifest=JsonCodec.json.decodeFromString<Manifest>(File(dir,"manifest.json").readText())
-            require(manifest.schemaVersion in 1..3) { "不支援的備份版本" }
+            require(manifest.schemaVersion in 1..4) { "不支援的備份版本" }
             require(manifest.createdAt>0 && manifest.appVersion.isNotBlank()) { "備份資訊不合法" }
             require(manifest.checksum.keys==payloadNames) { "缺少完整性檢查資料" }
             manifest.checksum.forEach { (name,sha) -> require(digest(File(dir,name))==sha) { "備份校驗失敗：$name" } }
@@ -69,7 +69,7 @@ object BackupArchive {
             require(sources.size==manifest.sourceCount && sources.map { it.sourceId }.distinct().size==sources.size)
             sources.forEach {
                 require(it.sourceId.isNotBlank() && it.sourceId.length<=512 && it.name.isNotBlank() && it.lastSync>=0)
-                require(it.access in listOf("public","google")) { "不支援的來源存取模式" }
+                require(it.access in listOf("public","google","file")) { "不支援的來源存取模式" }
                 if(it.url.isNotEmpty()) require(it.url==SheetUrl.normalize(it.url)) { "來源網址必須為不含憑證的標準 CSV 網址" }
                 if(it.access=="google") tw.language.listener.authoring.SheetLink.parse(it.url)
             }
@@ -183,7 +183,7 @@ class BackupManager(private val repo: Repository, private val cache: File) {
             repo.db.withTransaction {
                 val dao=repo.dao
                 if(replace) {
-                    dao.clearQueue(); dao.clearSession(); dao.clearProgress(); dao.clearItems(); dao.clearSources(); dao.clearSettings(); dao.clearDays(); dao.clearDraft()
+                    dao.clearQueue(); dao.clearSession(); dao.clearProgress(); dao.clearItems(); dao.clearSources(); dao.clearSettings(); dao.clearDocuments(); dao.clearDays(); dao.clearDraft()
                 }
                 val existing=dao.sources().associateBy { it.sourceId }
                 dao.putSources(preview.sources.filter { replace || it.sourceId !in existing })

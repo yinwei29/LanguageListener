@@ -29,6 +29,21 @@ class Repository(val db: ListenerDatabase) {
             }
         }
     }
+    /** Device-owned lessons never participate in a remote snapshot. */
+    suspend fun saveLocalItem(value: Item) = mutation.withLock {
+        val selected=dao.sources().find { it.sourceId==value.sourceId }
+        require((value.sourceId==LOCAL_SOURCE_ID || selected?.access=="file") && value.itemId.isNotBlank() && value.itemId.length<=512)
+        require(listOf(value.zh,value.en,value.id).count { it.isNotBlank() }>=2) { "請至少填寫兩種語言的教材文字" }
+        require(listOf(value.zh,value.en,value.id).all { it.length<=100_000 } && value.category.length<=512 && value.level.length<=512) { "教材欄位過長" }
+        require(value.type in listOf("word","phrase","sentence"))
+        db.withTransaction {
+            val source=selected
+            require(source==null || source.access=="file" || (source.sourceId==LOCAL_SOURCE_ID && source.url.isEmpty() && source.access=="public")) { "本機教材來源不合法" }
+            if(source==null) dao.putSources(listOf(Source(LOCAL_SOURCE_ID,"我的本機教材","")))
+            syncEpoch.incrementAndGet()
+            dao.putItems(listOf(value.copy(zh=value.zh.trim(),en=value.en.trim(),id=value.id.trim(),category=value.category.trim().ifBlank { "日常" },enabled=true,deleted=false)))
+        }
+    }
     suspend fun saveSettings(settings: Settings) = mutation.withLock {
         settings.playback.validate()
         require(settings.uiLanguage in setOf("zh-TW","en","id")) { "不支援的介面語言" }
@@ -73,10 +88,11 @@ class Repository(val db: ListenerDatabase) {
         syncEpoch.incrementAndGet()
     }
     suspend fun removeSource(id: String) = mutation.withLock {
-        db.withTransaction { dao.softDeleteSource(id); dao.deleteSource(id) }
+        db.withTransaction { dao.softDeleteSource(id); dao.deleteSource(id); dao.deleteDocument(id) }
         syncEpoch.incrementAndGet()
     }
     companion object {
+        const val LOCAL_SOURCE_ID="local-lessons"
         fun streakDays(days: List<Long>, today: LocalDate = LocalDate.now()): Int {
             val unique=days.toSet()
             var day=today.toEpochDay()

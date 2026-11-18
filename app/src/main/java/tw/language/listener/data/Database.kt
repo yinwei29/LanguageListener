@@ -5,6 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ListenerDao {
+    @Upsert suspend fun putDocument(value: tw.language.listener.documents.LocalDocument)
+    @Query("SELECT * FROM local_documents") suspend fun documents(): List<tw.language.listener.documents.LocalDocument>
+    @Query("SELECT * FROM local_documents") fun observeDocuments(): Flow<List<tw.language.listener.documents.LocalDocument>>
+    @Query("DELETE FROM local_documents WHERE sourceId=:id") suspend fun deleteDocument(id: String)
+    @Query("DELETE FROM local_documents") suspend fun clearDocuments()
     @Upsert suspend fun putDraft(value: DraftRecord)
     @Query("SELECT * FROM ai_drafts WHERE singleton=1") fun observeDraft(): Flow<DraftRecord?>
     @Query("DELETE FROM ai_drafts") suspend fun clearDraft()
@@ -67,6 +72,6 @@ interface ListenerDao {
     @Query("DELETE FROM settings") suspend fun clearSettings()
 }
 
-@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class, DraftRecord::class], version = 3, exportSchema = true)
+@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class, DraftRecord::class,tw.language.listener.documents.LocalDocument::class], version = 4, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class ListenerDatabase : RoomDatabase() { abstract fun dao(): ListenerDao }

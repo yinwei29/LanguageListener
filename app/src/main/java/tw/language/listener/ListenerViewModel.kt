@@ -162,6 +162,15 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         if(action in listOf("learned","7","30")) next()
     }
     fun sync() { SyncWorker.enqueue(getApplication(),settings.value.wifiOnly); message.value="已排入同步工作；離線時會等待網路" }
+    private var libraryQuery=""
+    private var libraryCategory=""
+    fun saveLocalItem(value: Item, complete: ()->Unit) = runTask {
+        repo.saveLocalItem(value)
+        library.value=repo.dao.search(libraryQuery,libraryCategory,100,0)
+        hasMore.value=library.value.size==100
+        message.value="教材已儲存，可建立場次開始離線學習"
+        complete()
+    }
     fun addSource(name: String, url: String) = runTask {
         repo.addSource(name,url)
         SyncWorker.enqueue(getApplication(),(repo.dao.settings() ?: Settings()).wifiOnly,replace=true)
@@ -173,6 +182,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun checkVoices() = runTask { voiceStatus.value=(getApplication<Application>() as ListenerApp).speech.checkVoices() }
     fun search(query: String, category: String, more: Boolean=false) = runTask {
+        libraryQuery=query; libraryCategory=category
         val offset=if(more) library.value.size else 0
         val page=repo.dao.search(query,category,100,offset)
         library.value=if(more) library.value+page else page

@@ -2032,5 +2032,593 @@
     "en": "This source already exists",
     "id": "Sumber ini sudah ada",
     "key": "this_source_already_exists_7dddbc"
+  },
+  {
+    "key": "local_lessons",
+    "zh": "直接新增本機教材",
+    "en": "Add lessons on this device",
+    "id": "Tambah materi di perangkat ini"
+  },
+  {
+    "key": "local_lessons_help",
+    "zh": "不需要 Google 或 AI 金鑰。輸入至少兩種語言，儲存後到播放器建立新場次；本機教材不會自動寫回 Sheets。",
+    "en": "No Google account or AI key required. Enter at least two languages, save, then create a session in Player. Local lessons are not written to Sheets.",
+    "id": "Tidak memerlukan akun Google atau kunci AI. Isi sedikitnya dua bahasa, simpan, lalu buat sesi di Pemutar. Materi lokal tidak ditulis ke Sheets."
+  },
+  {
+    "key": "add_lesson",
+    "zh": "新增教材",
+    "en": "Add lesson",
+    "id": "Tambah materi"
+  },
+  {
+    "key": "edit_local_lesson",
+    "zh": "編輯本機教材",
+    "en": "Edit local lesson",
+    "id": "Edit materi lokal"
+  },
+  {
+    "key": "my_local_lessons",
+    "zh": "我的本機教材",
+    "en": "My local lessons",
+    "id": "Materi lokal saya"
+  },
+  {
+    "key": "local_source_help",
+    "zh": "本機教材，不會從 Google Sheets 同步",
+    "en": "Local lessons; not synced from Google Sheets",
+    "id": "Materi lokal; tidak disinkronkan dari Google Sheets"
+  },
+  {
+    "key": "local_backup_help",
+    "zh": "儲存在這台裝置；請使用完整 ZIP 備份保存教材文字",
+    "en": "Stored on this device; use a full ZIP backup to preserve lesson text",
+    "id": "Disimpan di perangkat ini; gunakan cadangan ZIP lengkap untuk menyimpan teks materi"
+  },
+  {
+    "key": "initialize_this_sheet",
+    "zh": "初始化這個工作表／授權新增教材",
+    "en": "Initialize this sheet / authorize lesson creation",
+    "id": "Inisialisasi sheet ini / izinkan penambahan materi"
+  },
+  {
+    "key": "two_languages_required",
+    "zh": "請至少填寫兩種語言的教材文字",
+    "en": "Enter lesson text in at least two languages",
+    "id": "Isi teks materi dalam sedikitnya dua bahasa"
+  },
+  {
+    "key": "lesson_fields_too_long",
+    "zh": "教材欄位過長",
+    "en": "Lesson fields are too long",
+    "id": "Kolom materi terlalu panjang"
+  },
+  {
+    "key": "invalid_local_source",
+    "zh": "本機教材來源不合法",
+    "en": "Invalid local lesson source",
+    "id": "Sumber materi lokal tidak valid"
+  },
+  {
+    "key": "lesson_saved",
+    "zh": "教材已儲存，可建立場次開始離線學習",
+    "en": "Lesson saved. Create a session to start learning offline",
+    "id": "Materi disimpan. Buat sesi untuk mulai belajar secara offline"
+  },
+  {
+    "key": "empty_sheet_help",
+    "zh": "工作表沒有可讀取的 CSV 內容。請確認 gid 與分享權限；空白表請按「初始化這個工作表／授權新增教材」，或直接新增本機教材。原有教材與進度保留。",
+    "en": "This sheet has no readable CSV content. Check its gid and sharing permissions. Initialize a blank sheet or add a lesson on this device. Existing lessons and progress are preserved.",
+    "id": "Sheet ini tidak memiliki konten CSV yang dapat dibaca. Periksa gid dan izin berbagi. Inisialisasi sheet kosong atau tambah materi lokal. Materi dan progres sebelumnya tetap tersimpan."
+  },
+  {
+    "key": "local_light_backup_warning",
+    "zh": "本機新增的教材無法從 Sheets 重新下載；請選完整備份，才能保留這些教材文字。",
+    "en": "Local lessons cannot be downloaded again from Sheets. Choose a full backup to preserve their text.",
+    "id": "Materi lokal tidak dapat diunduh ulang dari Sheets. Pilih cadangan lengkap untuk menyimpan teksnya."
+  },
+  {
+    "key": "save_lesson",
+    "zh": "儲存教材",
+    "en": "Save lesson",
+    "id": "Simpan materi"
+  },
+  {
+    "key": "doc_6ab915b88b",
+    "zh": "App 教材已改變，請重新預覽",
+    "en": "App lessons changed. Preview again",
+    "id": "Materi App berubah. Pratinjau lagi"
+  },
+  {
+    "key": "doc_a76abb6efd",
+    "zh": "App 與本機檔案已同步，學習進度保留",
+    "en": "App and local file synchronized; progress preserved",
+    "id": "App dan file lokal disinkronkan; progres tetap tersimpan"
+  },
+  {
+    "key": "doc_a5df32288d",
+    "zh": "CSV 已匯出，可用 Excel 開啟",
+    "en": "CSV exported; open it in Excel",
+    "id": "CSV diekspor; dapat dibuka di Excel"
+  },
+  {
+    "key": "doc_dc65ad181b",
+    "zh": "Excel XML 含不支援的實體或編碼",
+    "en": "Unsupported XML entities or encoding in Excel",
+    "id": "Entitas atau pengodean XML Excel tidak didukung"
+  },
+  {
+    "key": "doc_5c5d51118a",
+    "zh": "Excel ZIP 路徑或項目不合法",
+    "en": "Invalid Excel ZIP path or entry",
+    "id": "Jalur atau entri ZIP Excel tidak valid"
+  },
+  {
+    "key": "doc_6da40b70a6",
+    "zh": "Excel 共用字串索引不合法",
+    "en": "Invalid Excel shared-string index",
+    "id": "Indeks string bersama Excel tidak valid"
+  },
+  {
+    "key": "doc_3eee8648b6",
+    "zh": "Excel 展開內容超過 64 MiB 安全上限",
+    "en": "Expanded Excel contents exceed the 64 MiB safety limit",
+    "id": "Konten Excel setelah ekstraksi melebihi batas aman 64 MiB"
+  },
+  {
+    "key": "doc_2be644414e",
+    "zh": "Excel 工作表",
+    "en": "Excel worksheet",
+    "id": "Lembar kerja Excel"
+  },
+  {
+    "key": "doc_9a5acfed92",
+    "zh": "Excel 工作表範圍過大",
+    "en": "Excel worksheet range is too large",
+    "id": "Rentang lembar kerja Excel terlalu besar"
+  },
+  {
+    "key": "doc_ae932b50dd",
+    "zh": "Excel 沒有工作表",
+    "en": "Excel has no worksheets",
+    "id": "Excel tidak memiliki lembar kerja"
+  },
+  {
+    "key": "doc_402f9d82b9",
+    "zh": "Excel 缺少 sheetData",
+    "en": "Excel is missing sheetData",
+    "id": "Excel tidak memiliki sheetData"
+  },
+  {
+    "key": "doc_743493671d",
+    "zh": "Google Sheets 已被修改，請重新預覽，未覆寫",
+    "en": "Google Sheets changed. Preview again; nothing overwritten",
+    "id": "Google Sheets berubah. Pratinjau lagi; tidak ditimpa"
+  },
+  {
+    "key": "doc_aefc65375b",
+    "zh": "不允許外部 XML 實體",
+    "en": "External XML entities are not allowed",
+    "id": "Entitas XML eksternal tidak diizinkan"
+  },
+  {
+    "key": "doc_57c33e6922",
+    "zh": "先建立 CSV 或選擇 .xlsx／UTF-8 CSV，再預覽初始化。檔案由你選擇儲存位置，不需 Google 授權。",
+    "en": "Create a CSV or select an .xlsx / UTF-8 CSV, then preview initialization. You choose where the file is stored; no Google authorization is required.",
+    "id": "Buat CSV atau pilih .xlsx / CSV UTF-8, lalu pratinjau inisialisasi. Anda memilih lokasi file; tidak memerlukan otorisasi Google."
+  },
+  {
+    "key": "doc_bcc7463d90",
+    "zh": "初始化並連接",
+    "en": "Initialize and connect",
+    "id": "Inisialisasi dan hubungkan"
+  },
+  {
+    "key": "doc_83cc6e7356",
+    "zh": "初始化後雲端內容已改變，請重新預覽",
+    "en": "Cloud contents changed after initialization. Preview again",
+    "id": "Konten cloud berubah setelah inisialisasi. Pratinjau lagi"
+  },
+  {
+    "key": "doc_3bd94710ec",
+    "zh": "另存 App 教材為 CSV",
+    "en": "Save App lessons as CSV",
+    "id": "Simpan materi App sebagai CSV"
+  },
+  {
+    "key": "doc_352193eee0",
+    "zh": "另存同步前的復原副本",
+    "en": "Save the recovery copy from before synchronization",
+    "id": "Simpan salinan pemulihan sebelum sinkronisasi"
+  },
+  {
+    "key": "doc_58997e1cbc",
+    "zh": "同一教材在兩邊都有不同修改，未覆寫；請先將內容調整一致再同步",
+    "en": "The same lesson has different edits on both sides. Nothing overwritten; make the contents agree before syncing",
+    "id": "Materi yang sama memiliki perubahan berbeda di kedua sisi. Tidak ditimpa; samakan isinya sebelum sinkronisasi"
+  },
+  {
+    "key": "doc_ebecab7134",
+    "zh": "同步 App 與本機檔案",
+    "en": "Sync App and local file",
+    "id": "Sinkronkan App dan file lokal"
+  },
+  {
+    "key": "doc_0f71c33bc9",
+    "zh": "同步不依缺少的列自動刪除教材；停用請設定 enabled=false。兩邊同時修改同一 ID 時會停止，不直接覆蓋。",
+    "en": "Missing rows do not delete lessons during sync. Disable lessons with enabled=false. Conflicting edits to the same ID stop synchronization without overwriting.",
+    "id": "Baris yang hilang tidak menghapus materi saat sinkronisasi. Nonaktifkan dengan enabled=false. Perubahan berbeda pada ID yang sama menghentikan sinkronisasi tanpa menimpa."
+  },
+  {
+    "key": "doc_771a4169b6",
+    "zh": "同步前的檔案副本已另存",
+    "en": "Recovery copy saved separately",
+    "id": "Salinan pemulihan disimpan terpisah"
+  },
+  {
+    "key": "doc_eef95c5ef9",
+    "zh": "同步後的教材筆數：",
+    "en": "Lesson count after synchronization: ",
+    "id": "Jumlah materi setelah sinkronisasi: "
+  },
+  {
+    "key": "doc_b0147570b2",
+    "zh": "將補上的欄位：",
+    "en": "Columns to add: ",
+    "id": "Kolom yang akan ditambahkan: "
+  },
+  {
+    "key": "doc_ec27fbffbc",
+    "zh": "將補上穩定 ID 的筆數：",
+    "en": "Rows receiving stable IDs: ",
+    "id": "Baris yang akan diberi ID tetap: "
+  },
+  {
+    "key": "doc_6c6b23931e",
+    "zh": "尚未連接檔案；請選擇此來源後重新選檔",
+    "en": "No file connected. Select this source and choose the file again",
+    "id": "Belum ada file terhubung. Pilih sumber ini lalu pilih file lagi"
+  },
+  {
+    "key": "doc_34a1df9f30",
+    "zh": "尚無檔案復原副本",
+    "en": "No recovery copy is available yet",
+    "id": "Belum ada salinan pemulihan"
+  },
+  {
+    "key": "doc_a56d53be2f",
+    "zh": "已儲存審核教材到 App；檔案來源請再按同步本機檔案，或預覽與 Sheets 同步",
+    "en": "Reviewed lessons saved in App. For file sources, sync the local file or preview synchronization with Sheets",
+    "id": "Materi yang ditinjau disimpan di App. Untuk sumber file, sinkronkan file lokal atau pratinjau sinkronisasi dengan Sheets"
+  },
+  {
+    "key": "doc_416d39b3be",
+    "zh": "建立初始 CSV",
+    "en": "Create initial CSV",
+    "id": "Buat CSV awal"
+  },
+  {
+    "key": "doc_8cefd24206",
+    "zh": "建立新來源",
+    "en": "Create new source",
+    "id": "Buat sumber baru"
+  },
+  {
+    "key": "doc_70b19ec52a",
+    "zh": "接到既有來源（重新連接或共用 Sheets 進度）",
+    "en": "Attach to an existing source (reconnect or share Sheets progress)",
+    "id": "Hubungkan ke sumber yang ada (sambungkan ulang atau gunakan progres Sheets)"
+  },
+  {
+    "key": "doc_db48503b35",
+    "zh": "支援 .xlsx 與 UTF-8 CSV；.xls／巨集檔請先轉存。初始化只補教材欄位與缺少的 ID，保留其他欄位及工作表。",
+    "en": "Supports .xlsx and UTF-8 CSV. Convert .xls / macro files first. Initialization only adds lesson columns and missing IDs, preserving other columns and worksheets.",
+    "id": "Mendukung .xlsx dan CSV UTF-8. Konversi file .xls / makro terlebih dahulu. Inisialisasi hanya menambah kolom materi dan ID yang belum ada, sambil mempertahankan kolom dan lembar lain."
+  },
+  {
+    "key": "doc_393ac2b8f9",
+    "zh": "教材 ID 與本機內容衝突，請重新審核",
+    "en": "Lesson ID conflicts with local contents. Review again",
+    "id": "ID materi bertentangan dengan konten lokal. Tinjau lagi"
+  },
+  {
+    "key": "doc_1942a7b1d8",
+    "zh": "教材 ID 重複，未同步",
+    "en": "Duplicate lesson IDs; not synchronized",
+    "id": "ID materi duplikat; tidak disinkronkan"
+  },
+  {
+    "key": "doc_6b291a80d5",
+    "zh": "教材工作表最多支援 100 欄",
+    "en": "Lesson worksheets support up to 100 columns",
+    "id": "Lembar materi mendukung hingga 100 kolom"
+  },
+  {
+    "key": "doc_47ffc1bcca",
+    "zh": "教材欄位含 Excel 公式，請另存純值檔案後再同步",
+    "en": "Lesson cells contain Excel formulas. Save a values-only copy before syncing",
+    "id": "Sel materi berisi rumus Excel. Simpan salinan berisi nilai saja sebelum sinkronisasi"
+  },
+  {
+    "key": "doc_f4965d18aa",
+    "zh": "新增此來源教材",
+    "en": "Add lesson to this source",
+    "id": "Tambah materi ke sumber ini"
+  },
+  {
+    "key": "doc_be6fdc44e1",
+    "zh": "本機 Excel／CSV：離線開始",
+    "en": "Local Excel / CSV: start offline",
+    "id": "Excel / CSV lokal: mulai secara offline"
+  },
+  {
+    "key": "doc_fddb4c4be3",
+    "zh": "本機檔案、App 與 Google Sheets 已同步",
+    "en": "Local file, App and Google Sheets synchronized",
+    "id": "File lokal, App, dan Google Sheets disinkronkan"
+  },
+  {
+    "key": "doc_03bac2eeca",
+    "zh": "本機檔案已連接，可新增教材與離線播放",
+    "en": "Local file connected. Add lessons and play offline",
+    "id": "File lokal terhubung. Tambah materi dan putar secara offline"
+  },
+  {
+    "key": "doc_d84703c759",
+    "zh": "檔案不是教材格式，請建立新的 CSV，避免覆寫原檔",
+    "en": "This is not a lesson file. Create a new CSV to avoid overwriting it",
+    "id": "Ini bukan file materi. Buat CSV baru agar file asli tidak ditimpa"
+  },
+  {
+    "key": "doc_c537e36a86",
+    "zh": "檔案含重複教材 ID，請先修正再同步",
+    "en": "Duplicate lesson IDs in the file. Correct them before syncing",
+    "id": "ID materi dalam file duplikat. Perbaiki sebelum sinkronisasi"
+  },
+  {
+    "key": "doc_76567040c2",
+    "zh": "檔案寫入未確認，本機教材與復原副本保留；請另存 CSV 後重新連接",
+    "en": "File write could not be verified. App lessons and recovery copy are preserved; save a new CSV and reconnect",
+    "id": "Penulisan file belum terverifikasi. Materi App dan salinan pemulihan tersimpan; simpan CSV baru dan hubungkan ulang"
+  },
+  {
+    "key": "doc_8cd00fd839",
+    "zh": "檔案已改變，請重新預覽",
+    "en": "File changed. Preview again",
+    "id": "File berubah. Pratinjau lagi"
+  },
+  {
+    "key": "doc_497c599216",
+    "zh": "檔案已被其他程式修改，請重新預覽，未覆寫",
+    "en": "Another app changed the file. Preview again; nothing overwritten",
+    "id": "Aplikasi lain mengubah file. Pratinjau lagi; tidak ditimpa"
+  },
+  {
+    "key": "doc_da1ba2e882",
+    "zh": "檔案操作失敗，App 教材保留",
+    "en": "File operation failed; App lessons are preserved",
+    "id": "Operasi file gagal; materi App tetap tersimpan"
+  },
+  {
+    "key": "doc_759476a787",
+    "zh": "檔案欄位或 ID 已改變，請重新連接並初始化",
+    "en": "File columns or IDs changed. Reconnect and initialize again",
+    "id": "Kolom atau ID file berubah. Hubungkan dan inisialisasi ulang"
+  },
+  {
+    "key": "doc_783fc6e677",
+    "zh": "檔案欄名不可空白、重複或超過 100 欄",
+    "en": "File headers must be nonempty, unique and at most 100 columns",
+    "id": "Judul kolom file harus terisi, unik, dan maksimal 100 kolom"
+  },
+  {
+    "key": "doc_d7edd978a6",
+    "zh": "檔案權限保存在此裝置；換機後須重新選檔",
+    "en": "File permissions stay on this device. Choose the file again on a new device",
+    "id": "Izin file tersimpan di perangkat ini. Pilih file lagi di perangkat baru"
+  },
+  {
+    "key": "doc_7a190eb2cf",
+    "zh": "檔案無法寫入，請改選可寫入位置",
+    "en": "Cannot write this file. Choose a writable location",
+    "id": "File ini tidak dapat ditulis. Pilih lokasi yang dapat ditulis"
+  },
+  {
+    "key": "doc_fa1bc5a8e3",
+    "zh": "檔案資料欄位超出標題，未寫入",
+    "en": "File rows extend beyond the headers; nothing written",
+    "id": "Baris file melebihi judul kolom; tidak ditulis"
+  },
+  {
+    "key": "doc_a5500fcab7",
+    "zh": "檔案超過 32 MiB 安全上限",
+    "en": "File exceeds the 32 MiB safety limit",
+    "id": "File melebihi batas aman 32 MiB"
+  },
+  {
+    "key": "doc_610537ec93",
+    "zh": "此 Sheets 已連接其他來源，請先選擇該既有來源再連接本機檔案",
+    "en": "This Sheets document belongs to another source. Select that existing source before connecting the local file",
+    "id": "Dokumen Sheets ini sudah terhubung ke sumber lain. Pilih sumber yang ada sebelum menghubungkan file lokal"
+  },
+  {
+    "key": "doc_59507b11f1",
+    "zh": "無法讀取檔案，請重新選擇",
+    "en": "Cannot read the file. Choose it again",
+    "id": "File tidak dapat dibaca. Pilih lagi"
+  },
+  {
+    "key": "doc_75361b53cf",
+    "zh": "確認同步",
+    "en": "Confirm synchronization",
+    "id": "Konfirmasi sinkronisasi"
+  },
+  {
+    "key": "doc_fd29686afb",
+    "zh": "確認同步本機與 Google Sheets",
+    "en": "Confirm local file and Google Sheets synchronization",
+    "id": "Konfirmasi sinkronisasi file lokal dan Google Sheets"
+  },
+  {
+    "key": "doc_ab316e401a",
+    "zh": "確認後依穩定 ID 合併並寫回 App、本機檔案與 Google Sheets。雲端需 Google 授權及網路；離線仍可使用本機教材。",
+    "en": "Confirm to merge by stable IDs and write to App, local file and Google Sheets. Cloud sync requires Google authorization and network; local lessons remain available offline.",
+    "id": "Konfirmasikan untuk menggabungkan berdasarkan ID tetap dan menulis ke App, file lokal, dan Google Sheets. Sinkronisasi cloud memerlukan otorisasi Google dan jaringan; materi lokal tetap tersedia offline."
+  },
+  {
+    "key": "doc_0ffdce6d4c",
+    "zh": "確認後會把必要欄位、ID 與合併教材寫回選取的檔案。原有學習進度保留。",
+    "en": "Confirmation writes required columns, IDs and merged lessons to the selected file. Learning progress is preserved.",
+    "id": "Konfirmasi akan menulis kolom wajib, ID, dan materi gabungan ke file yang dipilih. Progres belajar tetap tersimpan."
+  },
+  {
+    "key": "doc_aece2de68b",
+    "zh": "確認檔案初始化與連接",
+    "en": "Confirm file initialization and connection",
+    "id": "Konfirmasi inisialisasi dan koneksi file"
+  },
+  {
+    "key": "doc_d3a703a6d1",
+    "zh": "第一列空白但下方有資料，未初始化",
+    "en": "First row is empty but data exists below; not initialized",
+    "id": "Baris pertama kosong tetapi ada data di bawahnya; tidak diinisialisasi"
+  },
+  {
+    "key": "doc_206772af2b",
+    "zh": "舊版 .xls／巨集檔請先轉存 .xlsx 或 UTF-8 CSV",
+    "en": "Convert legacy .xls / macro files to .xlsx or UTF-8 CSV first",
+    "id": "Konversi file .xls lama / makro ke .xlsx atau CSV UTF-8 terlebih dahulu"
+  },
+  {
+    "key": "doc_e4a1fd3f15",
+    "zh": "請使用不含巨集與外部連結的 .xlsx",
+    "en": "Use an .xlsx without macros or external links",
+    "id": "Gunakan .xlsx tanpa makro atau tautan eksternal"
+  },
+  {
+    "key": "doc_1f6d467f65",
+    "zh": "請先重新選擇本機檔案；備份不移轉檔案存取權限",
+    "en": "Choose the local file again. Backups do not transfer file access permissions",
+    "id": "Pilih file lokal lagi. Cadangan tidak memindahkan izin akses file"
+  },
+  {
+    "key": "doc_522140bf90",
+    "zh": "請輸入要同步的 Google Sheets 網址",
+    "en": "Enter the Google Sheets URL to synchronize",
+    "id": "Masukkan URL Google Sheets untuk sinkronisasi"
+  },
+  {
+    "key": "doc_bb958995ed",
+    "zh": "請選擇 UTF-8 CSV 或 .xlsx，舊版 .xls 請先轉存",
+    "en": "Select UTF-8 CSV or .xlsx. Convert legacy .xls first",
+    "id": "Pilih CSV UTF-8 atau .xlsx. Konversi .xls lama terlebih dahulu"
+  },
+  {
+    "key": "doc_84912329c2",
+    "zh": "請選擇本機檔案來源重新連接",
+    "en": "Select a local-file source to reconnect",
+    "id": "Pilih sumber file lokal untuk dihubungkan ulang"
+  },
+  {
+    "key": "doc_486103a0cd",
+    "zh": "這個工作表已連接另一個來源",
+    "en": "This worksheet is already connected to another source",
+    "id": "Lembar kerja ini sudah terhubung ke sumber lain"
+  },
+  {
+    "key": "doc_2c5e17ecab",
+    "zh": "這是空白工作表，確認後會先初始化教材欄位。",
+    "en": "This worksheet is empty. Confirmation will initialize lesson columns first.",
+    "id": "Lembar kerja ini kosong. Konfirmasi akan menginisialisasi kolom materi terlebih dahulu."
+  },
+  {
+    "key": "doc_f770baf5ca",
+    "zh": "連接後的教材筆數：",
+    "en": "Lesson count after connection: ",
+    "id": "Jumlah materi setelah terhubung: "
+  },
+  {
+    "key": "doc_01ee8e77d6",
+    "zh": "選取的位置已有資料，請使用選擇檔案而非建立新檔",
+    "en": "The selected location already has data. Choose the file instead of creating a new one",
+    "id": "Lokasi yang dipilih sudah berisi data. Pilih file yang ada alih-alih membuat yang baru"
+  },
+  {
+    "key": "doc_95e828e784",
+    "zh": "選擇 Excel／CSV",
+    "en": "Choose Excel / CSV",
+    "id": "Pilih Excel / CSV"
+  },
+  {
+    "key": "doc_93036b5dd3",
+    "zh": "選用：原本的 Google Sheets 網址",
+    "en": "Optional: original Google Sheets URL",
+    "id": "Opsional: URL Google Sheets asli"
+  },
+  {
+    "key": "doc_a2b1103d29",
+    "zh": "雲端含重複教材 ID，未同步",
+    "en": "Duplicate lesson IDs in the cloud; not synchronized",
+    "id": "ID materi di cloud duplikat; tidak disinkronkan"
+  },
+  {
+    "key": "doc_b89ccd1cad",
+    "zh": "雲端寫入結果未確認，請保留本機教材並重新同步",
+    "en": "Cloud write could not be verified. Keep App lessons and synchronize again",
+    "id": "Penulisan cloud belum terverifikasi. Pertahankan materi App dan sinkronkan lagi"
+  },
+  {
+    "key": "doc_f4d19cb0ce",
+    "zh": "雲端既有教材缺少欄位，請先使用 Google 初始化再同步",
+    "en": "Existing cloud lessons have missing columns. Initialize with Google first",
+    "id": "Materi cloud yang ada kekurangan kolom. Inisialisasi dengan Google terlebih dahulu"
+  },
+  {
+    "key": "doc_88ed53912f",
+    "zh": "預覽本機與 Google Sheets 同步",
+    "en": "Preview local file and Google Sheets synchronization",
+    "id": "Pratinjau sinkronisasi file lokal dan Google Sheets"
+  },
+  {
+    "key": "doc_81fbd41009",
+    "zh": "本機 Excel／CSV 來源；請使用上方檔案同步功能",
+    "en": "Local Excel / CSV source; use the file synchronization controls above",
+    "id": "Sumber Excel / CSV lokal; gunakan kontrol sinkronisasi file di atas"
+  },
+  {
+    "key": "doc_0b338e74d5",
+    "zh": "儲存審核教材到 App",
+    "en": "Save reviewed lessons in App",
+    "id": "Simpan materi yang ditinjau di App"
+  },
+  {
+    "key": "doc_b529d81231",
+    "zh": "確認儲存選取的教材到 App；檔案與 Sheets 請使用檔案同步按鈕寫回。",
+    "en": "Save selected lessons in App. Use the file synchronization buttons to write to the file and Sheets.",
+    "id": "Simpan materi terpilih di App. Gunakan tombol sinkronisasi file untuk menulis ke file dan Sheets."
+  },
+  {
+    "key": "doc_830457579b",
+    "zh": "已儲存到 App 的教材筆數：",
+    "en": "Lessons saved in App: ",
+    "id": "Materi disimpan di App: "
+  },
+  {
+    "key": "doc_17e375e23c",
+    "zh": "確認初始化雲端缺少欄位",
+    "en": "Confirm initialization of missing cloud columns",
+    "id": "Konfirmasi inisialisasi kolom cloud yang belum ada"
+  },
+  {
+    "key": "doc_a53eb1810f",
+    "zh": "只補缺少欄位，不新增重複來源；完成後重新預覽同步。",
+    "en": "Only missing columns are added, without creating a duplicate source. Preview synchronization again when complete.",
+    "id": "Hanya kolom yang belum ada ditambahkan, tanpa membuat sumber duplikat. Pratinjau sinkronisasi lagi setelah selesai."
+  },
+  {
+    "key": "doc_a1a806f0d1",
+    "zh": "初始化雲端欄位",
+    "en": "Initialize cloud columns",
+    "id": "Inisialisasi kolom cloud"
   }
 ]

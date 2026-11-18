@@ -26,7 +26,7 @@ class SyncWorker(context: Context, parameters: WorkerParameters) : CoroutineWork
         if(!networkAllowed()) return@withContext Result.retry()
         val client=OkHttpClient.Builder().connectTimeout(20,TimeUnit.SECONDS).readTimeout(60,TimeUnit.SECONDS).callTimeout(5,TimeUnit.MINUTES).build()
         var failed=false
-        for(source in repo.dao.sources().filter { it.url.isNotEmpty() }) {
+        for(source in repo.dao.sources().filter { it.url.isNotEmpty() && it.access!="file" }) {
             val epoch=repo.syncEpoch.get()
             val temporary=File.createTempFile("sheet", ".csv",applicationContext.cacheDir)
             try {

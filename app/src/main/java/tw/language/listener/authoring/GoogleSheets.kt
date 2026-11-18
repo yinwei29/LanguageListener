@@ -36,6 +36,8 @@ data class SheetPlan(val spreadsheetId: String, val sheetId: Int, val title: Str
 }
 data class AppendResult(val written: Int, val skipped: Int)
 
+data class CloudSnapshot(val plan: SheetPlan,val rows: Map<Int,List<String>>,val items: List<Item>,val hash: String)
+
 class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: HttpUrl="https://sheets.googleapis.com/v4/spreadsheets/".toHttpUrl()) {
     private fun endpoint(id: String, suffix: String=""): HttpUrl {
         val builder=base.newBuilder().addPathSegment(if(suffix.startsWith(":")) id+suffix else id)
@@ -163,6 +165,69 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
         check(result["updates"]?.jsonObject?.get("updatedRows")?.jsonPrimitive?.int==pending.size) { "寫入結果未確認，請保留草稿重試；系統會以穩定 ID 避免重複寫入" }
         return AppendResult(pending.size,items.size-pending.size)
     }
+    suspend fun snapshot(source: Source,token: String): CloudSnapshot {
+        val plan=inspect(source.name,source.url,token)
+        val columns=SheetColumns(plan.headers)
+        val rows=sortedMapOf<Int,List<String>>()
+        var start=2
+        while(start<=plan.rows) {
+            currentCoroutineContext().ensureActive()
+            val ranges=mutableListOf<Pair<Int,String>>()
+            repeat(5) { if(start<=plan.rows) {
+                val end=minOf(start+249,plan.rows)
+                ranges+=start to "${plan.rangeTitle}!A$start:${columnName(plan.headers.size)}$end";start=end+1
+            } }
+            val result=get(endpoint(plan.spreadsheetId,"values:batchGet").newBuilder().addQueryParameter("valueRenderOption","FORMATTED_VALUE").apply { ranges.forEach { addQueryParameter("ranges",it.second) } }.build(),token)["valueRanges"]?.jsonArray
+            check(result!=null && result.size==ranges.size) { "Google Sheets 未回傳完整範圍，保留原有離線教材" }
+            result.forEachIndexed { index,range ->
+                range.jsonObject["values"]?.jsonArray.orEmpty().forEachIndexed { offset,row ->
+                    val cells=row.jsonArray.map { it.jsonPrimitive.content }
+                    require(cells.size<=plan.headers.size)
+                    if(cells.any(String::isNotBlank)) rows[ranges[index].first+offset-1]=cells+List(plan.headers.size-cells.size) { "" }
+                }
+            }
+        }
+        val items=rows.values.map { columns.item(source.sourceId,it) }
+        require(items.map { it.itemId }.distinct().size==items.size) { "雲端含重複教材 ID，未同步" }
+        val hash=tw.language.listener.documents.DocumentCodec.hash(buildJsonObject { put("headers",JsonArray(plan.headers.map(::JsonPrimitive)));putJsonObject("rows") { rows.forEach { (index,values) -> put(index.toString(),JsonArray(values.map(::JsonPrimitive))) } } }.toString().toByteArray())
+        return CloudSnapshot(plan,rows,items,hash)
+    }
+    suspend fun writeMerged(source: Source,expected: CloudSnapshot,items: List<Item>,token: String) {
+        require(items.all { it.sourceId==source.sourceId } && items.map { it.itemId }.distinct().size==items.size)
+        val fresh=snapshot(source,token)
+        check(fresh.hash==expected.hash) { "Google Sheets 已被修改，請重新預覽，未覆寫" }
+        val plan=fresh.plan;val idColumn=plan.headers.indexOfFirst { it.equals("ID",true) }
+        val indices=fresh.rows.entries.filter { it.value[idColumn].isNotBlank() }.associate { it.value[idColumn] to it.key }
+        val old=fresh.items.associateBy { it.itemId };var appendAt=(fresh.rows.keys.maxOrNull() ?: 0)+1
+        val updates=mutableListOf<JsonObject>();var allocatedRows=plan.rows;var bytes=0
+        suspend fun flush() {
+            if(updates.isNotEmpty()) {
+                post(endpoint(plan.spreadsheetId,":batchUpdate"),token,buildJsonObject { put("requests",JsonArray(updates.toList())) })
+                updates.clear();bytes=0
+            }
+        }
+        for(item in items) {
+            if(old[item.itemId]==item) continue
+            val row=indices[item.itemId] ?: appendAt++
+            if(row+1>allocatedRows) {
+                updates+=buildJsonObject { putJsonObject("appendDimension") { put("sheetId",plan.sheetId);put("dimension","ROWS");put("length",row+1-allocatedRows) } }
+                allocatedRows=row+1
+            }
+            plan.headers.forEachIndexed { col,header -> if(HEADERS.any { it.equals(header,true) }) {
+                val request=buildJsonObject { putJsonObject("updateCells") {
+                    putJsonObject("range") { put("sheetId",plan.sheetId);put("startRowIndex",row);put("endRowIndex",row+1);put("startColumnIndex",col);put("endColumnIndex",col+1) }
+                    putJsonArray("rows") { add(buildJsonObject { putJsonArray("values") { add(buildJsonObject { putJsonObject("userEnteredValue") { put("stringValue",cell(item,header)) } }) } }) }
+                    put("fields","userEnteredValue")
+                } }
+                val size=request.toString().toByteArray().size
+                if(updates.size>=100 || bytes+size>1024*1024) flush()
+                updates+=request;bytes+=size
+            } }
+        }
+        flush()
+        val verified=snapshot(source,token).items.associateBy { it.itemId }
+        check(items.all { verified[it.itemId]==it }) { "雲端寫入結果未確認，請保留本機教材並重新同步" }
+    }
     companion object {
         val HEADERS=listOf("ID","Category","Type","zh-TW","en-US","id-ID","level","tags","enabled","updated_at","status","source_url","pronunciation_note")
         fun columnName(number: Int): String {
@@ -172,7 +237,7 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
             return result
         }
         fun csv(values: List<String>)=values.joinToString(",") { "\"${it.replace("\"","\"\"")}\"" }
-        private fun cell(item: Item, header: String)=when(header.lowercase(java.util.Locale.ROOT)) {
+        fun cell(item: Item, header: String)=when(header.lowercase(java.util.Locale.ROOT)) {
             "id"->item.itemId; "category"->item.category; "type"->item.type; "zh-tw"->item.zh; "en-us"->item.en; "id-id"->item.id
             "level"->item.level; "tags"->item.tags; "enabled"->item.enabled.toString(); "updated_at"->item.updatedAt; "status"->item.status
             "source_url"->item.sourceUrl; "pronunciation_note"->item.pronunciationNote; else->""
