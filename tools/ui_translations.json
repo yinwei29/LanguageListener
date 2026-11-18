@@ -2620,5 +2620,239 @@
     "zh": "初始化雲端欄位",
     "en": "Initialize cloud columns",
     "id": "Inisialisasi kolom cloud"
+  },
+  {
+    "key": "ai_24dde3f657",
+    "zh": "AI 回應因長度限制中止；已完成的批次保留，可改用其他模型後重新產生",
+    "en": "AI output hit the length limit. Completed batches are saved; choose another model to generate again",
+    "id": "Keluaran AI mencapai batas panjang. Batch selesai tersimpan; pilih model lain untuk membuat ulang"
+  },
+  {
+    "key": "ai_b10dbbcefd",
+    "zh": "AI 服務拒絕請求；請確認供應商、模型及 API／輸出格式，也可先以 10 筆測試",
+    "en": "The AI service rejected the request. Check provider, model and API/output formats, or test with 10 entries first",
+    "id": "Layanan AI menolak permintaan. Periksa penyedia, model, dan format API/keluaran, atau uji 10 entri dahulu"
+  },
+  {
+    "key": "ai_1f14dc0a19",
+    "zh": "AI 服務暫時無法完成請求；已完成的草稿保留，請稍後手動繼續",
+    "en": "The AI service cannot complete this request now. Saved drafts remain; continue manually later",
+    "id": "Layanan AI belum dapat menyelesaikan permintaan. Draf tersimpan tetap ada; lanjutkan manual nanti"
+  },
+  {
+    "key": "ai_d6103e011c",
+    "zh": "AI 模型清單",
+    "en": "AI model list",
+    "id": "Daftar model AI"
+  },
+  {
+    "key": "ai_ebd7d45828",
+    "zh": "AI 產生失敗，已完成的草稿保留",
+    "en": "AI generation failed; completed drafts are saved",
+    "id": "Pembuatan AI gagal; draf selesai tetap tersimpan"
+  },
+  {
+    "key": "ai_d321b31b96",
+    "zh": "API 格式",
+    "en": "API format",
+    "id": "Format API"
+  },
+  {
+    "key": "ai_bb18a05c8d",
+    "zh": "API 權限不足；請確認金鑰限制、服務啟用狀態與模型權限",
+    "en": "Insufficient API permissions. Check key restrictions, enabled services and model access",
+    "id": "Izin API tidak cukup. Periksa pembatasan kunci, layanan aktif, dan akses model"
+  },
+  {
+    "key": "ai_1472b9059e",
+    "zh": "API 請求過於頻繁或額度已用完；請檢查用量，稍後再手動繼續",
+    "en": "API rate limit or quota reached. Check usage and continue manually later",
+    "id": "Batas frekuensi atau kuota API tercapai. Periksa penggunaan dan lanjutkan manual nanti"
+  },
+  {
+    "key": "ai_545bd5b2c7",
+    "zh": "API 金鑰無效或已失效；請確認金鑰屬於目前選取的供應商，再重新儲存",
+    "en": "The API key is invalid or expired. Check that it belongs to the selected provider, then save it again",
+    "id": "Kunci API tidak valid atau kedaluwarsa. Pastikan sesuai penyedia terpilih, lalu simpan ulang"
+  },
+  {
+    "key": "ai_a3a3ea0a04",
+    "zh": "API 額度不足或未啟用計費；請到供應商的 API 帳戶檢查用量與計費",
+    "en": "API quota is exhausted or billing is not enabled. Check usage and billing in the provider API account",
+    "id": "Kuota API habis atau penagihan belum aktif. Periksa penggunaan dan penagihan akun API penyedia"
+  },
+  {
+    "key": "ai_44aa023eab",
+    "zh": "不支援的 AI API 或輸出格式",
+    "en": "Unsupported AI API or output format",
+    "id": "Format API AI atau keluaran tidak didukung"
+  },
+  {
+    "key": "ai_8993b156dc",
+    "zh": "停止產生並保留草稿",
+    "en": "Stop generation and keep drafts",
+    "id": "Hentikan pembuatan dan simpan draf"
+  },
+  {
+    "key": "ai_3df61c8450",
+    "zh": "僅提示詞 JSON（模型不支援格式參數時使用）",
+    "en": "Prompt-only JSON (for models without format parameters)",
+    "id": "JSON melalui prompt saja (untuk model tanpa parameter format)"
+  },
+  {
+    "key": "ai_eadf5f0cd3",
+    "zh": "分批產生完成；請審核實際新增筆數，尚未寫入檔案或雲端",
+    "en": "Batch generation finished. Review the actual new entry count; nothing written to files or cloud yet",
+    "id": "Pembuatan batch selesai. Tinjau jumlah entri baru sebenarnya; belum ditulis ke file atau cloud"
+  },
+  {
+    "key": "ai_9445811dca",
+    "zh": "分批產生尚未完成；已保存內容可先審核，或繼續剩餘批次。",
+    "en": "Batch generation is incomplete. Review saved entries now or continue the remaining batches.",
+    "id": "Pembuatan batch belum selesai. Tinjau entri tersimpan sekarang atau lanjutkan batch tersisa."
+  },
+  {
+    "key": "ai_f7fe8d32ec",
+    "zh": "已停止產生；已完成批次的草稿保留，可繼續剩餘批次",
+    "en": "Generation stopped. Completed batches are saved; remaining batches can be resumed",
+    "id": "Pembuatan dihentikan. Batch selesai tersimpan; batch tersisa dapat dilanjutkan"
+  },
+  {
+    "key": "ai_8d0553805c",
+    "zh": "已完成的請求量：",
+    "en": "Completed request quantity: ",
+    "id": "Jumlah permintaan selesai: "
+  },
+  {
+    "key": "ai_a31931d38c",
+    "zh": "帳號未回傳適合的文字模型；可手動輸入模型 ID 並檢查權限",
+    "en": "No suitable text models returned for this account. Enter a model ID manually and check access",
+    "id": "Akun ini tidak mengembalikan model teks yang sesuai. Isi ID model manual dan periksa akses"
+  },
+  {
+    "key": "ai_9ce2697b4f",
+    "zh": "找不到模型或帳號無權使用；請重新載入模型清單並選擇可用模型",
+    "en": "Model not found or unavailable to this account. Reload the model list and choose an available model",
+    "id": "Model tidak ditemukan atau tidak tersedia untuk akun ini. Muat ulang daftar dan pilih model tersedia"
+  },
+  {
+    "key": "ai_2303584c12",
+    "zh": "模型不接受目前參數；請切換 API 格式或輸出格式後重試",
+    "en": "The model does not accept these parameters. Change API or output format and try again",
+    "id": "Model tidak menerima parameter ini. Ubah format API atau keluaran lalu coba lagi"
+  },
+  {
+    "key": "ai_731cb7957d",
+    "zh": "模型分頁回應異常；可手動輸入模型 ID",
+    "en": "Invalid model pagination response. Enter a model ID manually",
+    "id": "Respons halaman model tidak valid. Isi ID model manual"
+  },
+  {
+    "key": "ai_7b1993ba0b",
+    "zh": "模型拒絕產生此內容，請調整主題",
+    "en": "The model refused this content. Change the topic",
+    "id": "Model menolak konten ini. Ubah topik"
+  },
+  {
+    "key": "ai_413e555393",
+    "zh": "模型清單已載入，請選擇模型後儲存 AI 設定",
+    "en": "Model list loaded. Choose a model and save AI settings",
+    "id": "Daftar model dimuat. Pilih model dan simpan pengaturan AI"
+  },
+  {
+    "key": "ai_e4280034e0",
+    "zh": "模型清單格式不符；可手動輸入模型 ID",
+    "en": "Unexpected model list format. Enter a model ID manually",
+    "id": "Format daftar model tidak sesuai. Isi ID model manual"
+  },
+  {
+    "key": "ai_c5af0d0dff",
+    "zh": "模型選單",
+    "en": "Model selection",
+    "id": "Pilihan model"
+  },
+  {
+    "key": "ai_1fc317799d",
+    "zh": "此帳號或地區尚未啟用這項 API；請檢查供應商的使用資格與計費設定",
+    "en": "This account or region is not enabled for this API. Check provider eligibility and billing settings",
+    "id": "Akun atau wilayah ini belum diaktifkan untuk API ini. Periksa kelayakan dan penagihan penyedia"
+  },
+  {
+    "key": "ai_677d91d554",
+    "zh": "每次 API 請求最多 10 筆；100 筆會分批產生並逐批保存。失敗或取消後可繼續已保存草稿，API 可能按請求計費。",
+    "en": "Each API request generates at most 10 entries. A 100-entry task saves drafts batch by batch. Resume saved drafts after a failure or cancellation; API requests may incur charges.",
+    "id": "Setiap permintaan API membuat maksimal 10 entri. Tugas 100 entri menyimpan draf per batch. Lanjutkan draf tersimpan setelah kegagalan atau pembatalan; permintaan API dapat dikenai biaya."
+  },
+  {
+    "key": "ai_72d576cee4",
+    "zh": "沒有可繼續的草稿",
+    "en": "No draft is available to resume",
+    "id": "Tidak ada draf untuk dilanjutkan"
+  },
+  {
+    "key": "ai_d64e5f510e",
+    "zh": "清單由供應商依此金鑰回傳；列出模型不保證可用額度或支援所有輸出格式。",
+    "en": "The provider returned this list for the key. Listed models do not guarantee quota or support for every output format.",
+    "id": "Penyedia mengembalikan daftar ini untuk kunci tersebut. Model terdaftar tidak menjamin kuota atau dukungan semua format keluaran."
+  },
+  {
+    "key": "ai_44e0fd96ed",
+    "zh": "產生的教材皆與既有內容重複，請更換主題",
+    "en": "All generated lessons duplicate existing content. Change the topic",
+    "id": "Semua materi yang dibuat sama dengan konten yang ada. Ubah topik"
+  },
+  {
+    "key": "ai_f72dbd8080",
+    "zh": "目前沒有新的待審核教材；請繼續批次或更換主題。",
+    "en": "No new review entries yet. Continue batches or change the topic.",
+    "id": "Belum ada entri tinjauan baru. Lanjutkan batch atau ubah topik."
+  },
+  {
+    "key": "ai_408106f619",
+    "zh": "目前顯示模型範例，不代表帳號可用；請載入模型清單或輸入自己的模型 ID。",
+    "en": "These are example model IDs, not verified account access. Load the model list or enter your own model ID.",
+    "id": "Ini contoh ID model, bukan akses akun yang terverifikasi. Muat daftar model atau isi ID model sendiri."
+  },
+  {
+    "key": "ai_80e9ed7b66",
+    "zh": "繼續產生剩餘批次",
+    "en": "Continue remaining batches",
+    "id": "Lanjutkan batch tersisa"
+  },
+  {
+    "key": "ai_e19bccb80d",
+    "zh": "自動（OpenAI 使用 Responses；相容 API 使用 Chat）",
+    "en": "Automatic (Responses for OpenAI; Chat for compatible APIs)",
+    "id": "Otomatis (Responses untuk OpenAI; Chat untuk API kompatibel)"
+  },
+  {
+    "key": "ai_d9dc805c96",
+    "zh": "草稿或 AI 設定已改變，請切回原設定繼續，或重新產生",
+    "en": "The draft or AI settings changed. Restore the original settings to resume, or generate again",
+    "id": "Draf atau pengaturan AI berubah. Kembalikan pengaturan awal untuk melanjutkan, atau buat ulang"
+  },
+  {
+    "key": "ai_9dcf1a4336",
+    "zh": "請先建立本機教材或連接檔案／Google Sheets 來源",
+    "en": "Create local lessons or connect a file / Google Sheets source first",
+    "id": "Buat materi lokal atau hubungkan sumber file / Google Sheets dahulu"
+  },
+  {
+    "key": "ai_364b7666df",
+    "zh": "請先輸入或儲存此供應商的 API 金鑰",
+    "en": "Enter or save the API key for this provider first",
+    "id": "Isi atau simpan kunci API penyedia ini dahulu"
+  },
+  {
+    "key": "ai_e3e3211974",
+    "zh": "載入模型清單／檢查金鑰",
+    "en": "Load model list / check key",
+    "id": "Muat daftar model / periksa kunci"
+  },
+  {
+    "key": "ai_2c57406dc8",
+    "zh": "輸出格式",
+    "en": "Output format",
+    "id": "Format keluaran"
   }
 ]

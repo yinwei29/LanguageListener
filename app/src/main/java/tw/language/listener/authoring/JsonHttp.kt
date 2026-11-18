@@ -8,7 +8,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okio.BufferedSink
 import java.util.concurrent.TimeUnit
 
-class RemoteError(val status: Int, service: String) : IllegalStateException("$service：HTTP $status，請檢查授權、API 設定或配額")
+class RemoteError(val status: Int, val service: String,val failure: ApiFailure?=null) : IllegalStateException(
+    "$service：HTTP $status，請檢查授權、API 設定或配額"+(failure?.let { "\n"+it.hint+(it.parameter?.let { p -> "\nParameter: $p" } ?: "") } ?: ""))
 
 class JsonHttp(private val client: OkHttpClient=OkHttpClient.Builder().connectTimeout(20,TimeUnit.SECONDS)
     .readTimeout(90,TimeUnit.SECONDS).callTimeout(120,TimeUnit.SECONDS).build()) {
@@ -30,7 +31,10 @@ class JsonHttp(private val client: OkHttpClient=OkHttpClient.Builder().connectTi
             val cancellation=launch(start=CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { call.cancel() } }
             try {
                 call.execute().use { response ->
-                    if(!response.isSuccessful) throw RemoteError(response.code,service)
+                    if(!response.isSuccessful) {
+                        val failure=if(service in setOf("AI 產生教材","AI 模型清單")) ApiFailure.parse(response.code,runCatching { response.peekBody(64*1024).string() }.getOrDefault("")) else null
+                        throw RemoteError(response.code,service,failure)
+                    }
                     val data=checkNotNull(response.body).byteStream().use { input ->
                         val output=java.io.ByteArrayOutputStream(); val buffer=ByteArray(8192)
                         while(true) {

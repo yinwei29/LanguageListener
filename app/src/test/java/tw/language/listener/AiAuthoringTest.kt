@@ -73,7 +73,7 @@ class AiAuthoringTest {
         } } }) } }
         assertEquals(1,generator.decodeResponse(gemini,envelope,request).items.size)
         val openai=AiProfile("openai","https://api.openai.com/v1","gpt-4o-mini")
-        assertEquals("json_object",generator.body(openai,request)["response_format"]!!.jsonObject["type"]!!.jsonPrimitive.content)
+        assertEquals("json_object",generator.body(openai.copy(protocol="chat"),request)["response_format"]!!.jsonObject["type"]!!.jsonPrimitive.content)
         assertThrows(IllegalStateException::class.java) { generator.decodeResponse(gemini,JsonObject(emptyMap()),request) }
     }
     @Test fun redirectsDoNotForwardSecretsAndErrorsDoNotEchoServerBodies() = runBlocking {

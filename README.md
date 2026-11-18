@@ -13,6 +13,8 @@ Android 離線多語言聽力學習 APP（臺灣繁體中文優先）。
 
 Phase 2 同步可靠性與效能見 [進度紀錄](docs/PHASE2_PROGRESS.md)。最新 Google 授權與 AI 教材使用方式見 [Google／AI 設定](docs/GOOGLE_AI_SETUP.md)。三語介面與整批驗收方式見 [0.3.0 整合測試指南](docs/TESTING_0_3.md)。
 
+0.4.1 改善 AI HTTP 錯誤診斷，新增 ChatGPT／OpenAI Responses、帳號模型清單與逐批保存／繼續生成，見 [AI 與模型使用說明](docs/AI_MODELS.md)。
+
 ## 取得與建置 APK
 
 Android 8.0（API 26）以上，compile／target SDK 35，JDK 17。
@@ -57,4 +59,4 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 - [實機驗收表](docs/DEVICE_ACCEPTANCE.md)：斷網初次合成、鎖屏持續播放、耳機、來電中斷及換機 SAF 還原需實機確認，不能以 UI 原型或 JVM 測試代替。
 - 自動化涵蓋 CSV 引號／多行／BOM／格式錯誤、來源網址、同步去重與交易回復、穩定鍵進度、場次排除／去重／舊位置寫入、Room 重開、ZIP 來回／合併／輕量、惡意路徑／重複項目／校驗／版本／解壓超限，以及 PCM 音訊與靜音。
 
-未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3／4 與 1→2→3→4 migration 已納入版本控制；ZIP schema 4 保留來源模式、模型設定與介面語言，並可讀取舊版 schema 1／2／3。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。
+未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3／4 與 1→2→3→4 migration 已納入版本控制；ZIP schema 5 保留來源模式、模型及 API 格式設定與介面語言，並可讀取舊版 schema 1／2／3／4。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。
