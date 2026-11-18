@@ -16,6 +16,8 @@ if [[ -n "${LL_DEBUG_KEYSTORE_BASE64:-}" ]]; then
   unset LL_DEBUG_KEYSTORE_BASE64
 fi
 
+python3 tools/generate_localizations.py --check
+
 # Keep the 4 GiB medium Docker executor within its memory budget.
 # Run all checks once and preserve failed test/lint reports for CircleCI's upload steps.
 ./gradlew \

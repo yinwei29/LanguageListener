@@ -31,6 +31,7 @@ class Repository(val db: ListenerDatabase) {
     }
     suspend fun saveSettings(settings: Settings) = mutation.withLock {
         settings.playback.validate()
+        require(settings.uiLanguage in setOf("zh-TW","en","id")) { "不支援的介面語言" }
         dao.putSettings(settings.copy(modifiedAt=System.currentTimeMillis(),aiProfile=dao.settings()?.aiProfile ?: settings.aiProfile))
     }
     suspend fun createSession(options: PlaybackOptions): Int = mutation.withLock {

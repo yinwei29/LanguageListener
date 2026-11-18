@@ -11,7 +11,7 @@ Android 離線多語言聽力學習 APP（臺灣繁體中文優先）。
 
 **目前狀態：離線 MVP、Sheets 初始化與 AI 審核寫回流程已實作；Google／AI 真實帳號設定及硬體功能仍需實際驗收。**
 
-Phase 2 同步可靠性與效能見 [進度紀錄](docs/PHASE2_PROGRESS.md)。最新 Google 授權與 AI 教材使用方式見 [Google／AI 設定](docs/GOOGLE_AI_SETUP.md)；英文／印尼文介面仍待後續交付。
+Phase 2 同步可靠性與效能見 [進度紀錄](docs/PHASE2_PROGRESS.md)。最新 Google 授權與 AI 教材使用方式見 [Google／AI 設定](docs/GOOGLE_AI_SETUP.md)。三語介面與整批驗收方式見 [0.3.0 整合測試指南](docs/TESTING_0_3.md)。
 
 ## 取得與建置 APK
 
@@ -37,7 +37,7 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 
 ## 本次範圍
 
-- Kotlin、Jetpack Compose、Material 3 四頁，預設臺灣繁體中文，支援深色模式與可捲動版面。
+- Kotlin、Jetpack Compose、Material 3 四頁，預設臺灣繁體中文，可切換英文／印尼文介面，支援深色模式與可捲動版面。
 - Room 教材／來源／穩定鍵進度／持久佇列／設定／每日學習紀錄；DataStore 保存上次頁籤。
 - 離線 Android TTS voice 驗證、三語切換、方向／語速／重複／靜音間隔、循環。
 - Media3 ExoPlayer + MediaSessionService，音訊焦點、拔除耳機暫停、播放位置持久化；重啟不自動出聲。
@@ -45,7 +45,7 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 - 多來源公開 Sheets CSV、WorkManager 手動與啟動同步、Wi-Fi 政策、批次 upsert、去重／軟刪除與失敗回復。
 - SAF ZIP 完整／輕量備份、SHA-256／CRC／schema／資料校驗、Zip Slip／Zip Bomb 防護、交易式覆蓋與合併。
 
-私人 Sheets 使用 Google 原生授權，支援安全初始化與人工確認後附加 AI 教材。Gemini、OpenAI 與 OpenAI 相容 BYOK 金鑰只存裝置加密區，不納入備份；真實網路搜尋與英文／印尼文介面尚未實作。公開 CSV 每次下載完整來源；尚未提供遠端變更 token 的增量傳輸。備份解壓安全上限 128 MiB、單筆合成音訊上限 64 MiB；未對教材列數設人為上限，但超大型場次仍受手機資源限制。
+私人 Sheets 使用 Google 原生授權，支援安全初始化與人工確認後附加 AI 教材。Gemini、OpenAI 與 OpenAI 相容 BYOK 金鑰只存裝置加密區，不納入備份；真實網路搜尋尚未實作。公開 CSV 每次下載完整來源；尚未提供遠端變更 token 的增量傳輸。備份解壓安全上限 128 MiB、單筆合成音訊上限 64 MiB；未對教材列數設人為上限，但超大型場次仍受手機資源限制。
 
 ## 驗證與文件
 
@@ -53,4 +53,4 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 - [實機驗收表](docs/DEVICE_ACCEPTANCE.md)：斷網初次合成、鎖屏持續播放、耳機、來電中斷及換機 SAF 還原需實機確認，不能以 UI 原型或 JVM 測試代替。
 - 自動化涵蓋 CSV 引號／多行／BOM／格式錯誤、來源網址、同步去重與交易回復、穩定鍵進度、場次排除／去重／舊位置寫入、Room 重開、ZIP 來回／合併／輕量、惡意路徑／重複項目／校驗／版本／解壓超限，以及 PCM 音訊與靜音。
 
-未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2 與 1→2 migration 已納入版本控制；ZIP schema 2 保留來源模式並可讀取舊版 schema 1。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。
+未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3 與 1→2→3 migration 已納入版本控制；ZIP schema 3 保留來源模式、模型設定與介面語言，並可讀取舊版 schema 1／2。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。

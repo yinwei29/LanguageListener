@@ -1,0 +1,2036 @@
+[
+  {
+    "key": "ai_lessons_setup_and_generation_cdeefa",
+    "zh": "AI 教材：設定與產生",
+    "en": "AI lessons: setup and generation",
+    "id": "Materi AI: pengaturan dan pembuatan"
+  },
+  {
+    "key": "ai_generated_without_web_search_or_fact_checking_78767f",
+    "zh": "AI 生成，未經網路搜尋或查證。請確認翻譯與用法後再寫入。未選項目視為本批不採用。",
+    "en": "AI-generated, without web search or fact-checking. Review translations and usage before writing. Unselected entries will not be used.",
+    "id": "Dibuat AI, tanpa pencarian web atau pemeriksaan fakta. Periksa terjemahan dan penggunaannya sebelum menulis. Entri yang tidak dipilih tidak akan digunakan."
+  },
+  {
+    "key": "api_base_url_https_no_key_228df9",
+    "zh": "API base URL（HTTPS，不含金鑰）",
+    "en": "API base URL (HTTPS, no key)",
+    "id": "URL dasar API (HTTPS, tanpa kunci)"
+  },
+  {
+    "key": "api_key_leave_blank_to_reuse_the_saved_key_for_t_fab1c0",
+    "zh": "API 金鑰（留空沿用此供應商／網址的已存金鑰）",
+    "en": "API key (leave blank to reuse the saved key for this provider and URL)",
+    "id": "Kunci API (kosongkan untuk memakai kunci tersimpan bagi penyedia dan URL ini)"
+  },
+  {
+    "key": "original_google_sheets_url_gid_supported_8056ed",
+    "zh": "Google Sheets 原始網址（可含 gid）",
+    "en": "Original Google Sheets URL (gid supported)",
+    "id": "URL asli Google Sheets (mendukung gid)"
+  },
+  {
+    "key": "openai_compatible_api_fd90fc",
+    "zh": "OpenAI 相容 API",
+    "en": "OpenAI-compatible API",
+    "id": "API kompatibel OpenAI"
+  },
+  {
+    "key": "previous_page_d1bf40",
+    "zh": "上一頁",
+    "en": "Previous page",
+    "id": "Halaman sebelumnya"
+  },
+  {
+    "key": "next_page_d44baa",
+    "zh": "下一頁",
+    "en": "Next page",
+    "id": "Halaman berikutnya"
+  },
+  {
+    "key": "topic_e_g_hotel_check_in_vocabulary_586e44",
+    "zh": "主題，例如飯店入住常用詞彙",
+    "en": "Topic, e.g. hotel check-in vocabulary",
+    "id": "Topik, misalnya kosakata check-in hotel"
+  },
+  {
+    "key": "topic_source_this_batch_entries_duplicates_remov_e9c7b2",
+    "zh": "主題：%1$s\n來源：%2$s\n本批 %3$s 筆，產生階段略過重複 %4$s 筆",
+    "en": "Topic: %1$s\nSource: %2$s\nThis batch: %3$s entries; %4$s duplicates removed during generation",
+    "id": "Topik: %1$s\nSumber: %2$s\nBatch ini: %3$s entri; %4$s duplikat dihapus saat pembuatan"
+  },
+  {
+    "key": "review_not_yet_written_0c4c42",
+    "zh": "人工審核：尚未寫回",
+    "en": "Review: not yet written",
+    "id": "Tinjauan: belum ditulis"
+  },
+  {
+    "key": "use_your_own_api_key_your_provider_charges_for_u_2160a9",
+    "zh": "使用你自己的 API 金鑰，費用依供應商計算。Gemini／ChatGPT 訂閱不代表 API 額度。生成內容尚未查證，本功能沒有網路搜尋，也不會自動寫回。",
+    "en": "Use your own API key; your provider charges for usage. Gemini/ChatGPT subscriptions do not include API credit. Generated content is unverified. This feature does not search the web or write automatically.",
+    "id": "Gunakan kunci API sendiri; biaya mengikuti penyedia. Langganan Gemini/ChatGPT tidak mencakup kredit API. Konten belum diverifikasi. Fitur ini tidak mencari di web atau menulis otomatis."
+  },
+  {
+    "key": "source_removed_or_not_reconnected_880136",
+    "zh": "來源已移除或尚未重新連接",
+    "en": "Source removed or not reconnected",
+    "id": "Sumber dihapus atau belum dihubungkan kembali"
+  },
+  {
+    "key": "provider_46ea7f",
+    "zh": "供應商",
+    "en": "Provider",
+    "id": "Penyedia"
+  },
+  {
+    "key": "save_ai_settings_70dc45",
+    "zh": "儲存 AI 設定",
+    "en": "Save AI settings",
+    "id": "Simpan pengaturan AI"
+  },
+  {
+    "key": "category_7c6fd7",
+    "zh": "分類",
+    "en": "Category",
+    "id": "Kategori"
+  },
+  {
+    "key": "initialize_and_save_97d8ee",
+    "zh": "初始化並儲存",
+    "en": "Initialize and save",
+    "id": "Inisialisasi dan simpan"
+  },
+  {
+    "key": "existing_lessons_will_not_be_deleted_or_overwrit_c49191",
+    "zh": "原有教材不會被刪除或覆寫。若已有教材列，每列仍需填寫穩定且唯一的 ID，否則同步會保留舊快取並報錯。",
+    "en": "Existing lessons will not be deleted or overwritten. Every existing row still needs a stable, unique ID. Invalid data causes sync to report an error and retain the previous cache.",
+    "id": "Materi yang ada tidak akan dihapus atau ditimpa. Setiap baris tetap memerlukan ID unik dan tetap. Data tidak valid menyebabkan galat sinkronisasi dan cache lama dipertahankan."
+  },
+  {
+    "key": "replace_the_unwritten_draft_e61ef4",
+    "zh": "取代尚未寫入的草稿？",
+    "en": "Replace the unwritten draft?",
+    "id": "Ganti draf yang belum ditulis?"
+  },
+  {
+    "key": "cancel_4d0b46",
+    "zh": "取消",
+    "en": "Cancel",
+    "id": "Batal"
+  },
+  {
+    "key": "deselect_all_63dd30",
+    "zh": "取消所有選取",
+    "en": "Deselect all",
+    "id": "Batalkan semua pilihan"
+  },
+  {
+    "key": "cancel_current_operation_bb77ad",
+    "zh": "取消目前操作",
+    "en": "Cancel current operation",
+    "id": "Batalkan operasi saat ini"
+  },
+  {
+    "key": "sentences_8cfcfc",
+    "zh": "句子",
+    "en": "Sentences",
+    "id": "Kalimat"
+  },
+  {
+    "key": "only_these_missing_columns_will_be_added_b39fb4",
+    "zh": "只會補上以下缺少的欄位：\n%1$s",
+    "en": "Only these missing columns will be added:\n%1$s",
+    "id": "Hanya kolom yang belum ada ini yang akan ditambahkan:\n%1$s"
+  },
+  {
+    "key": "read_only_connection_requires_complete_lesson_co_de5e25",
+    "zh": "唯讀加入要求現有教材欄位完整，不會初始化或修改工作表；之後確認寫回時才請求寫入權限。",
+    "en": "Read-only connection requires complete lesson columns and does not initialize or edit the sheet. Write permission is requested only when you confirm writing later.",
+    "id": "Koneksi baca-saja memerlukan kolom materi lengkap dan tidak menginisialisasi atau mengedit lembar. Izin menulis baru diminta saat Anda mengonfirmasi penulisan."
+  },
+  {
+    "key": "words_d34b56",
+    "zh": "單字",
+    "en": "Words",
+    "id": "Kata"
+  },
+  {
+    "key": "entries_per_batch_1_100_more_batches_can_be_adde_e59fc7",
+    "zh": "單批數量 1–100（可分批加入）",
+    "en": "Entries per batch: 1–100 (more batches can be added)",
+    "id": "Entri per batch: 1–100 (dapat menambahkan batch lain)"
+  },
+  {
+    "key": "enter_a_batch_size_from_1_to_100_9af542",
+    "zh": "單批數量請輸入 1–100",
+    "en": "Enter a batch size from 1 to 100",
+    "id": "Masukkan jumlah batch antara 1 dan 100"
+  },
+  {
+    "key": "review_page_10_entries_per_page_select_entries_i_6510f0",
+    "zh": "審核第 %1$s/%2$s 頁，每頁 10 筆；請逐筆或審核後選取本頁。",
+    "en": "Review page %1$s/%2$s, 10 entries per page. Select entries individually or select the page after reviewing.",
+    "id": "Tinjau halaman %1$s/%2$s, 10 entri per halaman. Pilih satu per satu atau pilih halaman setelah meninjaunya."
+  },
+  {
+    "key": "write_to_google_sheets_ce59c6",
+    "zh": "寫入 Google Sheets？",
+    "en": "Write to Google Sheets?",
+    "id": "Tulis ke Google Sheets?"
+  },
+  {
+    "key": "destination_source_e40e7f",
+    "zh": "寫入來源",
+    "en": "Destination source",
+    "id": "Sumber tujuan"
+  },
+  {
+    "key": "writing_rechecks_stable_ids_and_duplicate_text_i_3cb7d4",
+    "zh": "寫回會再次檢查 Sheets 的穩定 ID 與重複文字。若上一輪網路結果未確認，請先保留原文字重試。",
+    "en": "Writing rechecks stable IDs and duplicate text in Sheets. If the previous network result is uncertain, retry with the original text first.",
+    "id": "Penulisan memeriksa ulang ID tetap dan teks duplikat di Sheets. Jika hasil jaringan sebelumnya tidak pasti, coba lagi dengan teks asli terlebih dahulu."
+  },
+  {
+    "key": "existing_lessons_connect_read_only_cf42a3",
+    "zh": "已有教材：授權唯讀加入",
+    "en": "Existing lessons: connect read-only",
+    "id": "Materi sudah ada: hubungkan baca-saja"
+  },
+  {
+    "key": "confirmed_new_entries_already_present_and_skippe_76c2bd",
+    "zh": "已確認新增 %1$s 筆、已存在略過 %2$s 筆；離線下載狀態請查看來源同步結果。",
+    "en": "Confirmed: %1$s new entries, %2$s already present and skipped. Check source sync status for the offline download.",
+    "id": "Terkonfirmasi: %1$s entri baru, %2$s sudah ada dan dilewati. Periksa status sinkronisasi sumber untuk unduhan luring."
+  },
+  {
+    "key": "a_successfully_generated_batch_will_replace_the_3db38e",
+    "zh": "成功產生新教材後，會取代目前待審核批次；現有 Sheets 與離線教材不變。",
+    "en": "A successfully generated batch will replace the current review draft. Existing Sheets and offline lessons will stay unchanged.",
+    "id": "Batch baru yang berhasil dibuat akan menggantikan draf tinjauan saat ini. Sheets dan materi luring yang ada tidak berubah."
+  },
+  {
+    "key": "lesson_source_name_6b80fc",
+    "zh": "教材來源名稱",
+    "en": "Lesson source name",
+    "id": "Nama sumber materi"
+  },
+  {
+    "key": "lesson_type_f0ab97",
+    "zh": "教材類型",
+    "en": "Lesson type",
+    "id": "Jenis materi"
+  },
+  {
+    "key": "batch_write_result_025023",
+    "zh": "本批寫回結果",
+    "en": "Batch write result",
+    "id": "Hasil penulisan batch"
+  },
+  {
+    "key": "model_name_4585e1",
+    "zh": "模型名稱",
+    "en": "Model name",
+    "id": "Nama model"
+  },
+  {
+    "key": "clear_local_google_authorization_and_stop_author_5b0551",
+    "zh": "清除本機 Google 授權並停止授權同步",
+    "en": "Clear local Google authorization and stop authorized sync",
+    "id": "Hapus otorisasi Google lokal dan hentikan sinkronisasi berizin"
+  },
+  {
+    "key": "cannot_open_google_authorization_check_google_pl_c98baf",
+    "zh": "無法開啟 Google 授權畫面，請確認 Google Play 服務",
+    "en": "Cannot open Google authorization. Check Google Play services.",
+    "id": "Tidak dapat membuka otorisasi Google. Periksa layanan Google Play."
+  },
+  {
+    "key": "generate_a_review_draft_526d40",
+    "zh": "產生待審核教材",
+    "en": "Generate a review draft",
+    "id": "Buat draf untuk ditinjau"
+  },
+  {
+    "key": "pronunciation_note_optional_8c42ba",
+    "zh": "發音備註（選填）",
+    "en": "Pronunciation note (optional)",
+    "id": "Catatan pengucapan (opsional)"
+  },
+  {
+    "key": "no_key_is_configured_for_this_provider_yet_cf1a46",
+    "zh": "目前尚未設定此供應商的金鑰。",
+    "en": "No key is configured for this provider yet.",
+    "id": "Belum ada kunci untuk penyedia ini."
+  },
+  {
+    "key": "key_saved_encrypted_on_this_device_and_excluded_65497f",
+    "zh": "目前已儲存金鑰：裝置加密，不納入備份。",
+    "en": "Key saved: encrypted on this device and excluded from backups.",
+    "id": "Kunci tersimpan: dienkripsi di perangkat ini dan tidak disertakan dalam cadangan."
+  },
+  {
+    "key": "destination_add_reviewed_entries_without_overwri_04cd4d",
+    "zh": "目標：%1$s\n%2$s\n將新增 %3$s 筆已審核教材；不覆寫既有教材。寫入後依同步網路政策下載。",
+    "en": "Destination: %1$s\n%2$s\nAdd %3$s reviewed entries without overwriting existing lessons. Download afterward according to the sync network policy.",
+    "id": "Tujuan: %1$s\n%2$s\nTambahkan %3$s entri yang ditinjau tanpa menimpa materi yang ada. Unduh sesudahnya sesuai kebijakan jaringan sinkronisasi."
+  },
+  {
+    "key": "destination_sheet_8a2797",
+    "zh": "目標：%1$s\n工作表：%2$s\n%3$s",
+    "en": "Destination: %1$s\nSheet: %2$s\n%3$s",
+    "id": "Tujuan: %1$s\nLembar: %2$s\n%3$s"
+  },
+  {
+    "key": "phrases_155650",
+    "zh": "短語",
+    "en": "Phrases",
+    "id": "Frasa"
+  },
+  {
+    "key": "confirm_lesson_column_initialization_d37eb0",
+    "zh": "確認初始化教材欄位",
+    "en": "Confirm lesson column initialization",
+    "id": "Konfirmasi inisialisasi kolom materi"
+  },
+  {
+    "key": "confirm_writing_selected_entries_df53ff",
+    "zh": "確認寫回已選 %1$s 筆",
+    "en": "Confirm writing %1$s selected entries",
+    "id": "Konfirmasi penulisan %1$s entri terpilih"
+  },
+  {
+    "key": "confirm_addition_f2a275",
+    "zh": "確認新增",
+    "en": "Confirm addition",
+    "id": "Konfirmasi penambahan"
+  },
+  {
+    "key": "remove_the_saved_key_e3ab12",
+    "zh": "移除目前已存金鑰",
+    "en": "Remove the saved key",
+    "id": "Hapus kunci tersimpan"
+  },
+  {
+    "key": "entry_749064",
+    "zh": "第 %1$s 筆",
+    "en": "Entry %1$s",
+    "id": "Entri %1$s"
+  },
+  {
+    "key": "traditional_chinese_indonesian_b57055",
+    "zh": "繁中＋印尼文",
+    "en": "Traditional Chinese + Indonesian",
+    "id": "Mandarin Tradisional + Indonesia"
+  },
+  {
+    "key": "traditional_chinese_english_c3b3d3",
+    "zh": "繁中＋英文",
+    "en": "Traditional Chinese + English",
+    "id": "Mandarin Tradisional + Inggris"
+  },
+  {
+    "key": "traditional_chinese_english_indonesian_e2e999",
+    "zh": "繁中／英文／印尼文",
+    "en": "Traditional Chinese / English / Indonesian",
+    "id": "Mandarin Tradisional / Inggris / Indonesia"
+  },
+  {
+    "key": "traditional_chinese_1f7e4a",
+    "zh": "繁體中文",
+    "en": "Traditional Chinese",
+    "id": "Mandarin Tradisional"
+  },
+  {
+    "key": "language_78be3c",
+    "zh": "語言",
+    "en": "Language",
+    "id": "Bahasa"
+  },
+  {
+    "key": "save_the_current_ai_settings_before_generating_00bd57",
+    "zh": "請先儲存目前 AI 設定，再開始產生。",
+    "en": "Save the current AI settings before generating.",
+    "id": "Simpan pengaturan AI saat ini sebelum membuat materi."
+  },
+  {
+    "key": "first_connect_and_initialize_a_writable_sheets_s_de7a05",
+    "zh": "請先在上方連接並初始化可寫入的 Sheets 來源。",
+    "en": "First connect and initialize a writable Sheets source above.",
+    "id": "Hubungkan dan inisialisasi sumber Sheets yang dapat ditulis di atas terlebih dahulu."
+  },
+  {
+    "key": "paste_the_original_google_sheets_url_you_can_edi_3cc076",
+    "zh": "貼上你可編輯的原始 Google Sheets 網址。授權後先檢查工作表，再確認補上教材欄位；不會清空既有資料。私人教材不需公開。",
+    "en": "Paste the original Google Sheets URL you can edit. After authorization, review the sheet before adding missing lesson columns. Existing data will not be cleared. Private lessons do not need to be public.",
+    "id": "Tempel URL asli Google Sheets yang dapat Anda edit. Setelah otorisasi, periksa lembar sebelum menambahkan kolom materi yang belum ada. Data lama tidak dihapus. Materi pribadi tidak perlu dipublikasikan."
+  },
+  {
+    "key": "connect_save_and_initialize_4ed786",
+    "zh": "連接、儲存並初始化",
+    "en": "Connect, save and initialize",
+    "id": "Hubungkan, simpan, dan inisialisasi"
+  },
+  {
+    "key": "select_this_page_cbccfc",
+    "zh": "選取本頁",
+    "en": "Select this page",
+    "id": "Pilih halaman ini"
+  },
+  {
+    "key": "generate_again_2f2f5e",
+    "zh": "重新產生",
+    "en": "Generate again",
+    "id": "Buat ulang"
+  },
+  {
+    "key": "get_started_connect_and_initialize_sheets_14dccc",
+    "zh": "開始使用：連接與初始化 Sheets",
+    "en": "Get started: connect and initialize Sheets",
+    "id": "Mulai: hubungkan dan inisialisasi Sheets"
+  },
+  {
+    "key": "level_e_g_a1_a2_b1_95dafc",
+    "zh": "難度，例如 A1、A2、B1",
+    "en": "Level, e.g. A1, A2, B1",
+    "id": "Tingkat, misalnya A1, A2, B1"
+  },
+  {
+    "key": "required_columns_already_exist_only_the_source_w_cab59e",
+    "zh": "需要的欄位已存在，只會儲存來源並同步。",
+    "en": "Required columns already exist. Only the source will be saved and synced.",
+    "id": "Kolom yang diperlukan sudah ada. Hanya sumber yang akan disimpan dan disinkronkan."
+  },
+  {
+    "key": "google_account_consent_is_required_for_reading_a_a9889c",
+    "zh": "首次需 Google 帳號同意讀寫試算表。輸入連結本身不代表已取得該檔案的編輯權限。",
+    "en": "Google account consent is required for reading and writing. A URL alone does not grant edit access to the file.",
+    "id": "Persetujuan akun Google diperlukan untuk membaca dan menulis. URL saja tidak memberikan hak edit pada berkas."
+  },
+  {
+    "key": "zip_backup_exported_credentials_and_tts_voice_pa_b3a385",
+    "zh": "ZIP 備份已匯出（不含憑證及 TTS 語音包）",
+    "en": "ZIP backup exported (credentials and TTS voice packages excluded)",
+    "id": "Cadangan ZIP diekspor (tanpa kredensial dan paket suara TTS)"
+  },
+  {
+    "key": "you_have_reached_the_last_entry_in_this_session_9bb13a",
+    "zh": "已到場次最後一筆",
+    "en": "You have reached the last entry in this session",
+    "id": "Anda telah mencapai entri terakhir sesi"
+  },
+  {
+    "key": "reset_to_unlearned_77b736",
+    "zh": "已恢復未學狀態",
+    "en": "Reset to unlearned",
+    "id": "Dikembalikan ke belum dikuasai"
+  },
+  {
+    "key": "sync_queued_waiting_for_a_network_when_offline_88323c",
+    "zh": "已排入同步工作；離線時會等待網路",
+    "en": "Sync queued; waiting for a network when offline",
+    "id": "Sinkronisasi dijadwalkan; menunggu jaringan jika luring"
+  },
+  {
+    "key": "source_added_and_sync_rescheduled_a2350d",
+    "zh": "已新增來源並重新排程同步",
+    "en": "Source added and sync rescheduled",
+    "id": "Sumber ditambahkan dan sinkronisasi dijadwalkan ulang"
+  },
+  {
+    "key": "marked_as_learned_50d138",
+    "zh": "已標記學會",
+    "en": "Marked as learned",
+    "id": "Ditandai sudah dikuasai"
+  },
+  {
+    "key": "player_connection_failed_223761",
+    "zh": "播放器連線失敗：%1$s",
+    "en": "Player connection failed: %1$s",
+    "id": "Koneksi pemutar gagal: %1$s"
+  },
+  {
+    "key": "operation_failed_626c6d",
+    "zh": "操作失敗",
+    "en": "Operation failed",
+    "id": "Operasi gagal"
+  },
+  {
+    "key": "no_matching_offline_lessons_sync_sources_or_adju_ef3baf",
+    "zh": "沒有符合條件的離線教材，請同步來源或調整篩選",
+    "en": "No matching offline lessons. Sync sources or adjust your filters.",
+    "id": "Tidak ada materi luring yang cocok. Sinkronkan sumber atau ubah filter."
+  },
+  {
+    "key": "cannot_play_check_offline_voice_packages_8b7429",
+    "zh": "無法播放，請檢查離線語音包",
+    "en": "Cannot play. Check offline voice packages.",
+    "id": "Tidak dapat memutar. Periksa paket suara luring."
+  },
+  {
+    "key": "only_entries_match_all_available_entries_will_be_8391c2",
+    "zh": "符合條件僅 %1$s 筆，將播放全部可用教材",
+    "en": "Only %1$s entries match; all available entries will be played",
+    "id": "Hanya %1$s entri yang cocok; semua entri tersedia akan diputar"
+  },
+  {
+    "key": "restore_complete_resync_lessons_after_a_lightwei_bd9a6c",
+    "zh": "還原完成；輕量備份的教材需重新同步，TTS 語音包需重新安裝",
+    "en": "Restore complete. Resync lessons after a lightweight backup and reinstall TTS voice packages.",
+    "id": "Pemulihan selesai. Sinkronkan kembali materi setelah cadangan ringan dan pasang ulang paket suara TTS."
+  },
+  {
+    "key": "seconds_b14097",
+    "zh": "%1$s / %2$s 秒",
+    "en": "%1$s / %2$s seconds",
+    "id": "%1$s / %2$s detik"
+  },
+  {
+    "key": "entries_09c5b2",
+    "zh": "%1$s · %2$s · %3$s 筆",
+    "en": "%1$s · %2$s · %3$s entries",
+    "id": "%1$s · %2$s · %3$s entri"
+  },
+  {
+    "key": "entries_1b770f",
+    "zh": "%1$s · %2$s/%3$s 筆",
+    "en": "%1$s · %2$s/%3$s entries",
+    "id": "%1$s · %2$s/%3$s entri"
+  },
+  {
+    "key": "lessons_from_will_be_soft_deleted_learning_recor_96f485",
+    "zh": "%1$s 的教材將軟刪除；保留學習紀錄及既有場次，未來以相同穩定鍵還原可繼續使用。",
+    "en": "Lessons from %1$s will be soft-deleted. Learning records and the current session stay saved and can be reused with the same stable keys.",
+    "id": "Materi dari %1$s akan ditandai dihapus. Catatan belajar dan sesi saat ini tetap tersimpan dan dapat digunakan lagi dengan kunci tetap yang sama."
+  },
+  {
+    "key": "speech_rate_0959eb",
+    "zh": "%1$s 語速：%2$s 倍",
+    "en": "%1$s speech rate: %2$s×",
+    "id": "Kecepatan suara %1$s: %2$s×"
+  },
+  {
+    "key": "backup_replace_deletes_current_data_smart_merge_445fe0",
+    "zh": "%1$s備份。完整覆蓋會刪除目前資料；智慧合併依修改時間選取較新進度，保留本機教材與非空佇列。",
+    "en": "%1$s backup. Replace deletes current data; smart merge keeps newer progress, local lessons and a nonempty local queue.",
+    "id": "Cadangan %1$s. Penggantian menghapus data saat ini; gabungan cerdas mempertahankan progres terbaru, materi lokal, dan antrean lokal yang tidak kosong."
+  },
+  {
+    "key": "google_source_writing_requires_valid_authorizati_949627",
+    "zh": "Google 連接來源，寫回需有效授權",
+    "en": "Google source; writing requires valid authorization",
+    "id": "Sumber Google; penulisan memerlukan otorisasi yang valid"
+  },
+  {
+    "key": "previous_entry_7f3fd8",
+    "zh": "上一筆",
+    "en": "Previous entry",
+    "id": "Entri sebelumnya"
+  },
+  {
+    "key": "last_sync_failed_check_source_errors_5d23ff",
+    "zh": "上次同步失敗，請查看來源錯誤",
+    "en": "Last sync failed. Check source errors.",
+    "id": "Sinkronisasi terakhir gagal. Periksa galat sumber."
+  },
+  {
+    "key": "last_sync_completed_94fada",
+    "zh": "上次同步工作已完成",
+    "en": "Last sync completed",
+    "id": "Sinkronisasi terakhir selesai"
+  },
+  {
+    "key": "next_entry_58bf90",
+    "zh": "下一筆",
+    "en": "Next entry",
+    "id": "Entri berikutnya"
+  },
+  {
+    "key": "do_not_exclude_e78264",
+    "zh": "不排除",
+    "en": "Do not exclude",
+    "id": "Jangan kecualikan"
+  },
+  {
+    "key": "random_learning_f41522",
+    "zh": "亂數學習",
+    "en": "Random learning",
+    "id": "Belajar acak"
+  },
+  {
+    "key": "shuffle_no_repeats_within_a_session_61e644",
+    "zh": "亂數（單場次不重複）",
+    "en": "Shuffle (no repeats within a session)",
+    "id": "Acak (tanpa pengulangan dalam sesi)"
+  },
+  {
+    "key": "interface_and_sync_d92df4",
+    "zh": "介面與同步",
+    "en": "Interface and sync",
+    "id": "Antarmuka dan sinkronisasi"
+  },
+  {
+    "key": "changes_below_apply_when_creating_the_next_sessi_20ffb6",
+    "zh": "以下變更於下次建立場次生效；目前佇列、語速與朗讀順序不會被清空或改寫。",
+    "en": "Changes below apply when creating the next session. The current queue, speech rates and order stay unchanged.",
+    "id": "Perubahan di bawah berlaku saat membuat sesi berikutnya. Antrean, kecepatan, dan urutan suara saat ini tidak berubah."
+  },
+  {
+    "key": "use_a_public_spreadsheet_url_or_a_published_csv_dcabb5",
+    "zh": "使用公開試算表網址或發布為 CSV 的網址；教材需有穩定 ID 與 zh-TW、en-US、id-ID 欄位。",
+    "en": "Use a public spreadsheet URL or a published CSV URL. Lessons need stable ID, zh-TW, en-US and id-ID columns.",
+    "id": "Gunakan URL spreadsheet publik atau URL CSV terpublikasi. Materi memerlukan kolom ID tetap, zh-TW, en-US, dan id-ID."
+  },
+  {
+    "key": "source_name_0ccc8a",
+    "zh": "來源名稱",
+    "en": "Source name",
+    "id": "Nama sumber"
+  },
+  {
+    "key": "backup_contents_94ace2",
+    "zh": "備份內容",
+    "en": "Backup contents",
+    "id": "Isi cadangan"
+  },
+  {
+    "key": "backup_and_device_transfer_f1a679",
+    "zh": "備份與換機",
+    "en": "Backup and device transfer",
+    "id": "Cadangan dan pindah perangkat"
+  },
+  {
+    "key": "learning_records_only_d16fb6",
+    "zh": "僅學習紀錄",
+    "en": "Learning records only",
+    "id": "Catatan belajar saja"
+  },
+  {
+    "key": "target_language_only_f1e468",
+    "zh": "僅目標語",
+    "en": "Target language only",
+    "id": "Bahasa target saja"
+  },
+  {
+    "key": "prioritize_review_363ac5",
+    "zh": "優先複習",
+    "en": "Prioritize review",
+    "id": "Utamakan tinjauan"
+  },
+  {
+    "key": "save_settings_bcc070",
+    "zh": "儲存設定",
+    "en": "Save settings",
+    "id": "Simpan pengaturan"
+  },
+  {
+    "key": "all_778fc8",
+    "zh": "全部",
+    "en": "All",
+    "id": "Semua"
+  },
+  {
+    "key": "public_read_only_source_664e30",
+    "zh": "公開唯讀來源",
+    "en": "Public read-only source",
+    "id": "Sumber publik baca-saja"
+  },
+  {
+    "key": "category_blank_for_all_33af15",
+    "zh": "分類（留空為全部）",
+    "en": "Category (blank for all)",
+    "id": "Kategori (kosongkan untuk semua)"
+  },
+  {
+    "key": "add_to_review_aec981",
+    "zh": "加入複習",
+    "en": "Add to review",
+    "id": "Tambahkan ke tinjauan"
+  },
+  {
+    "key": "includes_sources_learning_progress_queues_and_se_743f52",
+    "zh": "包含來源、學習進度、播放清單與設定；不含教材，換機後需重新同步。",
+    "en": "Includes sources, learning progress, queues and settings. Lessons are excluded and must be resynced on the new device.",
+    "id": "Mencakup sumber, progres belajar, antrean, dan pengaturan. Materi tidak disertakan dan perlu disinkronkan ulang di perangkat baru."
+  },
+  {
+    "key": "includes_offline_lessons_sources_learning_progre_2f38a3",
+    "zh": "包含離線教材、來源、學習進度、播放清單與設定。",
+    "en": "Includes offline lessons, sources, learning progress, queues and settings.",
+    "id": "Mencakup materi luring, sumber, progres belajar, antrean, dan pengaturan."
+  },
+  {
+    "key": "import_and_preview_a8bb8f",
+    "zh": "匯入與預覽",
+    "en": "Import and preview",
+    "id": "Impor dan pratinjau"
+  },
+  {
+    "key": "import_preview_460dc3",
+    "zh": "匯入預覽",
+    "en": "Import preview",
+    "id": "Pratinjau impor"
+  },
+  {
+    "key": "export_zip_89f513",
+    "zh": "匯出 ZIP",
+    "en": "Export ZIP",
+    "id": "Ekspor ZIP"
+  },
+  {
+    "key": "remove_favorite_26acae",
+    "zh": "取消收藏",
+    "en": "Remove favorite",
+    "id": "Hapus favorit"
+  },
+  {
+    "key": "remove_from_review_35169d",
+    "zh": "取消複習",
+    "en": "Remove from review",
+    "id": "Hapus dari tinjauan"
+  },
+  {
+    "key": "sentence_listening_de9200",
+    "zh": "句子聽力",
+    "en": "Sentence listening",
+    "id": "Mendengarkan kalimat"
+  },
+  {
+    "key": "synthesis_uses_only_voices_the_engine_reports_as_d8dada",
+    "zh": "只有引擎回報已安裝、且不需網路的 voice 才會用於合成。各引擎與裝置支援不同，需在飛航模式實測。",
+    "en": "Synthesis uses only voices the engine reports as installed and not requiring a network. Engine and device support varies; test in airplane mode.",
+    "id": "Sintesis hanya memakai suara yang dilaporkan sudah terpasang dan tidak memerlukan jaringan. Dukungan mesin dan perangkat berbeda; uji dalam mode pesawat."
+  },
+  {
+    "key": "offline_voice_available_9b3a3a",
+    "zh": "可用離線語音",
+    "en": "Offline voice available",
+    "id": "Suara luring tersedia"
+  },
+  {
+    "key": "transfer_manually_using_usb_quick_share_or_googl_798d78",
+    "zh": "可透過 USB、Quick Share 或 Google Drive 手動移轉；解壓安全上限為 128 MiB。",
+    "en": "Transfer manually using USB, Quick Share or Google Drive. Safe extraction limit: 128 MiB.",
+    "id": "Pindahkan secara manual melalui USB, Quick Share, atau Google Drive. Batas ekstraksi aman: 128 MiB."
+  },
+  {
+    "key": "syncing_offline_lessons_remain_available_d7fcfa",
+    "zh": "同步中，離線教材仍可使用",
+    "en": "Syncing; offline lessons remain available",
+    "id": "Sedang sinkronisasi; materi luring tetap tersedia"
+  },
+  {
+    "key": "sync_only_on_wi_fi_bdf678",
+    "zh": "同步僅使用 Wi-Fi",
+    "en": "Sync only on Wi-Fi",
+    "id": "Sinkronkan hanya melalui Wi-Fi"
+  },
+  {
+    "key": "sync_all_sources_84ce63",
+    "zh": "同步全部來源",
+    "en": "Sync all sources",
+    "id": "Sinkronkan semua sumber"
+  },
+  {
+    "key": "sync_failed_cache_retained_2f0d91",
+    "zh": "同步失敗（保留快取）：%1$s",
+    "en": "Sync failed (cache retained): %1$s",
+    "id": "Sinkronisasi gagal (cache dipertahankan): %1$s"
+  },
+  {
+    "key": "sync_cancelled_dd26f7",
+    "zh": "同步已取消",
+    "en": "Sync cancelled",
+    "id": "Sinkronisasi dibatalkan"
+  },
+  {
+    "key": "sync_queued_waiting_for_an_eligible_network_d8981d",
+    "zh": "同步已排程，等待符合條件的網路",
+    "en": "Sync queued, waiting for an eligible network",
+    "id": "Sinkronisasi dijadwalkan, menunggu jaringan yang sesuai"
+  },
+  {
+    "key": "sync_on_launch_b1fb8c",
+    "zh": "啟動時同步",
+    "en": "Sync on launch",
+    "id": "Sinkronkan saat aplikasi dibuka"
+  },
+  {
+    "key": "word_practice_1f71d6",
+    "zh": "單字練習",
+    "en": "Word practice",
+    "id": "Latihan kata"
+  },
+  {
+    "key": "session_size_666f5b",
+    "zh": "場次數量",
+    "en": "Session size",
+    "id": "Jumlah entri per sesi"
+  },
+  {
+    "key": "session_and_speech_settings_8673cd",
+    "zh": "場次與朗讀設定",
+    "en": "Session and speech settings",
+    "id": "Pengaturan sesi dan suara"
+  },
+  {
+    "key": "install_voice_packages_4c0ceb",
+    "zh": "安裝語音包",
+    "en": "Install voice packages",
+    "id": "Pasang paket suara"
+  },
+  {
+    "key": "full_6e6e58",
+    "zh": "完整",
+    "en": "Full",
+    "id": "Lengkap"
+  },
+  {
+    "key": "full_backup_d3d579",
+    "zh": "完整備份",
+    "en": "Full backup",
+    "id": "Cadangan lengkap"
+  },
+  {
+    "key": "replace_all_720837",
+    "zh": "完整覆蓋",
+    "en": "Replace all",
+    "id": "Ganti semua"
+  },
+  {
+    "key": "not_synced_yet_eeee89",
+    "zh": "尚未同步",
+    "en": "Not synced yet",
+    "id": "Belum disinkronkan"
+  },
+  {
+    "key": "no_sync_scheduled_fb8d3d",
+    "zh": "尚未排程同步",
+    "en": "No sync scheduled",
+    "id": "Belum ada jadwal sinkronisasi"
+  },
+  {
+    "key": "no_session_yet_ab52a9",
+    "zh": "尚無場次",
+    "en": "No session yet",
+    "id": "Belum ada sesi"
+  },
+  {
+    "key": "no_lessons_yet_1ad296",
+    "zh": "尚無教材",
+    "en": "No lessons yet",
+    "id": "Belum ada materi"
+  },
+  {
+    "key": "learned_0f130c",
+    "zh": "已學會",
+    "en": "Learned",
+    "id": "Sudah dikuasai"
+  },
+  {
+    "key": "played_times_79b9e3",
+    "zh": "已播放 %1$s 次 · %2$s",
+    "en": "Played %1$s times · %2$s",
+    "id": "Diputar %1$s kali · %2$s"
+  },
+  {
+    "key": "online_lessons_use_offline_voices_on_this_device_395220",
+    "zh": "已連線 · 教材播放使用本機離線語音",
+    "en": "Online · lessons use offline voices on this device",
+    "id": "Daring · materi memakai suara luring di perangkat ini"
+  },
+  {
+    "key": "create_new_session_b359ba",
+    "zh": "建立新場次",
+    "en": "Create new session",
+    "id": "Buat sesi baru"
+  },
+  {
+    "key": "needs_review_d00608",
+    "zh": "待複習",
+    "en": "Needs review",
+    "id": "Perlu ditinjau"
+  },
+  {
+    "key": "loop_session_366b56",
+    "zh": "循環場次",
+    "en": "Loop session",
+    "id": "Ulangi sesi"
+  },
+  {
+    "key": "quick_start_72add7",
+    "zh": "快速開始",
+    "en": "Quick start",
+    "id": "Mulai cepat"
+  },
+  {
+    "key": "reset_to_unlearned_6ddb59",
+    "zh": "恢復未學",
+    "en": "Reset to unlearned",
+    "id": "Kembalikan ke belum dikuasai"
+  },
+  {
+    "key": "exclude_learned_entries_61e4c7",
+    "zh": "排除已學會",
+    "en": "Exclude learned entries",
+    "id": "Kecualikan entri yang sudah dikuasai"
+  },
+  {
+    "key": "search_0a4379",
+    "zh": "搜尋",
+    "en": "Search",
+    "id": "Cari"
+  },
+  {
+    "key": "search_text_in_all_three_languages_42f81d",
+    "zh": "搜尋三語文字",
+    "en": "Search text in all three languages",
+    "id": "Cari teks dalam ketiga bahasa"
+  },
+  {
+    "key": "search_offline_lessons_b65cdf",
+    "zh": "搜尋離線教材",
+    "en": "Search offline lessons",
+    "id": "Cari materi luring"
+  },
+  {
+    "key": "play_219253",
+    "zh": "播放",
+    "en": "Play",
+    "id": "Putar"
+  },
+  {
+    "key": "player_aa109d",
+    "zh": "播放器",
+    "en": "Player",
+    "id": "Pemutar"
+  },
+  {
+    "key": "favorite_d07cee",
+    "zh": "收藏",
+    "en": "Favorite",
+    "id": "Favorit"
+  },
+  {
+    "key": "lessons_learned_favorites_learning_streak_days_20e9df",
+    "zh": "教材 %1$s 筆　已學會 %2$s 筆\n收藏 %3$s 筆　連續學習 %4$s 天",
+    "en": "Lessons: %1$s　Learned: %2$s\nFavorites: %3$s　Learning streak: %4$s days",
+    "id": "Materi: %1$s　Dikuasai: %2$s\nFavorit: %3$s　Belajar berturut-turut: %4$s hari"
+  },
+  {
+    "key": "sources_and_sync_public_sources_can_be_added_rea_c90c00",
+    "zh": "教材來源與同步（公開來源可直接唯讀加入）",
+    "en": "Sources and sync (public sources can be added read-only)",
+    "id": "Sumber dan sinkronisasi (sumber publik dapat ditambahkan baca-saja)"
+  },
+  {
+    "key": "lesson_categories_1dff78",
+    "zh": "教材分類",
+    "en": "Lesson categories",
+    "id": "Kategori materi"
+  },
+  {
+    "key": "library_9de5bd",
+    "zh": "教材庫",
+    "en": "Library",
+    "id": "Pustaka"
+  },
+  {
+    "key": "add_public_google_sheets_or_create_a_session_wit_dcfde8",
+    "zh": "新增公開 Google Sheets 或建立示範教材場次後即可開始。",
+    "en": "Add public Google Sheets or create a session with sample lessons to start.",
+    "id": "Tambahkan Google Sheets publik atau buat sesi dengan materi contoh untuk memulai."
+  },
+  {
+    "key": "add_public_read_only_source_d4f075",
+    "zh": "新增公開唯讀來源",
+    "en": "Add public read-only source",
+    "id": "Tambahkan sumber publik baca-saja"
+  },
+  {
+    "key": "date_version_schema_lessons_learning_records_sou_f0b022",
+    "zh": "日期：%1$s\n版本：%2$s／schema %3$s\n教材：%4$s 筆\n學習紀錄：%5$s 筆\n來源：%6$s",
+    "en": "Date: %1$s\nVersion: %2$s / schema %3$s\nLessons: %4$s\nLearning records: %5$s\nSources: %6$s",
+    "id": "Tanggal: %1$s\nVersi: %2$s / skema %3$s\nMateri: %4$s\nCatatan belajar: %5$s\nSumber: %6$s"
+  },
+  {
+    "key": "smart_merge_0494db",
+    "zh": "智慧合併",
+    "en": "Smart merge",
+    "id": "Gabungan cerdas"
+  },
+  {
+    "key": "pause_37676b",
+    "zh": "暫停",
+    "en": "Pause",
+    "id": "Jeda"
+  },
+  {
+    "key": "suspend_for_30_days_31f064",
+    "zh": "暫停 30 天",
+    "en": "Suspend for 30 days",
+    "id": "Tangguhkan 30 hari"
+  },
+  {
+    "key": "suspend_for_7_days_c6ba96",
+    "zh": "暫停 7 天",
+    "en": "Suspend for 7 days",
+    "id": "Tangguhkan 7 hari"
+  },
+  {
+    "key": "last_sync_0620ac",
+    "zh": "最後同步：%1$s",
+    "en": "Last sync: %1$s",
+    "id": "Sinkronisasi terakhir: %1$s"
+  },
+  {
+    "key": "last_day_1442e5",
+    "zh": "最近 1 天",
+    "en": "Last day",
+    "id": "1 hari terakhir"
+  },
+  {
+    "key": "last_30_days_279e4c",
+    "zh": "最近 30 天",
+    "en": "Last 30 days",
+    "id": "30 hari terakhir"
+  },
+  {
+    "key": "last_7_days_2a0a05",
+    "zh": "最近 7 天",
+    "en": "Last 7 days",
+    "id": "7 hari terakhir"
+  },
+  {
+    "key": "speech_order_cfb84b",
+    "zh": "朗讀順序",
+    "en": "Speech order",
+    "id": "Urutan pembacaan"
+  },
+  {
+    "key": "not_learned_2a214f",
+    "zh": "未學會",
+    "en": "Not learned",
+    "id": "Belum dikuasai"
+  },
+  {
+    "key": "standard_zip_unencrypted_save_backups_only_in_tr_9df06b",
+    "zh": "標準 ZIP 格式，不加密。請將備份保存在信任的位置；不包含 API Key、OAuth Token、憑證、合成音訊或 TTS 語音包。",
+    "en": "Standard ZIP, unencrypted. Save backups only in trusted locations. API keys, OAuth tokens, credentials, synthesized audio and TTS voice packages are excluded.",
+    "id": "ZIP standar, tanpa enkripsi. Simpan cadangan hanya di tempat tepercaya. Kunci API, token OAuth, kredensial, audio hasil sintesis, dan paket suara TTS tidak disertakan."
+  },
+  {
+    "key": "check_voice_packages_583911",
+    "zh": "檢查語音包",
+    "en": "Check voice packages",
+    "id": "Periksa paket suara"
+  },
+  {
+    "key": "synthesizing_offline_audio_the_first_playback_ma_4a780a",
+    "zh": "正在以離線語音合成音訊，首次播放可能需要一些時間…",
+    "en": "Synthesizing offline audio. The first playback may take a moment…",
+    "id": "Sedang membuat audio luring. Pemutaran pertama mungkin memerlukan waktu…"
+  },
+  {
+    "key": "this_device_has_no_voice_package_installer_insta_9cca81",
+    "zh": "此裝置未提供語音包安裝畫面，請至系統的文字轉語音設定安裝",
+    "en": "This device has no voice-package installer. Install voices in system text-to-speech settings.",
+    "id": "Perangkat ini tidak menyediakan pemasang paket suara. Pasang suara melalui pengaturan text-to-speech sistem."
+  },
+  {
+    "key": "native_language_9bbc85",
+    "zh": "母語",
+    "en": "Native language",
+    "id": "Bahasa utama"
+  },
+  {
+    "key": "native_target_632dc2",
+    "zh": "母語 → 目標語",
+    "en": "Native → target",
+    "id": "Bahasa utama → target"
+  },
+  {
+    "key": "listen_a_little_every_day_let_languages_feel_nat_79d6bf",
+    "zh": "每天聽一點，語言更自然。",
+    "en": "Listen a little every day. Let languages feel natural.",
+    "id": "Dengarkan sedikit setiap hari agar berbahasa semakin alami."
+  },
+  {
+    "key": "gap_between_segments_seconds_6afbef",
+    "zh": "每段間隔 %1$s 秒",
+    "en": "Gap between segments: %1$s seconds",
+    "id": "Jeda antarsegmen: %1$s detik"
+  },
+  {
+    "key": "repeat_each_entry_times_4a864c",
+    "zh": "每筆重複 %1$s 次",
+    "en": "Repeat each entry %1$s times",
+    "id": "Ulangi setiap entri %1$s kali"
+  },
+  {
+    "key": "dark_mode_750642",
+    "zh": "深色模式",
+    "en": "Dark mode",
+    "id": "Mode gelap"
+  },
+  {
+    "key": "status_452935",
+    "zh": "狀態",
+    "en": "Status",
+    "id": "Status"
+  },
+  {
+    "key": "no_lessons_yet_add_a_source_and_sync_7a204c",
+    "zh": "目前沒有教材，請新增來源並同步。",
+    "en": "No lessons yet. Add a source and sync.",
+    "id": "Belum ada materi. Tambahkan sumber dan sinkronkan."
+  },
+  {
+    "key": "offline_downloaded_lessons_are_available_a21fca",
+    "zh": "目前離線 · 可播放已下載教材",
+    "en": "Offline · downloaded lessons are available",
+    "id": "Luring · materi yang diunduh tersedia"
+  },
+  {
+    "key": "target_language_651506",
+    "zh": "目標語",
+    "en": "Target language",
+    "id": "Bahasa target"
+  },
+  {
+    "key": "target_native_9fb69a",
+    "zh": "目標語 → 母語",
+    "en": "Target → native",
+    "id": "Bahasa target → utama"
+  },
+  {
+    "key": "remove_2f752c",
+    "zh": "移除",
+    "en": "Remove",
+    "id": "Hapus"
+  },
+  {
+    "key": "remove_source_0e4e14",
+    "zh": "移除來源",
+    "en": "Remove source",
+    "id": "Hapus sumber"
+  },
+  {
+    "key": "remove_source_ffd5c8",
+    "zh": "移除來源？",
+    "en": "Remove source?",
+    "id": "Hapus sumber?"
+  },
+  {
+    "key": "entry_71375b",
+    "zh": "第 %1$s/%2$s 筆 · %3$s",
+    "en": "Entry %1$s/%2$s · %3$s",
+    "id": "Entri %1$s/%2$s · %3$s"
+  },
+  {
+    "key": "continue_learning_66b50b",
+    "zh": "繼續學習",
+    "en": "Continue learning",
+    "id": "Lanjutkan belajar"
+  },
+  {
+    "key": "offline_voice_package_missing_6689f4",
+    "zh": "缺少離線語音包",
+    "en": "Offline voice package missing",
+    "id": "Paket suara luring belum ada"
+  },
+  {
+    "key": "mediasession_provides_headset_play_pause_and_pre_4b43a0",
+    "zh": "耳機播放／暫停、上一筆、下一筆由 MediaSession 提供。特殊手勢依耳機與系統支援；來電等暫時失去音訊焦點時會暫停，焦點恢復後由系統恢復。拔除耳機會暫停。",
+    "en": "MediaSession provides headset play/pause and previous/next controls. Special gestures depend on the headset and system. Transient audio-focus loss pauses playback and focus restoration resumes it. Unplugging headphones pauses playback.",
+    "id": "MediaSession menyediakan kontrol headset putar/jeda dan sebelumnya/berikutnya. Gestur khusus bergantung pada headset dan sistem. Hilangnya fokus audio sementara menjeda pemutaran dan kembalinya fokus melanjutkannya. Melepas headset menjeda pemutaran."
+  },
+  {
+    "key": "custom_count_must_be_a_positive_integer_a7c1c9",
+    "zh": "自訂數量需為正整數",
+    "en": "Custom count must be a positive integer",
+    "id": "Jumlah khusus harus bilangan bulat positif"
+  },
+  {
+    "key": "custom_positive_integer_or_all_7a1c42",
+    "zh": "自訂正整數或全部",
+    "en": "Custom positive integer, or All",
+    "id": "Bilangan bulat positif khusus, atau Semua"
+  },
+  {
+    "key": "review_learned_entries_96a409",
+    "zh": "複習已學",
+    "en": "Review learned entries",
+    "id": "Tinjau entri yang dikuasai"
+  },
+  {
+    "key": "settings_6329f2",
+    "zh": "設定",
+    "en": "Settings",
+    "id": "Pengaturan"
+  },
+  {
+    "key": "invalid_settings_18dcd4",
+    "zh": "設定不合法",
+    "en": "Invalid settings",
+    "id": "Pengaturan tidak valid"
+  },
+  {
+    "key": "enter_a_positive_integer_or_all_3915ed",
+    "zh": "請輸入正整數或「全部」",
+    "en": "Enter a positive integer or All",
+    "id": "Masukkan bilangan bulat positif atau Semua"
+  },
+  {
+    "key": "changing_the_network_policy_cancels_old_work_and_1b3e74",
+    "zh": "變更同步網路政策會取消舊工作並重新排程；僅 Wi-Fi 模式也要求網路非計量。",
+    "en": "Changing the network policy cancels old work and reschedules sync. Wi-Fi-only mode also requires an unmetered network.",
+    "id": "Mengubah kebijakan jaringan membatalkan tugas lama dan menjadwalkan ulang sinkronisasi. Mode Wi-Fi saja juga memerlukan jaringan tanpa batas kuota."
+  },
+  {
+    "key": "skip_this_time_9b9b43",
+    "zh": "跳過本次",
+    "en": "Skip this time",
+    "id": "Lewati kali ini"
+  },
+  {
+    "key": "load_next_100_entries_a1e2e1",
+    "zh": "載入下 100 筆",
+    "en": "Load next 100 entries",
+    "id": "Muat 100 entri berikutnya"
+  },
+  {
+    "key": "lightweight_backups_exclude_lesson_text_after_re_c3f7cd",
+    "zh": "輕量備份不含教材文字；覆蓋後需連線同步來源，才能離線播放。",
+    "en": "Lightweight backups exclude lesson text. After replacement, reconnect and sync the sources before offline playback.",
+    "id": "Cadangan ringan tidak menyertakan teks materi. Setelah mengganti data, hubungkan dan sinkronkan sumber sebelum memutar luring."
+  },
+  {
+    "key": "avoid_recently_played_entries_b9e9d4",
+    "zh": "避開近期教材",
+    "en": "Avoid recently played entries",
+    "id": "Hindari entri yang baru diputar"
+  },
+  {
+    "key": "open_player_74ee10",
+    "zh": "開啟播放器",
+    "en": "Open player",
+    "id": "Buka pemutar"
+  },
+  {
+    "key": "offline_sample_lessons_e2b085",
+    "zh": "離線示範教材",
+    "en": "Offline sample lessons",
+    "id": "Materi contoh luring"
+  },
+  {
+    "key": "offline_voice_packages_8ee771",
+    "zh": "離線語音包",
+    "en": "Offline voice packages",
+    "id": "Paket suara luring"
+  },
+  {
+    "key": "level_blank_for_all_f722d1",
+    "zh": "難度（留空為全部）",
+    "en": "Level (blank for all)",
+    "id": "Tingkat (kosongkan untuk semua)"
+  },
+  {
+    "key": "show_the_third_language_3450d3",
+    "zh": "顯示第三語言",
+    "en": "Show the third language",
+    "id": "Tampilkan bahasa ketiga"
+  },
+  {
+    "key": "home_fdf1f0",
+    "zh": "首頁",
+    "en": "Home",
+    "id": "Beranda"
+  },
+  {
+    "key": "unexpected_ai_entry_count_reduce_the_batch_size_c79a30",
+    "zh": "AI 回傳筆數不符，請減少數量或更換模型",
+    "en": "Unexpected AI entry count. Reduce the batch size or change the model.",
+    "id": "Jumlah entri AI tidak sesuai. Kurangi jumlah batch atau ganti model."
+  },
+  {
+    "key": "ai_response_is_too_long_801252",
+    "zh": "AI 回應過長",
+    "en": "AI response is too long",
+    "id": "Respons AI terlalu panjang"
+  },
+  {
+    "key": "ai_lessons_must_remain_marked_as_unverified_and_ff829e",
+    "zh": "AI 教材必須保留未查證標示，不能加入未驗證來源",
+    "en": "AI lessons must remain marked as unverified and cannot include unverified source URLs",
+    "id": "Materi AI harus tetap ditandai belum diverifikasi dan tidak boleh memuat URL sumber yang belum diverifikasi"
+  },
+  {
+    "key": "ai_returned_no_lessons_check_the_model_content_r_e9ea4a",
+    "zh": "AI 未回傳教材，請檢查模型、內容限制或配額",
+    "en": "AI returned no lessons. Check the model, content restrictions or quota.",
+    "id": "AI tidak mengembalikan materi. Periksa model, pembatasan konten, atau kuota."
+  },
+  {
+    "key": "ai_field_must_be_text_00881f",
+    "zh": "AI 欄位 %1$s 必須是文字",
+    "en": "AI field %1$s must be text",
+    "id": "Kolom AI %1$s harus berupa teks"
+  },
+  {
+    "key": "ai_lesson_generation_d0c3ff",
+    "zh": "AI 產生教材",
+    "en": "AI lesson generation",
+    "id": "Pembuatan materi AI"
+  },
+  {
+    "key": "the_api_base_url_must_use_https_and_contain_no_c_0f6534",
+    "zh": "API 網址需為不含帳密或 query 的 HTTPS base URL",
+    "en": "The API base URL must use HTTPS and contain no credentials or query parameters",
+    "id": "URL dasar API harus memakai HTTPS tanpa kredensial atau parameter query"
+  },
+  {
+    "key": "invalid_api_key_format_fba577",
+    "zh": "API 金鑰格式不合法",
+    "en": "Invalid API key format",
+    "id": "Format kunci API tidak valid"
+  },
+  {
+    "key": "invalid_gemini_model_name_8815e0",
+    "zh": "Gemini 模型名稱格式錯誤",
+    "en": "Invalid Gemini model name",
+    "id": "Nama model Gemini tidak valid"
+  },
+  {
+    "key": "use_the_official_gemini_api_url_c76245",
+    "zh": "Gemini 請使用官方 API 網址",
+    "en": "Use the official Gemini API URL",
+    "id": "Gunakan URL API Gemini resmi"
+  },
+  {
+    "key": "use_the_official_openai_url_or_select_a_compatib_5f9f7f",
+    "zh": "OpenAI 請使用官方 API 網址，其他網址請選相容 API",
+    "en": "Use the official OpenAI URL, or select a compatible API for other endpoints",
+    "id": "Gunakan URL OpenAI resmi, atau pilih API kompatibel untuk endpoint lain"
+  },
+  {
+    "key": "unsupported_ai_provider_0be43e",
+    "zh": "不支援的 AI 供應商",
+    "en": "Unsupported AI provider",
+    "id": "Penyedia AI tidak didukung"
+  },
+  {
+    "key": "select_words_phrases_or_sentences_and_a_batch_si_52b288",
+    "zh": "單批請選擇單字／短語／句子與 1–100 筆",
+    "en": "Select words, phrases or sentences and a batch size of 1–100",
+    "id": "Pilih kata, frasa, atau kalimat dan jumlah batch 1–100"
+  },
+  {
+    "key": "the_reviewed_entries_contain_duplicates_deselect_6c5df8",
+    "zh": "審核後有重複教材，請取消重複項目",
+    "en": "The reviewed entries contain duplicates. Deselect repeated lessons.",
+    "id": "Entri yang ditinjau mengandung duplikat. Batalkan pilihan materi yang sama."
+  },
+  {
+    "key": "lesson_category_type_or_level_does_not_match_rev_c5d72a",
+    "zh": "教材分類、類型或難度不符，請重新審核",
+    "en": "Lesson category, type or level does not match. Review again.",
+    "id": "Kategori, jenis, atau tingkat materi tidak sesuai. Tinjau kembali."
+  },
+  {
+    "key": "lesson_text_is_too_long_or_contains_invalid_char_8f77d2",
+    "zh": "教材文字過長或含有非法字元",
+    "en": "Lesson text is too long or contains invalid characters",
+    "id": "Teks materi terlalu panjang atau mengandung karakter tidak valid"
+  },
+  {
+    "key": "a_requested_lesson_language_is_missing_4844d8",
+    "zh": "教材缺少指定語言",
+    "en": "A requested lesson language is missing",
+    "id": "Bahasa materi yang diminta belum ada"
+  },
+  {
+    "key": "no_lessons_available_for_review_8aabd9",
+    "zh": "沒有可供審核的教材",
+    "en": "No lessons available for review",
+    "id": "Tidak ada materi untuk ditinjau"
+  },
+  {
+    "key": "draft_ids_do_not_match_be4b07",
+    "zh": "草稿 ID 不符",
+    "en": "Draft IDs do not match",
+    "id": "ID draf tidak sesuai"
+  },
+  {
+    "key": "configure_a_key_for_this_provider_and_api_url_fi_783af8",
+    "zh": "請先為此供應商及 API 網址設定金鑰",
+    "en": "Configure a key for this provider and API URL first",
+    "id": "Atur kunci untuk penyedia dan URL API ini terlebih dahulu"
+  },
+  {
+    "key": "enter_a_topic_category_and_valid_text_lengths_3d9382",
+    "zh": "請填寫主題、分類與合法長度",
+    "en": "Enter a topic, category and valid text lengths",
+    "id": "Masukkan topik, kategori, dan panjang teks yang valid"
+  },
+  {
+    "key": "enter_a_valid_model_name_47fa0f",
+    "zh": "請輸入合法的模型名稱",
+    "en": "Enter a valid model name",
+    "id": "Masukkan nama model yang valid"
+  },
+  {
+    "key": "select_unwritten_lessons_first_196b5a",
+    "zh": "請選擇尚未寫入的教材",
+    "en": "Select unwritten lessons first",
+    "id": "Pilih materi yang belum ditulis terlebih dahulu"
+  },
+  {
+    "key": "ai_settings_saved_locally_keys_are_not_shared_be_bad5e4",
+    "zh": "AI 設定已儲存於本機；不同供應商與網址不會共用金鑰",
+    "en": "AI settings saved locally. Keys are not shared between providers or URLs.",
+    "id": "Pengaturan AI disimpan secara lokal. Kunci tidak dibagikan antarpenyedia atau URL."
+  },
+  {
+    "key": "google_authorization_failed_check_play_services_3e12bd",
+    "zh": "Google 授權失敗（%1$s），請確認 Google Play 服務、Cloud OAuth 的套件名稱／簽章指紋及測試帳號設定",
+    "en": "Google authorization failed (%1$s). Check Play services, the Cloud OAuth package/signing fingerprint and test users.",
+    "id": "Otorisasi Google gagal (%1$s). Periksa layanan Play, paket/sidik jari tanda tangan OAuth Cloud, dan pengguna pengujian."
+  },
+  {
+    "key": "google_authorization_cancelled_no_initialization_41a49f",
+    "zh": "Google 授權已取消，尚未初始化或寫入",
+    "en": "Google authorization cancelled; no initialization or writing occurred",
+    "id": "Otorisasi Google dibatalkan; tidak ada inisialisasi atau penulisan"
+  },
+  {
+    "key": "google_did_not_provide_an_authorization_screen_23ae3a",
+    "zh": "Google 未提供授權畫面",
+    "en": "Google did not provide an authorization screen",
+    "id": "Google tidak menyediakan layar otorisasi"
+  },
+  {
+    "key": "source_removed_or_changed_nothing_was_written_9c3c2e",
+    "zh": "來源已移除或改變，未寫入",
+    "en": "Source removed or changed; nothing was written",
+    "id": "Sumber dihapus atau berubah; tidak ada yang ditulis"
+  },
+  {
+    "key": "source_removed_draft_was_not_saved_f734de",
+    "zh": "來源已移除，未保存草稿",
+    "en": "Source removed; draft was not saved",
+    "id": "Sumber dihapus; draf tidak disimpan"
+  },
+  {
+    "key": "source_or_backup_state_changed_nothing_has_been_bd9723",
+    "zh": "來源或備份狀態已改變，尚未寫入，請重新審核",
+    "en": "Source or backup state changed. Nothing has been written; review again.",
+    "id": "Status sumber atau cadangan berubah. Belum ada yang ditulis; tinjau kembali."
+  },
+  {
+    "key": "authorized_source_added_and_download_queued_no_s_431c8a",
+    "zh": "已以授權方式加入來源並排程下載；未初始化或修改工作表",
+    "en": "Authorized source added and download queued; no sheet was initialized or edited",
+    "id": "Sumber berizin ditambahkan dan unduhan dijadwalkan; tidak ada lembar yang diinisialisasi atau diedit"
+  },
+  {
+    "key": "cancelled_if_a_write_request_was_sent_retry_with_8693e2",
+    "zh": "已取消；若已送出寫回請保留草稿原樣重試確認",
+    "en": "Cancelled. If a write request was sent, retry with the original draft to confirm its result.",
+    "id": "Dibatalkan. Jika permintaan penulisan sudah dikirim, coba lagi dengan draf asli untuk memastikan hasilnya."
+  },
+  {
+    "key": "generated_entries_for_review_nothing_has_been_wr_2d0695",
+    "zh": "已產生 %1$s/%2$s 筆待審核教材，尚未寫入 Sheets，也未宣稱已搜尋或查證",
+    "en": "Generated %1$s/%2$s entries for review. Nothing has been written to Sheets or claimed as searched or verified.",
+    "id": "Dibuat %1$s/%2$s entri untuk ditinjau. Belum ada yang ditulis ke Sheets atau dinyatakan sebagai hasil pencarian maupun verifikasi."
+  },
+  {
+    "key": "confirmed_written_already_present_and_skipped_do_92f632",
+    "zh": "已確認寫入 %1$s 筆，已存在略過 %2$s 筆；已依網路政策排程下載，完成後可離線學習",
+    "en": "Confirmed %1$s written, %2$s already present and skipped. Download queued according to the network policy for later offline study.",
+    "id": "Terkonfirmasi %1$s ditulis, %2$s sudah ada dan dilewati. Unduhan dijadwalkan sesuai kebijakan jaringan untuk belajar luring."
+  },
+  {
+    "key": "authorization_complete_select_initialization_or_c33b9c",
+    "zh": "授權完成，請重新選擇初始化或寫入操作",
+    "en": "Authorization complete. Select initialization or writing again.",
+    "id": "Otorisasi selesai. Pilih kembali inisialisasi atau penulisan."
+  },
+  {
+    "key": "operation_failed_existing_offline_lessons_remain_81f2b8",
+    "zh": "操作失敗，原有離線教材仍可使用",
+    "en": "Operation failed. Existing offline lessons remain available.",
+    "id": "Operasi gagal. Materi luring yang ada tetap tersedia."
+  },
+  {
+    "key": "lesson_columns_and_source_are_ready_download_que_63c95e",
+    "zh": "教材欄位已就緒並儲存來源，已排程下載；可以開始產生 AI 教材",
+    "en": "Lesson columns and source are ready; download queued. You can start generating AI lessons.",
+    "id": "Kolom materi dan sumber siap; unduhan dijadwalkan. Anda dapat mulai membuat materi AI."
+  },
+  {
+    "key": "invalid_service_response_or_draft_format_adjust_0e55f9",
+    "zh": "服務回應或草稿格式不合法，請調整模型或重新產生",
+    "en": "Invalid service response or draft format. Adjust the model or generate again.",
+    "id": "Respons layanan atau format draf tidak valid. Sesuaikan model atau buat ulang."
+  },
+  {
+    "key": "local_google_sync_disabled_account_authorization_003253",
+    "zh": "本機 Google 同步已停用；未撤銷 Google 帳號既有授權，離線教材保留",
+    "en": "Local Google sync disabled. Account authorization was not revoked and offline lessons were retained.",
+    "id": "Sinkronisasi Google lokal dinonaktifkan. Otorisasi akun tidak dicabut dan materi luring dipertahankan."
+  },
+  {
+    "key": "cannot_read_the_local_key_configure_it_again_784995",
+    "zh": "本機金鑰無法讀取，請重新設定",
+    "en": "Cannot read the local key. Configure it again.",
+    "id": "Kunci lokal tidak dapat dibaca. Atur kembali."
+  },
+  {
+    "key": "the_local_api_key_for_this_provider_was_removed_ca90a1",
+    "zh": "此供應商的本機 API 金鑰已移除",
+    "en": "The local API key for this provider was removed",
+    "id": "Kunci API lokal untuk penyedia ini dihapus"
+  },
+  {
+    "key": "all_generated_lessons_duplicate_the_offline_cach_27d5f8",
+    "zh": "產生的教材皆與離線快取重複，請更換主題",
+    "en": "All generated lessons duplicate the offline cache. Try another topic.",
+    "id": "Semua materi yang dibuat sama dengan cache luring. Coba topik lain."
+  },
+  {
+    "key": "network_connection_failed_a_write_result_may_be_6ee461",
+    "zh": "網路連線失敗。若正在寫回，結果可能未確認；保留草稿原樣重試可用穩定 ID 去重",
+    "en": "Network connection failed. A write result may be uncertain; retry the unchanged draft to deduplicate using stable IDs.",
+    "id": "Koneksi jaringan gagal. Hasil penulisan mungkin tidak pasti; coba lagi dengan draf tanpa perubahan untuk menghindari duplikat melalui ID tetap."
+  },
+  {
+    "key": "first_connect_and_initialize_a_writable_google_s_add98b",
+    "zh": "請先連接並初始化可寫入的 Google Sheets 來源",
+    "en": "First connect and initialize a writable Google Sheets source",
+    "id": "Hubungkan dan inisialisasi sumber Google Sheets yang dapat ditulis terlebih dahulu"
+  },
+  {
+    "key": "device_credentials_are_no_longer_valid_reauthori_9ae20a",
+    "zh": "裝置憑證已失效，請重新授權或設定 API 金鑰",
+    "en": "Device credentials are no longer valid. Reauthorize or configure the API key again.",
+    "id": "Kredensial perangkat tidak lagi valid. Otorisasi atau atur ulang kunci API."
+  },
+  {
+    "key": "local_google_authorization_is_disabled_reconnect_cdd27e",
+    "zh": "Google 同步授權已在本機停用，請在教材庫重新連接",
+    "en": "Local Google authorization is disabled. Reconnect in the library.",
+    "id": "Otorisasi Google lokal dinonaktifkan. Hubungkan kembali di pustaka."
+  },
+  {
+    "key": "google_authorization_is_incomplete_44f87e",
+    "zh": "Google 授權尚未完成",
+    "en": "Google authorization is incomplete",
+    "id": "Otorisasi Google belum selesai"
+  },
+  {
+    "key": "no_google_authorization_was_received_0aa8a8",
+    "zh": "未取得 Google 授權",
+    "en": "No Google authorization was received",
+    "id": "Otorisasi Google tidak diterima"
+  },
+  {
+    "key": "sheets_write_permission_was_not_granted_nothing_581b0c",
+    "zh": "未授予 Sheets 寫入權限，尚未初始化或寫入",
+    "en": "Sheets write permission was not granted. Nothing has been initialized or written.",
+    "id": "Izin menulis Sheets tidak diberikan. Belum ada yang diinisialisasi atau ditulis."
+  },
+  {
+    "key": "sheets_read_permission_was_not_granted_5b09fa",
+    "zh": "未授予 Sheets 讀取權限",
+    "en": "Sheets read permission was not granted",
+    "id": "Izin membaca Sheets tidak diberikan"
+  },
+  {
+    "key": "the_local_google_credential_format_is_invalid_re_123f61",
+    "zh": "本機 Google 憑證格式已失效，請重新授權",
+    "en": "The local Google credential format is invalid. Reauthorize.",
+    "id": "Format kredensial Google lokal tidak valid. Lakukan otorisasi ulang."
+  },
+  {
+    "key": "open_the_library_to_reauthorize_google_sheets_2cbc84",
+    "zh": "需要開啟教材庫重新授權 Google Sheets",
+    "en": "Open the library to reauthorize Google Sheets",
+    "id": "Buka pustaka untuk mengotorisasi ulang Google Sheets"
+  },
+  {
+    "key": "google_sheets_returned_incomplete_ranges_offline_7cc4a3",
+    "zh": "Google Sheets 未回傳完整範圍，保留原有離線教材",
+    "en": "Google Sheets returned incomplete ranges. Offline lessons were retained.",
+    "id": "Google Sheets mengembalikan rentang tidak lengkap. Materi luring dipertahankan."
+  },
+  {
+    "key": "initialization_would_exceed_100_columns_d2ae59",
+    "zh": "初始化後欄位超過 100 欄",
+    "en": "Initialization would exceed 100 columns",
+    "id": "Inisialisasi akan melebihi 100 kolom"
+  },
+  {
+    "key": "write_result_unconfirmed_keep_and_retry_the_draf_e5d3f1",
+    "zh": "寫入結果未確認，請保留草稿重試；系統會以穩定 ID 避免重複寫入",
+    "en": "Write result unconfirmed. Keep and retry the draft; stable IDs prevent duplicate writes.",
+    "id": "Hasil penulisan belum terkonfirmasi. Simpan dan coba lagi draf; ID tetap mencegah penulisan duplikat."
+  },
+  {
+    "key": "invalid_sheet_gid_ce1f57",
+    "zh": "工作表 gid 不合法",
+    "en": "Invalid sheet gid",
+    "id": "Gid lembar tidak valid"
+  },
+  {
+    "key": "sheet_columns_changed_inspect_again_before_initi_c91484",
+    "zh": "工作表欄位已改變，請重新檢查再初始化",
+    "en": "Sheet columns changed. Inspect again before initialization.",
+    "id": "Kolom lembar berubah. Periksa kembali sebelum inisialisasi."
+  },
+  {
+    "key": "the_first_row_is_blank_but_data_exists_below_use_1758eb",
+    "zh": "工作表第一列雖空白，但下方已有資料；請新增空白工作表，避免把既有內容誤當教材",
+    "en": "The first row is blank but data exists below. Use a new empty sheet to avoid interpreting other data as lessons.",
+    "id": "Baris pertama kosong tetapi ada data di bawahnya. Gunakan lembar kosong baru agar data lain tidak dianggap sebagai materi."
+  },
+  {
+    "key": "sheet_not_found_check_the_url_gid_a2e800",
+    "zh": "找不到指定工作表，請檢查網址 gid",
+    "en": "Sheet not found. Check the URL gid.",
+    "id": "Lembar tidak ditemukan. Periksa gid URL."
+  },
+  {
+    "key": "authorized_access_requires_the_original_spreadsh_5aa3c6",
+    "zh": "授權讀寫需使用原始試算表網址，不能使用發布 CSV 網址",
+    "en": "Authorized access requires the original spreadsheet URL, not a published CSV URL",
+    "id": "Akses berizin memerlukan URL spreadsheet asli, bukan URL CSV terpublikasi"
+  },
+  {
+    "key": "a_lesson_id_conflicts_with_sheet_content_review_4f7b3c",
+    "zh": "教材 ID 與工作表內容衝突，請重新審核",
+    "en": "A lesson ID conflicts with sheet content. Review again.",
+    "id": "ID materi bertentangan dengan isi lembar. Tinjau kembali."
+  },
+  {
+    "key": "initialized_columns_do_not_match_inspect_the_she_d837e5",
+    "zh": "欄位初始化結果不符，請重新檢查工作表",
+    "en": "Initialized columns do not match. Inspect the sheet again.",
+    "id": "Kolom hasil inisialisasi tidak sesuai. Periksa kembali lembar."
+  },
+  {
+    "key": "columns_contain_blank_or_duplicate_names_or_exce_036d72",
+    "zh": "欄位含空白、重複名稱或超過 100 欄，請先修正",
+    "en": "Columns contain blank or duplicate names or exceed 100. Correct them first.",
+    "id": "Kolom berisi nama kosong atau duplikat, atau melebihi 100. Perbaiki terlebih dahulu."
+  },
+  {
+    "key": "this_sheet_has_columns_for_another_purpose_choos_20f32f",
+    "zh": "此工作表已有其他用途的欄位，請選擇空白工作表或既有教材工作表；不會覆寫原內容",
+    "en": "This sheet has columns for another purpose. Choose an empty or existing lesson sheet; current content will not be overwritten.",
+    "id": "Lembar ini memiliki kolom untuk tujuan lain. Pilih lembar kosong atau lembar materi; isi saat ini tidak akan ditimpa."
+  },
+  {
+    "key": "cannot_confirm_the_sheet_is_empty_initialization_3e4a94",
+    "zh": "無法確認工作表是否空白，未初始化",
+    "en": "Cannot confirm the sheet is empty; initialization was not performed",
+    "id": "Tidak dapat memastikan lembar kosong; inisialisasi tidak dilakukan"
+  },
+  {
+    "key": "network_does_not_meet_the_sync_policy_existing_l_20f7c3",
+    "zh": "目前網路不符合同步政策，保留原有教材",
+    "en": "Network does not meet the sync policy. Existing lessons were retained.",
+    "id": "Jaringan tidak memenuhi kebijakan sinkronisasi. Materi yang ada dipertahankan."
+  },
+  {
+    "key": "initialize_using_an_empty_sheet_with_at_most_100_174d94",
+    "zh": "請使用 100 欄以內的空白工作表初始化",
+    "en": "Initialize using an empty sheet with at most 100 columns",
+    "id": "Gunakan lembar kosong dengan maksimal 100 kolom untuk inisialisasi"
+  },
+  {
+    "key": "enter_the_original_https_google_sheets_url_8f8fba",
+    "zh": "請輸入 Google Sheets HTTPS 原始試算表網址",
+    "en": "Enter the original HTTPS Google Sheets URL",
+    "id": "Masukkan URL HTTPS Google Sheets asli"
+  },
+  {
+    "key": "response_is_too_large_reduce_the_batch_size_4a2616",
+    "zh": "%1$s 回應過大，請減少每批資料",
+    "en": "%1$s response is too large. Reduce the batch size.",
+    "id": "Respons %1$s terlalu besar. Kurangi jumlah batch."
+  },
+  {
+    "key": "http_check_authorization_api_settings_or_quota_064fe4",
+    "zh": "%1$s：HTTP %2$s，請檢查授權、API 設定或配額",
+    "en": "%1$s: HTTP %2$s. Check authorization, API settings or quota.",
+    "id": "%1$s: HTTP %2$s. Periksa otorisasi, pengaturan API, atau kuota."
+  },
+  {
+    "key": "the_api_requires_https_urls_without_credentials_c2b961",
+    "zh": "API 僅接受不含帳密的 HTTPS 網址",
+    "en": "The API requires HTTPS URLs without credentials",
+    "id": "API memerlukan URL HTTPS tanpa kredensial"
+  },
+  {
+    "key": "unsupported_source_access_mode_54dafe",
+    "zh": "不支援的來源存取模式",
+    "en": "Unsupported source access mode",
+    "id": "Mode akses sumber tidak didukung"
+  },
+  {
+    "key": "unsupported_backup_version_0b0755",
+    "zh": "不支援的備份版本",
+    "en": "Unsupported backup version",
+    "id": "Versi cadangan tidak didukung"
+  },
+  {
+    "key": "source_urls_must_be_canonical_csv_urls_without_c_91aa8f",
+    "zh": "來源網址必須為不含憑證的標準 CSV 網址",
+    "en": "Source URLs must be canonical CSV URLs without credentials",
+    "id": "URL sumber harus berupa URL CSV baku tanpa kredensial"
+  },
+  {
+    "key": "backup_contains_duplicate_entries_or_directories_dcee80",
+    "zh": "備份含有重複或目錄項目",
+    "en": "Backup contains duplicate entries or directories",
+    "id": "Cadangan berisi entri duplikat atau direktori"
+  },
+  {
+    "key": "backup_contains_an_invalid_path_or_unknown_file_8b8c53",
+    "zh": "備份含有非法路徑或未知檔案",
+    "en": "Backup contains an invalid path or unknown file",
+    "id": "Cadangan berisi jalur tidak valid atau berkas tak dikenal"
+  },
+  {
+    "key": "a_backup_record_is_too_large_7da720",
+    "zh": "備份單筆資料過大",
+    "en": "A backup record is too large",
+    "id": "Satu catatan cadangan terlalu besar"
+  },
+  {
+    "key": "backup_checksum_failed_d60d90",
+    "zh": "備份校驗失敗：%1$s",
+    "en": "Backup checksum failed: %1$s",
+    "id": "Checksum cadangan gagal: %1$s"
+  },
+  {
+    "key": "backup_files_are_incomplete_c18676",
+    "zh": "備份檔案不完整",
+    "en": "Backup files are incomplete",
+    "id": "Berkas cadangan tidak lengkap"
+  },
+  {
+    "key": "extracted_backup_exceeds_the_safety_limit_281a83",
+    "zh": "備份解壓大小超過安全上限",
+    "en": "Extracted backup exceeds the safety limit",
+    "id": "Hasil ekstraksi cadangan melebihi batas keamanan"
+  },
+  {
+    "key": "invalid_backup_metadata_c4fbef",
+    "zh": "備份資訊不合法",
+    "en": "Invalid backup metadata",
+    "id": "Metadata cadangan tidak valid"
+  },
+  {
+    "key": "backup_exceeds_the_128_mib_safety_limit_a7a07e",
+    "zh": "備份超過 128 MiB 安全上限",
+    "en": "Backup exceeds the 128 MiB safety limit",
+    "id": "Cadangan melebihi batas keamanan 128 MiB"
+  },
+  {
+    "key": "backup_is_too_large_efd635",
+    "zh": "備份過大",
+    "en": "Backup is too large",
+    "id": "Cadangan terlalu besar"
+  },
+  {
+    "key": "the_full_backup_is_missing_queued_lessons_c573aa",
+    "zh": "完整備份缺少佇列教材",
+    "en": "The full backup is missing queued lessons",
+    "id": "Cadangan lengkap tidak memuat materi dalam antrean"
+  },
+  {
+    "key": "duplicate_lesson_primary_keys_881f8b",
+    "zh": "教材主鍵重複",
+    "en": "Duplicate lesson primary keys",
+    "id": "Kunci utama materi duplikat"
+  },
+  {
+    "key": "integrity_checks_are_missing_329e60",
+    "zh": "缺少完整性檢查資料",
+    "en": "Integrity checks are missing",
+    "id": "Pemeriksaan integritas tidak tersedia"
+  },
+  {
+    "key": "duplicate_progress_primary_keys_60fff1",
+    "zh": "進度主鍵重複",
+    "en": "Duplicate progress primary keys",
+    "id": "Kunci utama progres duplikat"
+  },
+  {
+    "key": "choose_different_native_and_target_languages_1efdcd",
+    "zh": "請選擇不同的母語及目標語",
+    "en": "Choose different native and target languages",
+    "id": "Pilih bahasa utama dan target yang berbeda"
+  },
+  {
+    "key": "lesson_not_downloaded_yet_782c42",
+    "zh": "尚未下載教材",
+    "en": "Lesson not downloaded yet",
+    "id": "Materi belum diunduh"
+  },
+  {
+    "key": "sync_the_source_ee0d5c",
+    "zh": "請同步來源",
+    "en": "Sync the source",
+    "id": "Sinkronkan sumber"
+  },
+  {
+    "key": "tts_engine_rejected_synthesis_a0f98c",
+    "zh": "TTS 引擎拒絕合成",
+    "en": "TTS engine rejected synthesis",
+    "id": "Mesin TTS menolak sintesis"
+  },
+  {
+    "key": "audio_for_one_entry_is_too_long_reduce_repeats_o_e46cb9",
+    "zh": "單筆音訊過長，請降低重複或間隔",
+    "en": "Audio for one entry is too long. Reduce repeats or gaps.",
+    "id": "Audio satu entri terlalu panjang. Kurangi pengulangan atau jeda."
+  },
+  {
+    "key": "this_lesson_has_no_text_f6f3ab",
+    "zh": "此教材缺少 %1$s 文字",
+    "en": "This lesson has no %1$s text",
+    "id": "Materi ini tidak memiliki teks %1$s"
+  },
+  {
+    "key": "cannot_save_offline_audio_795156",
+    "zh": "無法儲存離線音訊",
+    "en": "Cannot save offline audio",
+    "id": "Tidak dapat menyimpan audio luring"
+  },
+  {
+    "key": "cannot_activate_the_offline_voice_8997f7",
+    "zh": "無法啟用 %1$s 離線語音",
+    "en": "Cannot activate the %1$s offline voice",
+    "id": "Tidak dapat mengaktifkan suara luring %1$s"
+  },
+  {
+    "key": "system_tts_could_not_start_install_a_speech_engi_5b3f6a",
+    "zh": "系統 TTS 無法啟動，請安裝語音引擎",
+    "en": "System TTS could not start. Install a speech engine.",
+    "id": "TTS sistem tidak dapat dimulai. Pasang mesin suara."
+  },
+  {
+    "key": "missing_offline_voice_package_install_it_in_sett_da7e36",
+    "zh": "缺少 %1$s 離線語音包，請至設定安裝",
+    "en": "Missing %1$s offline voice package. Install it in settings.",
+    "id": "Paket suara luring %1$s belum ada. Pasang melalui pengaturan."
+  },
+  {
+    "key": "missing_offline_voice_package_install_it_in_sett_a1ae40",
+    "zh": "缺少 %1$s 離線語音包，請至設定安裝；無法使用網路語音替代",
+    "en": "Missing %1$s offline voice package. Install it in settings; a network voice will not be substituted.",
+    "id": "Paket suara luring %1$s belum ada. Pasang melalui pengaturan; suara daring tidak akan digunakan sebagai pengganti."
+  },
+  {
+    "key": "offline_tts_synthesis_failed_13d67b",
+    "zh": "離線 TTS 合成失敗",
+    "en": "Offline TTS synthesis failed",
+    "id": "Sintesis TTS luring gagal"
+  },
+  {
+    "key": "offline_tts_synthesis_failed_3d8f7c",
+    "zh": "離線 TTS 合成失敗（%1$s）",
+    "en": "Offline TTS synthesis failed (%1$s)",
+    "id": "Sintesis TTS luring gagal (%1$s)"
+  },
+  {
+    "key": "tts_audio_is_corrupted_8a7f92",
+    "zh": "TTS 音訊損毀",
+    "en": "TTS audio is corrupted",
+    "id": "Audio TTS rusak"
+  },
+  {
+    "key": "this_tts_engine_uses_an_unsupported_audio_format_3901e3",
+    "zh": "此 TTS 引擎的音訊格式不支援，請更換系統 TTS 引擎",
+    "en": "This TTS engine uses an unsupported audio format. Switch the system TTS engine.",
+    "id": "Mesin TTS ini memakai format audio yang tidak didukung. Ganti mesin TTS sistem."
+  },
+  {
+    "key": "offline_lesson_not_downloaded_sync_the_source_fi_eb7ac4",
+    "zh": "離線教材尚未下載，請先同步來源",
+    "en": "Offline lesson not downloaded. Sync the source first.",
+    "id": "Materi luring belum diunduh. Sinkronkan sumber terlebih dahulu."
+  },
+  {
+    "key": "offline_audio_cannot_be_played_e23d59",
+    "zh": "離線語音無法播放",
+    "en": "Offline audio cannot be played",
+    "id": "Audio luring tidak dapat diputar"
+  },
+  {
+    "key": "a_csv_field_is_too_long_e32dc7",
+    "zh": "CSV 單一欄位過長",
+    "en": "A CSV field is too long",
+    "id": "Kolom CSV terlalu panjang"
+  },
+  {
+    "key": "invalid_content_after_a_csv_closing_quote_1298e4",
+    "zh": "CSV 引號後含有非法內容",
+    "en": "Invalid content after a CSV closing quote",
+    "id": "Isi tidak valid setelah tanda kutip penutup CSV"
+  },
+  {
+    "key": "a_csv_quote_is_not_closed_97b5b2",
+    "zh": "CSV 引號未關閉",
+    "en": "A CSV quote is not closed",
+    "id": "Tanda kutip CSV belum ditutup"
+  },
+  {
+    "key": "invalid_csv_quoting_cbe892",
+    "zh": "CSV 引號格式錯誤",
+    "en": "Invalid CSV quoting",
+    "id": "Tanda kutip CSV tidak valid"
+  },
+  {
+    "key": "duplicate_csv_column_names_89c99c",
+    "zh": "CSV 欄位名稱重複",
+    "en": "Duplicate CSV column names",
+    "id": "Nama kolom CSV duplikat"
+  },
+  {
+    "key": "csv_column_count_does_not_match_200fff",
+    "zh": "CSV 欄位數不符",
+    "en": "CSV column count does not match",
+    "id": "Jumlah kolom CSV tidak sesuai"
+  },
+  {
+    "key": "too_many_csv_columns_057990",
+    "zh": "CSV 欄位過多",
+    "en": "Too many CSV columns",
+    "id": "Terlalu banyak kolom CSV"
+  },
+  {
+    "key": "enabled_must_be_true_false_0f9eff",
+    "zh": "enabled 必須為 true/false",
+    "en": "enabled must be true/false",
+    "id": "enabled harus true/false"
+  },
+  {
+    "key": "gid_must_be_a_number_58b8c3",
+    "zh": "gid 需為數字",
+    "en": "gid must be a number",
+    "id": "gid harus berupa angka"
+  },
+  {
+    "key": "lesson_id_is_empty_or_too_long_f4b48d",
+    "zh": "教材 ID 不可空白或過長",
+    "en": "Lesson ID is empty or too long",
+    "id": "ID materi kosong atau terlalu panjang"
+  },
+  {
+    "key": "a_lesson_needs_text_in_at_least_one_language_ce778a",
+    "zh": "教材至少需有一種語言文字",
+    "en": "A lesson needs text in at least one language",
+    "id": "Materi memerlukan teks dalam setidaknya satu bahasa"
+  },
+  {
+    "key": "unrecognized_google_sheets_url_c01e90",
+    "zh": "無法辨識 Google Sheets 網址",
+    "en": "Unrecognized Google Sheets URL",
+    "id": "URL Google Sheets tidak dikenali"
+  },
+  {
+    "key": "missing_id_zh_tw_en_us_or_id_id_columns_a82778",
+    "zh": "缺少 ID、zh-TW、en-US 或 id-ID 欄位",
+    "en": "Missing ID, zh-TW, en-US or id-ID columns",
+    "id": "Kolom ID, zh-TW, en-US, atau id-ID belum ada"
+  },
+  {
+    "key": "use_an_https_public_google_sheets_csv_url_4eb9ef",
+    "zh": "請使用 HTTPS Google Sheets 公開 CSV 網址",
+    "en": "Use an HTTPS public Google Sheets CSV URL",
+    "id": "Gunakan URL CSV Google Sheets publik berjenis HTTPS"
+  },
+  {
+    "key": "http_make_sure_lessons_are_public_or_published_a_475394",
+    "zh": "HTTP %1$s；請確認教材已公開或發布為 CSV",
+    "en": "HTTP %1$s; make sure lessons are public or published as CSV",
+    "id": "HTTP %1$s; pastikan materi bersifat publik atau dipublikasikan sebagai CSV"
+  },
+  {
+    "key": "the_source_returned_a_login_page_publish_or_shar_2d9ffe",
+    "zh": "來源傳回登入頁面，請公開或發布教材",
+    "en": "The source returned a login page. Publish or share the lessons publicly.",
+    "id": "Sumber mengembalikan halaman masuk. Publikasikan atau bagikan materi secara publik."
+  },
+  {
+    "key": "sync_requires_https_e52617",
+    "zh": "同步僅允許 HTTPS",
+    "en": "Sync requires HTTPS",
+    "id": "Sinkronisasi memerlukan HTTPS"
+  },
+  {
+    "key": "insecure_redirect_rejected_8a5fc7",
+    "zh": "拒絕不安全的重新導向",
+    "en": "Insecure redirect rejected",
+    "id": "Pengalihan tidak aman ditolak"
+  },
+  {
+    "key": "network_does_not_meet_the_sync_policy_582a3b",
+    "zh": "目前網路不符合同步政策",
+    "en": "Network does not meet the sync policy",
+    "id": "Jaringan tidak memenuhi kebijakan sinkronisasi"
+  },
+  {
+    "key": "network_changed_sync_stopped_and_previous_lesson_7dd59e",
+    "zh": "網路已變更，同步已停止；保留原有教材",
+    "en": "Network changed; sync stopped and previous lessons were retained",
+    "id": "Jaringan berubah; sinkronisasi dihentikan dan materi lama dipertahankan"
+  },
+  {
+    "key": "csv_is_empty_2f263a",
+    "zh": "CSV 為空",
+    "en": "CSV is empty",
+    "id": "CSV kosong"
+  },
+  {
+    "key": "sync_failed_6d3579",
+    "zh": "同步失敗",
+    "en": "Sync failed",
+    "id": "Sinkronisasi gagal"
+  },
+  {
+    "zh": "介面語言",
+    "en": "Interface language",
+    "id": "Bahasa antarmuka",
+    "key": "interface_language_c5354a"
+  },
+  {
+    "zh": "切換介面語言不會改變教材、學習進度或播放場次。",
+    "en": "Changing the interface language does not change lessons, progress or the playback session.",
+    "id": "Mengubah bahasa antarmuka tidak mengubah materi, progres, atau sesi pemutaran.",
+    "key": "changing_the_interface_language_does_not_change_06a194"
+  },
+  {
+    "zh": "不支援的介面語言",
+    "en": "Unsupported interface language",
+    "id": "Bahasa antarmuka tidak didukung",
+    "key": "unsupported_interface_language_493e9d"
+  },
+  {
+    "zh": "選取第 %1$s 筆教材",
+    "en": "Select lesson %1$s",
+    "id": "Pilih materi %1$s",
+    "key": "select_lesson_f118b9"
+  },
+  {
+    "zh": "此來源已存在",
+    "en": "This source already exists",
+    "id": "Sumber ini sudah ada",
+    "key": "this_source_already_exists_7dddbc"
+  }
+]

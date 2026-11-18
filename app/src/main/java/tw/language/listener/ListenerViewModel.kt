@@ -29,6 +29,7 @@ private val android.content.Context.uiStore by preferencesDataStore("interface")
 class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     val repo=(app as ListenerApp).repository
     val backup=BackupManager(repo,app.cacheDir)
+    val language=repo.dao.observeSettings().map { it?.uiLanguage }.stateIn(viewModelScope,SharingStarted.Eagerly,null)
     val settings=repo.dao.observeSettings().map { it ?: Settings() }.stateIn(viewModelScope,SharingStarted.Eagerly,Settings())
     val stats=repo.dao.stats().stateIn(viewModelScope,SharingStarted.Eagerly,Stats(0,0,0))
     val sources=repo.dao.observeSources().stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())

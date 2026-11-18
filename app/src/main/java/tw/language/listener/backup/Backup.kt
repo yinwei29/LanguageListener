@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 @Serializable
-data class Manifest(val schemaVersion: Int = 2, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
+data class Manifest(val schemaVersion: Int = 3, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
     val full: Boolean, val itemCount: Int, val progressCount: Int, val sourceCount: Int,
     val checksum: Map<String,String>, val dayCount: Int = 0)
 class BackupPreview(val directory: File, val manifest: Manifest, val sources: List<Source>) : Closeable {
@@ -61,7 +61,7 @@ object BackupArchive {
             }
             require(seen==payloadNames+"manifest.json") { "備份檔案不完整" }
             val manifest=JsonCodec.json.decodeFromString<Manifest>(File(dir,"manifest.json").readText())
-            require(manifest.schemaVersion in 1..2) { "不支援的備份版本" }
+            require(manifest.schemaVersion in 1..3) { "不支援的備份版本" }
             require(manifest.createdAt>0 && manifest.appVersion.isNotBlank()) { "備份資訊不合法" }
             require(manifest.checksum.keys==payloadNames) { "缺少完整性檢查資料" }
             manifest.checksum.forEach { (name,sha) -> require(digest(File(dir,name))==sha) { "備份校驗失敗：$name" } }
@@ -105,6 +105,7 @@ object BackupArchive {
             val settings=readLines<Settings>(dir,"settings.jsonl").toList()
             require(settings.size==1 && settings[0].singleton==1 && settings[0].modifiedAt>=0)
             settings[0].playback.validate()
+            require(settings[0].uiLanguage in setOf("zh-TW","en","id")) { "不支援的介面語言" }
             settings[0].aiProfile?.validate()
             val days=readLines<StudyDay>(dir,"days.jsonl").toList()
             require(days.size==manifest.dayCount && days.map { it.epochDay }.distinct().size==days.size)
