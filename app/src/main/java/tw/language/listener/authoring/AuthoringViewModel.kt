@@ -24,6 +24,9 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
     private val app=application as ListenerApp
     private val repo=app.repository
     private val preferences=AiPreferences(app.vault)
+    val models=MutableStateFlow<AiModelList?>(null)
+    val aiError=MutableStateFlow<String?>(null)
+    val generationProgress=MutableStateFlow<Pair<Int,Int>?>(null)
     val busy=MutableStateFlow(false)
     val notice=MutableStateFlow<String?>(null)
     val resolution=MutableStateFlow<PendingIntent?>(null)
@@ -57,7 +60,7 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
                     is SerializationException -> "服務回應或草稿格式不合法，請調整模型或重新產生"
                     is IOException -> "網路連線失敗。若正在寫回，結果可能未確認；保留草稿原樣重試可用穩定 ID 去重"
                     is RemoteError -> {
-                        if(e.status==401 && e.message.orEmpty().startsWith("Google Sheets")) app.google.clear()
+                        if(e.status==401 && e.service=="Google Sheets") app.google.clear()
                         e.message
                     }
                     else -> e.message ?: "操作失敗，原有離線教材仍可使用"
@@ -65,7 +68,7 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
             } finally { busy.value=false }
         }
     }
-    fun cancel() { operation?.cancel(); pendingAction=null; resolution.value=null; notice.value="已取消；若已送出寫回請保留草稿原樣重試確認" }
+    fun cancel() { val generating=generationProgress.value!=null;operation?.cancel(); pendingAction=null; resolution.value=null; notice.value=if(generating) "已停止產生；已完成批次的草稿保留，可繼續剩餘批次" else "已取消；若已送出寫回請保留草稿原樣重試確認" }
     private suspend fun withGoogle(write: Boolean=true, action: suspend (String)->Unit) {
         val result=app.google.authorize(write)
         if(result.hasResolution()) {
@@ -121,30 +124,46 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         profile.value=value; hasKey.value=preferences.hasKey(value); keySaved.value++
         notice.value="AI 設定已儲存於本機；不同供應商與網址不會共用金鑰"
     }
+    fun loadModels(value: AiProfile,newKey: String)=task {
+        aiError.value=null
+        try {
+            val key=newKey.trim().ifEmpty { preferences.key(value) }
+            models.value=AiModelList(value.keySlot(),AiModels().load(value,key))
+            notice.value="模型清單已載入，請選擇模型後儲存 AI 設定"
+        } catch(e: CancellationException) { throw e } catch(e: Exception) { aiError.value=e.message;throw e }
+    }
     fun clearKey()=task { preferences.clear(profile.value); hasKey.value=false; notice.value="此供應商的本機 API 金鑰已移除" }
-    fun generate(request: AiRequest)=task {
-        request.validate()
-        check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "請先連接並初始化可寫入的 Google Sheets 來源" }
-        val generated=AiGenerator().generate(profile.value,preferences.key(profile.value),request)
-        val desired=generated.items.map(AuthoringValidation::fingerprint).toSet()
-        val existing=mutableSetOf<String>()
-        var after: String?=null
-        while(true) {
-            val page=repo.dao.sourcePage(request.sourceId,after,250)
-            if(page.isEmpty()) break
-            for(item in page) if(item.enabled && !item.deleted) {
-                val fingerprint=AuthoringValidation.fingerprint(item)
-                if(fingerprint in desired) existing+=fingerprint
-            }
-            after=page.last().itemId
-        }
-        val items=generated.items.filter { AuthoringValidation.fingerprint(it) !in existing }
-        check(items.isNotEmpty()) { "產生的教材皆與離線快取重複，請更換主題" }
-        repo.mutation.withLock {
-            check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "來源已移除，未保存草稿" }
-            saveDraft(generated.copy(items=items,removedDuplicates=generated.removedDuplicates+generated.items.size-items.size))
-        }
-        notice.value="已產生 ${items.size}/${request.count} 筆待審核教材，尚未寫入 Sheets，也未宣稱已搜尋或查證"
+    fun generate(request: AiRequest)=task { generateWithCheckpoints(request,null) }
+    fun resumeGeneration()=task {
+        val value=checkNotNull(draft.value) { "沒有可繼續的草稿" }
+        generateWithCheckpoints(value.request,value)
+    }
+    private suspend fun generateWithCheckpoints(request: AiRequest,resume: AiDraft?) {
+        aiError.value=null
+        generationProgress.value=(resume?.generatedCount ?: 0) to request.count
+        try {
+            request.validate()
+            val settings=profile.value
+            check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "請先建立本機教材或連接檔案／Google Sheets 來源" }
+            val result=AiBatchGenerator().generate(settings,preferences.key(settings),request,resume,checkpoint={ value ->
+                repo.mutation.withLock {
+                    check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "來源已移除，未保存草稿" }
+                    saveDraft(value)
+                }
+                generationProgress.value=value.generatedCount to request.count
+            },existing={ candidates ->
+                val desired=candidates.map(AuthoringValidation::fingerprint).toSet();val found=mutableSetOf<String>();var after: String?=null
+                while(true) {
+                    val page=repo.dao.sourcePage(request.sourceId,after,250);if(page.isEmpty()) break
+                    for(item in page) if(item.enabled && !item.deleted) AuthoringValidation.fingerprint(item).let { if(it in desired) found+=it }
+                    after=page.last().itemId
+                }
+                found
+            })
+            notice.value=if(result.items.isEmpty()) "產生的教材皆與既有內容重複，請更換主題" else "分批產生完成；請審核實際新增筆數，尚未寫入檔案或雲端"
+        } catch(e: CancellationException) { throw e }
+        catch(e: Exception) { aiError.value=e.message ?: "AI 產生失敗，已完成的草稿保留";throw e }
+        finally { generationProgress.value=null }
     }
     private suspend fun saveDraft(value: AiDraft) { repo.dao.putDraft(DraftRecord(payload=JsonCodec.json.encodeToString(value))) }
     fun writeReviewed(value: AiDraft, selected: List<Item>)=task {

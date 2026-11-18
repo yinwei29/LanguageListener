@@ -21,10 +21,11 @@ class UiStrings(private val context: Context) {
             val match=template.pattern.matchEntire(raw) ?: continue
             val args=match.groupValues.drop(1).toTypedArray()
             // These two templates contain a controlled API service name, not user content.
-            if(template.serviceArgument && args.firstOrNull()=="AI 產生教材")
-                args[0]=invoke(checkNotNull(MessageCatalog.entries["AI 產生教材"]))
+            if(template.serviceArgument && args.firstOrNull() in setOf("AI 產生教材","AI 模型清單"))
+                args[0]=invoke(checkNotNull(MessageCatalog.entries[args[0]]))
             return invoke(template.id,*args)
         }
+        if(raw.contains('\n')) return raw.lines().joinToString("\n") { message(it) }
         return raw
     }
     private data class Template(val id: Int,val pattern: Regex,val serviceArgument: Boolean)

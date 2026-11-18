@@ -90,7 +90,7 @@ class AuthoringMigrationBackupTest {
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("TEST_SECRET_MUST_NOT_APPEAR_IN_ZIP") })
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("Unreviewed") })
             manager.preview(out.toByteArray().inputStream()).use { preview ->
-                assertEquals(4,preview.manifest.schemaVersion)
+                assertEquals(5,preview.manifest.schemaVersion)
                 assertEquals("google",preview.sources.first { it.sourceId=="private" }.access)
                 manager.restore(preview,true)
                 assertEquals(profile,repo.dao.settings()!!.aiProfile)
