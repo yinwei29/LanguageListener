@@ -82,6 +82,7 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         app.google.accept(result,if(action!=null) pendingWrite else false)
         if(action!=null) action(checkNotNull(result.accessToken)) else notice.value="授權完成，請重新選擇初始化或寫入操作"
     }
+    fun useGoogle(action: suspend (String)->Unit)=task { withGoogle(true,action) }
     fun inspect(name: String, url: String)=task { withGoogle { token -> plan.value=app.sheets.inspect(name,url,token) } }
     fun readOnly(name: String, url: String)=task {
         withGoogle(false) { token ->
@@ -123,7 +124,7 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
     fun clearKey()=task { preferences.clear(profile.value); hasKey.value=false; notice.value="此供應商的本機 API 金鑰已移除" }
     fun generate(request: AiRequest)=task {
         request.validate()
-        check(repo.dao.sources().any { it.sourceId==request.sourceId && it.access=="google" }) { "請先連接並初始化可寫入的 Google Sheets 來源" }
+        check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "請先連接並初始化可寫入的 Google Sheets 來源" }
         val generated=AiGenerator().generate(profile.value,preferences.key(profile.value),request)
         val desired=generated.items.map(AuthoringValidation::fingerprint).toSet()
         val existing=mutableSetOf<String>()
@@ -140,7 +141,7 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         val items=generated.items.filter { AuthoringValidation.fingerprint(it) !in existing }
         check(items.isNotEmpty()) { "產生的教材皆與離線快取重複，請更換主題" }
         repo.mutation.withLock {
-            check(repo.dao.sources().any { it.sourceId==request.sourceId && it.access=="google" }) { "來源已移除，未保存草稿" }
+            check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "來源已移除，未保存草稿" }
             saveDraft(generated.copy(items=items,removedDuplicates=generated.removedDuplicates+generated.items.size-items.size))
         }
         notice.value="已產生 ${items.size}/${request.count} 筆待審核教材，尚未寫入 Sheets，也未宣稱已搜尋或查證"
@@ -150,6 +151,21 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         AuthoringValidation.validateReview(value,selected)
         val saved=value.copy(items=value.items.map { old -> selected.find { it.itemId==old.itemId } ?: old },selectedIds=selected.map { it.itemId })
         saveDraft(saved) // Stable IDs and edited text survive ambiguous network failures/process death.
+        val destination=checkNotNull(repo.dao.sources().find { it.sourceId==value.request.sourceId }) { "來源已移除或改變，未寫入" }
+        if(destination.access=="file" || destination.sourceId==Repository.LOCAL_SOURCE_ID) {
+            repo.mutation.withLock { repo.db.withTransaction {
+                check(repo.dao.sources().any { it==destination }) { "來源已移除或改變，未寫入" }
+                selected.forEach { item ->
+                    val old=repo.dao.item(item.sourceId,item.itemId)
+                    check(old==null || old==item) { "教材 ID 與本機內容衝突，請重新審核" }
+                }
+                repo.dao.putItems(selected)
+                saveDraft(saved.copy(written=true,writtenCount=selected.size,skippedCount=0))
+                repo.syncEpoch.incrementAndGet()
+            } }
+            notice.value="已儲存審核教材到 App；檔案來源請再按同步本機檔案，或預覽與 Sheets 同步"
+            return@task
+        }
         withGoogle { token ->
             val source=checkNotNull(repo.dao.sources().find { it.sourceId==value.request.sourceId && it.access=="google" }) { "來源已移除或改變，未寫入" }
             val epoch=repo.syncEpoch.get()

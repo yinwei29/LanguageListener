@@ -73,7 +73,7 @@ fun ListenerScreen(vm: ListenerViewModel=viewModel()) {
         primary=Color(0xFF397FC9),onBackground=Color(0xFF172A43),background=Color.White,primaryContainer=Color(0xFFE8F3FF))
     MaterialTheme(colorScheme=colors) {
         BackHandler(tab!=0) { vm.chooseTab(0) }
-        Scaffold(topBar={ TopAppBar(title={ Text("Language Listener") }) },
+        Scaffold(topBar={ TopAppBar(title={ Text("Language Listener") },actions={ Text("v${BuildConfig.VERSION_NAME}",modifier=Modifier.padding(horizontal=12.dp)) }) },
             snackbarHost={ SnackbarHost(snack) },
             bottomBar={ NavigationBar {
                 listOf(ui(R.string.home_fdf1f0),ui(R.string.player_aa109d),ui(R.string.library_9de5bd),ui(R.string.settings_6329f2)).forEachIndexed { index,label ->
@@ -310,7 +310,10 @@ private fun LibraryScreen(vm: ListenerViewModel) {
     var query by rememberSaveable { mutableStateOf("") }
     var category by rememberSaveable { mutableStateOf("") }
     var remove by remember { mutableStateOf<Source?>(null) }
+    var editingLocal by remember { mutableStateOf<Item?>(null) }
     LaunchedEffect(Unit) { vm.search(query,category) }
+    DocumentPanel(vm,report={ vm.message.value=it })
+    LocalLessonsPanel(vm)
     GoogleAuthoringPanel(report={ vm.message.value=it })
     Panel(ui(R.string.sources_and_sync_public_sources_can_be_added_rea_c90c00)) {
         Text(when(syncStatus) {
@@ -330,11 +333,15 @@ private fun LibraryScreen(vm: ListenerViewModel) {
         }
         sources.forEach { source ->
             HorizontalDivider()
-            Text(source.name,style=MaterialTheme.typography.titleMedium)
-            Text(if(source.access=="google") ui(R.string.google_source_writing_requires_valid_authorizati_949627) else ui(R.string.public_read_only_source_664e30))
-            Text(if(source.url.isEmpty()) ui(R.string.offline_sample_lessons_e2b085) else source.url)
+            Text(if(source.sourceId==Repository.LOCAL_SOURCE_ID) ui.message("我的本機教材") else source.name,style=MaterialTheme.typography.titleMedium)
+            Text(if(source.access=="file") ui.message("本機 Excel／CSV 來源；請使用上方檔案同步功能") else if(source.url.isEmpty()) ui.message("本機教材，不會從 Google Sheets 同步") else if(source.access=="google") ui(R.string.google_source_writing_requires_valid_authorizati_949627) else ui(R.string.public_read_only_source_664e30))
+            Text(if(source.access=="file") ui.message("本機 Excel／CSV 來源；請使用上方檔案同步功能") else if(source.url.isEmpty()) ui.message("儲存在這台裝置；請使用完整 ZIP 備份保存教材文字") else source.url)
             Text(ui(R.string.last_sync_0620ac, (if(source.lastSync==0L) ui(R.string.not_synced_yet_eeee89) else ui.date(source.lastSync))))
             source.error?.let { Text(ui(R.string.sync_failed_cache_retained_2f0d91, (ui.message(it))),color=MaterialTheme.colorScheme.error) }
+            if(source.url.isNotEmpty() && source.access=="public") {
+                val authoring: tw.language.listener.authoring.AuthoringViewModel=viewModel()
+                TextButton(onClick={ authoring.inspect(source.name,source.url) }) { Text(ui.message("初始化這個工作表／授權新增教材")) }
+            }
             TextButton(onClick={ remove=source }) { Text(ui(R.string.remove_source_0e4e14)) }
         }
     }
@@ -351,12 +358,16 @@ private fun LibraryScreen(vm: ListenerViewModel) {
             Text("${item.zh}\n${item.en}\n${item.id}")
             Text("${item.category} · ${item.type} · ${listOf("zh-TW" to item.zh,"en-US" to item.en,"id-ID" to item.id).filter { it.second.isNotBlank() }.joinToString { it.first }}",style=MaterialTheme.typography.labelMedium)
             Actions {
+                if(item.sourceId==Repository.LOCAL_SOURCE_ID || sources.any { it.sourceId==item.sourceId && it.access=="file" }) {
+                    TextButton(onClick={ editingLocal=item }) { Text(ui.message("編輯本機教材")) }
+                }
                 TextButton(onClick={ vm.markLibrary(item,true) }) { Text(ui(R.string.learned_0f130c)) }
                 TextButton(onClick={ vm.markLibrary(item,false) }) { Text(ui(R.string.reset_to_unlearned_6ddb59)) }
             }
         }
         if(more) OutlinedButton(onClick={ vm.search(query,category,true) }) { Text(ui(R.string.load_next_100_entries_a1e2e1)) }
     }
+    editingLocal?.let { LocalLessonDialog(it,vm) { editingLocal=null } }
     AiAuthoringPanel(sources)
     remove?.let { source -> AlertDialog(onDismissRequest={ remove=null },title={ Text(ui(R.string.remove_source_ffd5c8)) },
         text={ Text(ui(R.string.lessons_from_will_be_soft_deleted_learning_recor_96f485, (source.name))) },
@@ -383,6 +394,7 @@ private fun SettingsScreen(vm: ListenerViewModel) {
             Button(enabled=!busy,onClick={ pendingFull=full; export.launch("LanguageListener-${System.currentTimeMillis()}.zip") }) { Text(ui(R.string.export_zip_89f513)) }
             OutlinedButton(enabled=!busy,onClick={ import.launch(arrayOf("application/zip","application/octet-stream")) }) { Text(ui(R.string.import_and_preview_a8bb8f)) }
         }
+        Text(ui(R.string.local_light_backup_warning))
         Text(ui(R.string.transfer_manually_using_usb_quick_share_or_googl_798d78))
     }
     Panel(ui(R.string.offline_voice_packages_8ee771)) {

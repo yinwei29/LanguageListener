@@ -15,6 +15,7 @@ class UiStrings(private val context: Context) {
         minimumFractionDigits=2; maximumFractionDigits=2
     }.format(value)
     fun message(raw: String): String {
+        if(raw=="CSV 為空") return invoke(tw.language.listener.R.string.empty_sheet_help)
         MessageCatalog.entries[raw]?.let { return invoke(it) }
         for(template in templates) {
             val match=template.pattern.matchEntire(raw) ?: continue

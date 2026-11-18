@@ -79,7 +79,7 @@ internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=view
     var key by remember { mutableStateOf("") }
     LaunchedEffect(keySaved) { key="" }
     var sourceId by rememberSaveable { mutableStateOf("") }
-    val writable=sources.filter { it.access=="google" }
+    val writable=sources.filter { it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID }
     LaunchedEffect(writable) { if(writable.none { it.sourceId==sourceId }) sourceId=writable.firstOrNull()?.sourceId ?: "" }
     var topic by rememberSaveable { mutableStateOf("") }
     var category by rememberSaveable { mutableStateOf("日常") }
@@ -140,11 +140,12 @@ private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, wr
     var selected by remember(draft.draftId,draft.written) { mutableStateOf(draft.selectedIds?.toSet() ?: emptySet()) }
     var page by remember(draft.draftId) { mutableStateOf(0) }
     var confirm by remember { mutableStateOf(false) }
-    val source=sources.find { it.sourceId==draft.request.sourceId && it.access=="google" }
+    val source=sources.find { it.sourceId==draft.request.sourceId }
+    val local=source?.access=="file" || source?.sourceId==Repository.LOCAL_SOURCE_ID
     Panel(if(draft.written) ui(R.string.batch_write_result_025023) else ui(R.string.review_not_yet_written_0c4c42)) {
         Text(ui(R.string.topic_source_this_batch_entries_duplicates_remov_e9c7b2, (draft.request.topic), (source?.name ?: ui(R.string.source_removed_or_not_reconnected_880136)), (draft.items.size), (draft.removedDuplicates)))
         Text(ui(R.string.ai_generated_without_web_search_or_fact_checking_78767f))
-        if(draft.written) Text(ui(R.string.confirmed_new_entries_already_present_and_skippe_76c2bd, (draft.writtenCount), (draft.skippedCount)))
+        if(draft.written) Text(if(local) ui.message("已儲存到 App 的教材筆數：")+draft.writtenCount else ui(R.string.confirmed_new_entries_already_present_and_skippe_76c2bd, (draft.writtenCount), (draft.skippedCount)))
         else {
             val pageItems=edited.withIndex().drop(page*10).take(10)
             Text(ui(R.string.review_page_10_entries_per_page_select_entries_i_6510f0, (page+1), ((edited.size+9)/10)))
@@ -167,8 +168,8 @@ private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, wr
             Button(enabled=!busy && selected.isNotEmpty() && source!=null,onClick={ confirm=true }) { Text(ui(R.string.confirm_writing_selected_entries_df53ff, (selected.size))) }
         }
     }
-    if(confirm) AlertDialog(onDismissRequest={ confirm=false },title={ Text(ui(R.string.write_to_google_sheets_ce59c6)) },
-        text={ Text(ui(R.string.destination_add_reviewed_entries_without_overwri_04cd4d, (source?.name), (source?.url), (selected.size))) },
+    if(confirm) AlertDialog(onDismissRequest={ confirm=false },title={ Text(if(local) ui.message("儲存審核教材到 App") else ui(R.string.write_to_google_sheets_ce59c6)) },
+        text={ Text(if(local) ui.message("確認儲存選取的教材到 App；檔案與 Sheets 請使用檔案同步按鈕寫回。") else ui(R.string.destination_add_reviewed_entries_without_overwri_04cd4d, (source?.name), (source?.url), (selected.size))) },
         confirmButton={ TextButton(enabled=!busy,onClick={ confirm=false; write(draft,edited.filter { it.itemId in selected }) }) { Text(ui(R.string.confirm_addition_f2a275)) } },
         dismissButton={ TextButton(onClick={ confirm=false }) { Text(ui(R.string.cancel_4d0b46)) } })
 }
