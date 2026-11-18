@@ -8,3 +8,6 @@ local.properties
 *.keystore
 *.zip
 .DS_Store
+
+__pycache__/
+*.pyc

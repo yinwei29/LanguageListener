@@ -38,7 +38,7 @@ import java.text.DateFormat
 import java.util.Date
 
 @UnstableApi
-class MainActivity : ComponentActivity() {
+class MainActivity : androidx.appcompat.app.AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { ListenerScreen() }
@@ -56,9 +56,19 @@ fun ListenerScreen(vm: ListenerViewModel=viewModel()) {
     val preview by vm.preview.collectAsStateWithLifecycle()
     val snack=remember { SnackbarHostState() }
     val context=LocalContext.current
+    val ui=tw.language.listener.i18n.UiStrings(context)
+    val language by vm.language.collectAsStateWithLifecycle()
+    LaunchedEffect(language) {
+        language?.let {
+            val locales=androidx.core.os.LocaleListCompat.forLanguageTags(it)
+            if(androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()!=locales)
+                androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(locales)
+        }
+    }
+    if(language==null) { CircularProgressIndicator(); return }
     val notification=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(Unit) { if(Build.VERSION.SDK_INT>=33) notification.launch(Manifest.permission.POST_NOTIFICATIONS) }
-    LaunchedEffect(message) { message?.let { snack.showSnackbar(it); vm.message.value=null } }
+    LaunchedEffect(message) { message?.let { snack.showSnackbar(ui.message(it)); vm.message.value=null } }
     val colors=if(settings.dark) darkColorScheme(primary=Color(0xFF8BC1FF)) else lightColorScheme(
         primary=Color(0xFF397FC9),onBackground=Color(0xFF172A43),background=Color.White,primaryContainer=Color(0xFFE8F3FF))
     MaterialTheme(colorScheme=colors) {
@@ -66,13 +76,13 @@ fun ListenerScreen(vm: ListenerViewModel=viewModel()) {
         Scaffold(topBar={ TopAppBar(title={ Text("Language Listener") }) },
             snackbarHost={ SnackbarHost(snack) },
             bottomBar={ NavigationBar {
-                listOf("首頁","播放器","教材庫","設定").forEachIndexed { index,label ->
+                listOf(ui(R.string.home_fdf1f0),ui(R.string.player_aa109d),ui(R.string.library_9de5bd),ui(R.string.settings_6329f2)).forEachIndexed { index,label ->
                     NavigationBarItem(selected=tab==index,onClick={ vm.chooseTab(index) },label={ Text(label) },icon={
                         Icon(when(index) { 0->Icons.Default.Home; 1->Icons.Default.Headphones; 2->Icons.Default.LibraryBooks; else->Icons.Default.Settings },contentDescription=null)
                     })
                 }
             } }) { padding ->
-            Column(Modifier.padding(padding).fillMaxSize()) {
+            Column(Modifier.padding(padding).fillMaxSize().imePadding()) {
                 if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
                 Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
                     NetworkStatus()
@@ -87,17 +97,17 @@ fun ListenerScreen(vm: ListenerViewModel=viewModel()) {
             }
         }
         preview?.let { pending ->
-            AlertDialog(onDismissRequest={ if(!busy) vm.dismissPreview() },title={ Text("匯入預覽") },text={
+            AlertDialog(onDismissRequest={ if(!busy) vm.dismissPreview() },title={ Text(ui(R.string.import_preview_460dc3)) },text={
                 Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                    Text("日期：${date(pending.manifest.createdAt)}\n版本：${pending.manifest.appVersion}／schema ${pending.manifest.schemaVersion}\n教材：${pending.manifest.itemCount} 筆\n學習紀錄：${pending.manifest.progressCount} 筆\n來源：${pending.manifest.sourceCount}")
+                    Text(ui(R.string.date_version_schema_lessons_learning_records_sou_f0b022, (ui.date(pending.manifest.createdAt)), (pending.manifest.appVersion), (pending.manifest.schemaVersion), (pending.manifest.itemCount), (pending.manifest.progressCount), (pending.manifest.sourceCount)))
                     pending.sources.forEach { Text(it.name) }
-                    Text("${if(pending.manifest.full) "完整" else "僅學習紀錄"}備份。完整覆蓋會刪除目前資料；智慧合併依修改時間選取較新進度，保留本機教材與非空佇列。")
-                    if(!pending.manifest.full) Text("輕量備份不含教材文字；覆蓋後需連線同步來源，才能離線播放。")
+                    Text(ui(R.string.backup_replace_deletes_current_data_smart_merge_445fe0, (if(pending.manifest.full) ui(R.string.full_6e6e58) else ui(R.string.learning_records_only_d16fb6))))
+                    if(!pending.manifest.full) Text(ui(R.string.lightweight_backups_exclude_lesson_text_after_re_c3f7cd))
                 }
-            },confirmButton={ TextButton(enabled=!busy,onClick={ vm.restore(false) }) { Text("智慧合併") } },dismissButton={
+            },confirmButton={ TextButton(enabled=!busy,onClick={ vm.restore(false) }) { Text(ui(R.string.smart_merge_0494db)) } },dismissButton={
                 Column {
-                    TextButton(enabled=!busy,onClick={ vm.restore(true) }) { Text("完整覆蓋") }
-                    TextButton(enabled=!busy,onClick=vm::dismissPreview) { Text("取消") }
+                    TextButton(enabled=!busy,onClick={ vm.restore(true) }) { Text(ui(R.string.replace_all_720837)) }
+                    TextButton(enabled=!busy,onClick=vm::dismissPreview) { Text(ui(R.string.cancel_4d0b46)) }
                 }
             })
         }
@@ -106,6 +116,7 @@ fun ListenerScreen(vm: ListenerViewModel=viewModel()) {
 
 @Composable
 private fun NetworkStatus() {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val context=LocalContext.current
     val cm=remember { context.getSystemService(ConnectivityManager::class.java) }
     fun connected()=cm.getNetworkCapabilities(cm.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)==true
@@ -119,7 +130,7 @@ private fun NetworkStatus() {
         cm.registerDefaultNetworkCallback(callback)
         onDispose { cm.unregisterNetworkCallback(callback) }
     }
-    Text(if(online) "已連線 · 教材播放使用本機離線語音" else "目前離線 · 可播放已下載教材",style=MaterialTheme.typography.labelLarge)
+    Text(if(online) ui(R.string.online_lessons_use_offline_voices_on_this_device_395220) else ui(R.string.offline_downloaded_lessons_are_available_a21fca),style=MaterialTheme.typography.labelLarge)
 }
 
 @Composable
@@ -140,31 +151,33 @@ internal fun Actions(content: @Composable FlowRowScope.()->Unit) {
 
 @UnstableApi @Composable
 private fun Home(vm: ListenerViewModel) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val stats by vm.stats.collectAsStateWithLifecycle()
     val streak by vm.streak.collectAsStateWithLifecycle()
     val saved by vm.session.collectAsStateWithLifecycle()
     val total by vm.queueSize.collectAsStateWithLifecycle()
     val current by vm.item.collectAsStateWithLifecycle()
-    Panel("每天聽一點，語言更自然。") {
-        Text("教材 ${stats.total} 筆　已學會 ${stats.learned} 筆\n收藏 ${stats.favorite} 筆　連續學習 $streak 天")
+    Panel(ui(R.string.listen_a_little_every_day_let_languages_feel_nat_79d6bf)) {
+        Text(ui(R.string.lessons_learned_favorites_learning_streak_days_20e9df, (stats.total), (stats.learned), (stats.favorite), (streak)))
     }
-    Panel("繼續學習") {
-        Text("${current?.category ?: "尚無場次"} · ${if(total>0) (saved?.position ?: 0)+1 else 0}/$total 筆")
+    Panel(ui(R.string.continue_learning_66b50b)) {
+        Text(ui(R.string.entries_1b770f, (current?.category ?: ui(R.string.no_session_yet_ab52a9)), (if(total>0) (saved?.position ?: 0)+1 else 0), (total)))
         LinearProgressIndicator(progress={ if(total==0) 0f else ((saved?.position ?: 0)+1f)/total },modifier=Modifier.fillMaxWidth())
-        Button(onClick={ vm.chooseTab(1) }) { Text("開啟播放器") }
+        Button(onClick={ vm.chooseTab(1) }) { Text(ui(R.string.open_player_74ee10)) }
     }
-    Panel("快速開始") {
+    Panel(ui(R.string.quick_start_72add7)) {
         Actions {
-            Button(onClick={ vm.start(vm.settings.value.playback.copy(type="word")) }) { Text("單字練習") }
-            Button(onClick={ vm.start(vm.settings.value.playback.copy(type="sentence")) }) { Text("句子聽力") }
-            Button(onClick={ vm.start(vm.settings.value.playback.copy(random=true)) }) { Text("亂數學習") }
-            Button(onClick={ vm.start(vm.settings.value.playback.copy(state="learned",excludeLearned=false)) }) { Text("複習已學") }
+            Button(onClick={ vm.start(vm.settings.value.playback.copy(type="word")) }) { Text(ui(R.string.word_practice_1f71d6)) }
+            Button(onClick={ vm.start(vm.settings.value.playback.copy(type="sentence")) }) { Text(ui(R.string.sentence_listening_de9200)) }
+            Button(onClick={ vm.start(vm.settings.value.playback.copy(random=true)) }) { Text(ui(R.string.random_learning_f41522)) }
+            Button(onClick={ vm.start(vm.settings.value.playback.copy(state="learned",excludeLearned=false)) }) { Text(ui(R.string.review_learned_entries_96a409)) }
         }
     }
 }
 
 @UnstableApi @Composable
 private fun PlayerScreen(vm: ListenerViewModel) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val item by vm.item.collectAsStateWithLifecycle()
     val progress by vm.progress.collectAsStateWithLifecycle()
     val index by vm.index.collectAsStateWithLifecycle()
@@ -176,50 +189,51 @@ private fun PlayerScreen(vm: ListenerViewModel) {
     val saved by vm.session.collectAsStateWithLifecycle()
     val settings by vm.settings.collectAsStateWithLifecycle()
     val options=saved?.options ?: settings.playback
-    Panel("第 ${if(size==0) 0 else index+1}/$size 筆 · ${item?.category ?: "尚無教材"}") {
-        Text("${options.native} → ${options.target} · ${directionLabel(options.direction)}")
+    Panel(ui(R.string.entry_71375b, (if(size==0) 0 else index+1), (size), (item?.category ?: ui(R.string.no_lessons_yet_1ad296)))) {
+        Text("${options.native} → ${options.target} · ${directionLabel(options.direction,ui)}")
         val current=item
         if(current!=null) {
             Text(current.text(options.native),style=MaterialTheme.typography.headlineSmall)
             Text(current.text(options.target),style=MaterialTheme.typography.headlineLarge,fontWeight=FontWeight.Bold)
             if(options.thirdLanguage) Text(PlaybackOptions.LANGUAGES.filter { it!=options.native && it!=options.target }.joinToString { current.text(it) })
             if(current.pronunciationNote.isNotBlank()) Text(current.pronunciationNote)
-        } else Text("新增公開 Google Sheets 或建立示範教材場次後即可開始。")
-        if(buffering) Text("正在以離線語音合成音訊，首次播放可能需要一些時間…")
+        } else Text(ui(R.string.add_public_google_sheets_or_create_a_session_wit_dcfde8))
+        if(buffering) Text(ui(R.string.synthesizing_offline_audio_the_first_playback_ma_4a780a))
         Slider(value=if(duration>0) (position.toFloat()/duration).coerceIn(0f,1f) else 0f,
             onValueChange=vm::seek,enabled=duration>0,modifier=Modifier.fillMaxWidth())
-        Text("${position/1000} / ${duration/1000} 秒",style=MaterialTheme.typography.labelMedium)
+        Text(ui(R.string.seconds_b14097, (position/1000), (duration/1000)),style=MaterialTheme.typography.labelMedium)
         Actions {
-            OutlinedButton(onClick=vm::previous,enabled=size>0) { Text("上一筆") }
+            OutlinedButton(onClick=vm::previous,enabled=size>0) { Text(ui(R.string.previous_entry_7f3fd8)) }
             Button(onClick=vm::toggle,modifier=Modifier.heightIn(min=64.dp)) {
                 Icon(if(playing) Icons.Default.Pause else Icons.Default.PlayArrow,contentDescription=null)
-                Text(if(playing) "暫停" else "播放")
+                Text(if(playing) ui(R.string.pause_37676b) else ui(R.string.play_219253))
             }
-            OutlinedButton(onClick=vm::next,enabled=size>0) { Text("下一筆") }
+            OutlinedButton(onClick=vm::next,enabled=size>0) { Text(ui(R.string.next_entry_58bf90)) }
         }
         Actions {
-            OutlinedButton(onClick=vm::next,enabled=item!=null) { Text("跳過本次") }
-            OutlinedButton(onClick={ vm.mark("learned") },enabled=item!=null) { Text("已學會") }
-            OutlinedButton(onClick={ vm.mark("7") },enabled=item!=null) { Text("暫停 7 天") }
-            OutlinedButton(onClick={ vm.mark("30") },enabled=item!=null) { Text("暫停 30 天") }
-            OutlinedButton(onClick={ vm.mark("favorite") },enabled=item!=null) { Text(if(progress?.favorite==true) "取消收藏" else "收藏") }
-            OutlinedButton(onClick={ vm.mark("review") },enabled=item!=null) { Text(if((progress?.reviewPriority ?: 0)>0) "取消複習" else "加入複習") }
-            OutlinedButton(onClick={ vm.mark("reset") },enabled=item!=null) { Text("恢復未學") }
+            OutlinedButton(onClick=vm::next,enabled=item!=null) { Text(ui(R.string.skip_this_time_9b9b43)) }
+            OutlinedButton(onClick={ vm.mark("learned") },enabled=item!=null) { Text(ui(R.string.learned_0f130c)) }
+            OutlinedButton(onClick={ vm.mark("7") },enabled=item!=null) { Text(ui(R.string.suspend_for_7_days_c6ba96)) }
+            OutlinedButton(onClick={ vm.mark("30") },enabled=item!=null) { Text(ui(R.string.suspend_for_30_days_31f064)) }
+            OutlinedButton(onClick={ vm.mark("favorite") },enabled=item!=null) { Text(if(progress?.favorite==true) ui(R.string.remove_favorite_26acae) else ui(R.string.favorite_d07cee)) }
+            OutlinedButton(onClick={ vm.mark("review") },enabled=item!=null) { Text(if((progress?.reviewPriority ?: 0)>0) ui(R.string.remove_from_review_35169d) else ui(R.string.add_to_review_aec981)) }
+            OutlinedButton(onClick={ vm.mark("reset") },enabled=item!=null) { Text(ui(R.string.reset_to_unlearned_6ddb59)) }
         }
-        Text("已播放 ${progress?.playCount ?: 0} 次 · ${if(progress?.learned==true) "已學會" else "未學會"}")
+        Text(ui(R.string.played_times_79b9e3, (progress?.playCount ?: 0), (if(progress?.learned==true) ui(R.string.learned_0f130c) else ui(R.string.not_learned_2a214f))))
     }
     OptionsEditor(settings.playback,onSave={ vm.saveSettings(settings.copy(playback=it)) },onStart=vm::start)
 }
 
-private fun directionLabel(value: String)=when(value) { "target-native"->"目標語 → 母語"; "target"->"僅目標語"; else->"母語 → 目標語" }
+private fun directionLabel(value: String, ui: tw.language.listener.i18n.UiStrings)=when(value) { "target-native"->ui(R.string.target_native_9fb69a); "target"->ui(R.string.target_language_only_f1e468); else->ui(R.string.native_target_632dc2) }
 
 @Composable
 internal fun Choice(label: String, value: String, choices: List<Pair<String,String>>, onChange: (String)->Unit) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     var open by remember { mutableStateOf(false) }
     Column {
         Text(label,style=MaterialTheme.typography.labelLarge)
         Box {
-            OutlinedButton(onClick={ open=true }) { Text(choices.firstOrNull { it.first==value }?.second ?: value.ifBlank { "全部" }) }
+            OutlinedButton(onClick={ open=true }) { Text(choices.firstOrNull { it.first==value }?.second ?: value.ifBlank { ui(R.string.all_778fc8) }) }
             DropdownMenu(expanded=open,onDismissRequest={ open=false }) {
                 choices.forEach { (key,name) -> DropdownMenuItem(text={ Text(name) },onClick={ onChange(key); open=false }) }
             }
@@ -229,6 +243,7 @@ internal fun Choice(label: String, value: String, choices: List<Pair<String,Stri
 
 @Composable
 private fun Toggle(label: String, checked: Boolean, onChange: (Boolean)->Unit) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
         Text(label,Modifier.weight(1f)); Switch(checked=checked,onCheckedChange=onChange)
     }
@@ -236,6 +251,7 @@ private fun Toggle(label: String, checked: Boolean, onChange: (Boolean)->Unit) {
 
 @Composable
 private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Unit, onStart: (PlaybackOptions)->Unit) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     var options by remember(saved) { mutableStateOf(saved) }
     var count by remember(saved) { mutableStateOf(if(saved.count==0) "全部" else saved.count.toString()) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -245,44 +261,45 @@ private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Uni
             val value=options.copy(count=amount); value.validate(); error=null; action(value)
         } catch(e: Exception) { error=e.message ?: "設定不合法" }
     }
-    Panel("場次與朗讀設定") {
-        Text("以下變更於下次建立場次生效；目前佇列、語速與朗讀順序不會被清空或改寫。")
+    Panel(ui(R.string.session_and_speech_settings_8673cd)) {
+        Text(ui(R.string.changes_below_apply_when_creating_the_next_sessi_20ffb6))
         val languages=listOf("zh-TW" to "繁體中文", "en-US" to "English", "id-ID" to "Bahasa Indonesia")
-        Choice("母語",options.native,languages) { options=options.copy(native=it) }
-        Choice("目標語",options.target,languages) { options=options.copy(target=it) }
-        Choice("朗讀順序",options.direction,listOf("native-target","target-native","target").map { it to directionLabel(it) }) { options=options.copy(direction=it) }
-        Toggle("顯示第三語言",options.thirdLanguage) { options=options.copy(thirdLanguage=it) }
-        Choice("場次數量",count,listOf("20","50","100","全部").map { it to it }) { count=it }
-        OutlinedTextField(value=count,onValueChange={ count=it },label={ Text("自訂正整數或全部") },singleLine=true,modifier=Modifier.fillMaxWidth())
-        Toggle("亂數（單場次不重複）",options.random) { options=options.copy(random=it) }
-        Toggle("排除已學會",options.excludeLearned) { options=options.copy(excludeLearned=it) }
-        Toggle("優先複習",options.reviewFirst) { options=options.copy(reviewFirst=it) }
-        Toggle("循環場次",options.loop) { options=options.copy(loop=it) }
-        OutlinedTextField(options.category,{ options=options.copy(category=it) },label={ Text("分類（留空為全部）") },modifier=Modifier.fillMaxWidth())
-        Choice("教材類型",options.type,listOf("" to "全部","word" to "單字","phrase" to "短語","sentence" to "句子")) { options=options.copy(type=it) }
-        OutlinedTextField(options.level,{ options=options.copy(level=it) },label={ Text("難度（留空為全部）") },modifier=Modifier.fillMaxWidth())
-        Choice("狀態",options.state,listOf("all" to "全部","learned" to "已學會","favorite" to "收藏","review" to "待複習")) { options=options.copy(state=it,excludeLearned=if(it=="learned") false else options.excludeLearned) }
-        Choice("避開近期教材",options.avoidRecentDays.toString(),listOf("0" to "不排除","1" to "最近 1 天","7" to "最近 7 天","30" to "最近 30 天")) { options=options.copy(avoidRecentDays=it.toInt()) }
+        Choice(ui(R.string.native_language_9bbc85),options.native,languages) { options=options.copy(native=it) }
+        Choice(ui(R.string.target_language_651506),options.target,languages) { options=options.copy(target=it) }
+        Choice(ui(R.string.speech_order_cfb84b),options.direction,listOf("native-target","target-native","target").map { it to directionLabel(it,ui) }) { options=options.copy(direction=it) }
+        Toggle(ui(R.string.show_the_third_language_3450d3),options.thirdLanguage) { options=options.copy(thirdLanguage=it) }
+        Choice(ui(R.string.session_size_666f5b),count,listOf("20","50","100","全部").map { it to if(it=="全部") ui(R.string.all_778fc8) else it }) { count=it }
+        OutlinedTextField(value=if(count=="全部") ui(R.string.all_778fc8) else count,onValueChange={ count=if(it==ui(R.string.all_778fc8)) "全部" else it },label={ Text(ui(R.string.custom_positive_integer_or_all_7a1c42)) },singleLine=true,modifier=Modifier.fillMaxWidth())
+        Toggle(ui(R.string.shuffle_no_repeats_within_a_session_61e644),options.random) { options=options.copy(random=it) }
+        Toggle(ui(R.string.exclude_learned_entries_61e4c7),options.excludeLearned) { options=options.copy(excludeLearned=it) }
+        Toggle(ui(R.string.prioritize_review_363ac5),options.reviewFirst) { options=options.copy(reviewFirst=it) }
+        Toggle(ui(R.string.loop_session_366b56),options.loop) { options=options.copy(loop=it) }
+        OutlinedTextField(options.category,{ options=options.copy(category=it) },label={ Text(ui(R.string.category_blank_for_all_33af15)) },modifier=Modifier.fillMaxWidth())
+        Choice(ui(R.string.lesson_type_f0ab97),options.type,listOf("" to ui(R.string.all_778fc8),"word" to ui(R.string.words_d34b56),"phrase" to ui(R.string.phrases_155650),"sentence" to ui(R.string.sentences_8cfcfc))) { options=options.copy(type=it) }
+        OutlinedTextField(options.level,{ options=options.copy(level=it) },label={ Text(ui(R.string.level_blank_for_all_f722d1)) },modifier=Modifier.fillMaxWidth())
+        Choice(ui(R.string.status_452935),options.state,listOf("all" to ui(R.string.all_778fc8),"learned" to ui(R.string.learned_0f130c),"favorite" to ui(R.string.favorite_d07cee),"review" to ui(R.string.needs_review_d00608))) { options=options.copy(state=it,excludeLearned=if(it=="learned") false else options.excludeLearned) }
+        Choice(ui(R.string.avoid_recently_played_entries_b9e9d4),options.avoidRecentDays.toString(),listOf("0" to ui(R.string.do_not_exclude_e78264),"1" to ui(R.string.last_day_1442e5),"7" to ui(R.string.last_7_days_2a0a05),"30" to ui(R.string.last_30_days_279e4c))) { options=options.copy(avoidRecentDays=it.toInt()) }
         languages.forEach { (tag,label) ->
-            Text("$label 語速：${"%.2f".format(options.rate(tag))} 倍")
+            Text(ui(R.string.speech_rate_0959eb, (label), (ui.decimal(options.rate(tag)))))
             Slider(value=options.rate(tag),valueRange=.25f..2f,onValueChange={ value -> options=when(tag) {
                 "zh-TW"->options.copy(zhRate=value); "en-US"->options.copy(enRate=value); else->options.copy(idRate=value)
             } })
         }
-        Text("每筆重複 ${options.repeats} 次")
+        Text(ui(R.string.repeat_each_entry_times_4a864c, (options.repeats)))
         Slider(value=options.repeats.toFloat(),valueRange=1f..10f,steps=8,onValueChange={ options=options.copy(repeats=it.toInt()) })
-        Text("每段間隔 ${options.gapSeconds} 秒")
+        Text(ui(R.string.gap_between_segments_seconds_6afbef, (options.gapSeconds)))
         Slider(value=options.gapSeconds.toFloat(),valueRange=0f..30f,steps=29,onValueChange={ options=options.copy(gapSeconds=it.toInt()) })
-        error?.let { Text(it,color=MaterialTheme.colorScheme.error) }
+        error?.let { Text(ui.message(it),color=MaterialTheme.colorScheme.error) }
         Actions {
-            OutlinedButton(onClick={ validated(onSave) }) { Text("儲存設定") }
-            Button(onClick={ validated(onStart) }) { Text("建立新場次") }
+            OutlinedButton(onClick={ validated(onSave) }) { Text(ui(R.string.save_settings_bcc070)) }
+            Button(onClick={ validated(onStart) }) { Text(ui(R.string.create_new_session_b359ba)) }
         }
     }
 }
 
 @UnstableApi @Composable
 private fun LibraryScreen(vm: ListenerViewModel) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val syncStatus by vm.syncStatus.collectAsStateWithLifecycle()
     val sources by vm.sources.collectAsStateWithLifecycle()
     val categories by vm.categories.collectAsStateWithLifecycle()
@@ -295,60 +312,61 @@ private fun LibraryScreen(vm: ListenerViewModel) {
     var remove by remember { mutableStateOf<Source?>(null) }
     LaunchedEffect(Unit) { vm.search(query,category) }
     GoogleAuthoringPanel(report={ vm.message.value=it })
-    Panel("教材來源與同步（公開來源可直接唯讀加入）") {
+    Panel(ui(R.string.sources_and_sync_public_sources_can_be_added_rea_c90c00)) {
         Text(when(syncStatus) {
-            androidx.work.WorkInfo.State.ENQUEUED -> "同步已排程，等待符合條件的網路"
-            androidx.work.WorkInfo.State.RUNNING -> "同步中，離線教材仍可使用"
-            androidx.work.WorkInfo.State.SUCCEEDED -> "上次同步工作已完成"
-            androidx.work.WorkInfo.State.FAILED -> "上次同步失敗，請查看來源錯誤"
-            androidx.work.WorkInfo.State.CANCELLED -> "同步已取消"
-            else -> "尚未排程同步"
+            androidx.work.WorkInfo.State.ENQUEUED -> ui(R.string.sync_queued_waiting_for_an_eligible_network_d8981d)
+            androidx.work.WorkInfo.State.RUNNING -> ui(R.string.syncing_offline_lessons_remain_available_d7fcfa)
+            androidx.work.WorkInfo.State.SUCCEEDED -> ui(R.string.last_sync_completed_94fada)
+            androidx.work.WorkInfo.State.FAILED -> ui(R.string.last_sync_failed_check_source_errors_5d23ff)
+            androidx.work.WorkInfo.State.CANCELLED -> ui(R.string.sync_cancelled_dd26f7)
+            else -> ui(R.string.no_sync_scheduled_fb8d3d)
         })
-        Text("使用公開試算表網址或發布為 CSV 的網址；教材需有穩定 ID 與 zh-TW、en-US、id-ID 欄位。")
-        OutlinedTextField(name,{ name=it },label={ Text("來源名稱") },modifier=Modifier.fillMaxWidth())
+        Text(ui(R.string.use_a_public_spreadsheet_url_or_a_published_csv_dcabb5))
+        OutlinedTextField(name,{ name=it },label={ Text(ui(R.string.source_name_0ccc8a)) },modifier=Modifier.fillMaxWidth())
         OutlinedTextField(url,{ url=it },label={ Text("Google Sheets URL") },modifier=Modifier.fillMaxWidth())
         Actions {
-            Button(onClick={ vm.addSource(name,url) },enabled=url.isNotBlank()) { Text("新增公開唯讀來源") }
-            OutlinedButton(onClick=vm::sync) { Text("同步全部來源") }
+            Button(onClick={ vm.addSource(name,url) },enabled=url.isNotBlank()) { Text(ui(R.string.add_public_read_only_source_d4f075)) }
+            OutlinedButton(onClick=vm::sync) { Text(ui(R.string.sync_all_sources_84ce63)) }
         }
         sources.forEach { source ->
             HorizontalDivider()
             Text(source.name,style=MaterialTheme.typography.titleMedium)
-            Text(if(source.access=="google") "Google 連接來源，寫回需有效授權" else "公開唯讀來源")
-            Text(if(source.url.isEmpty()) "離線示範教材" else source.url)
-            Text("最後同步：${if(source.lastSync==0L) "尚未同步" else date(source.lastSync)}")
-            source.error?.let { Text("同步失敗（保留快取）：$it",color=MaterialTheme.colorScheme.error) }
-            TextButton(onClick={ remove=source }) { Text("移除來源") }
+            Text(if(source.access=="google") ui(R.string.google_source_writing_requires_valid_authorizati_949627) else ui(R.string.public_read_only_source_664e30))
+            Text(if(source.url.isEmpty()) ui(R.string.offline_sample_lessons_e2b085) else source.url)
+            Text(ui(R.string.last_sync_0620ac, (if(source.lastSync==0L) ui(R.string.not_synced_yet_eeee89) else ui.date(source.lastSync))))
+            source.error?.let { Text(ui(R.string.sync_failed_cache_retained_2f0d91, (ui.message(it))),color=MaterialTheme.colorScheme.error) }
+            TextButton(onClick={ remove=source }) { Text(ui(R.string.remove_source_0e4e14)) }
         }
     }
-    Panel("教材分類") {
-        if(categories.isEmpty()) Text("目前沒有教材，請新增來源並同步。")
-        categories.forEach { Text("${it.category} · ${it.type} · ${it.total} 筆") }
+    Panel(ui(R.string.lesson_categories_1dff78)) {
+        if(categories.isEmpty()) Text(ui(R.string.no_lessons_yet_add_a_source_and_sync_7a204c))
+        categories.forEach { Text(ui(R.string.entries_09c5b2, (it.category), (it.type), (it.total))) }
     }
-    Panel("搜尋離線教材") {
-        OutlinedTextField(query,{ query=it },label={ Text("搜尋三語文字") },modifier=Modifier.fillMaxWidth())
-        Choice("分類",category,listOf("" to "全部")+categories.map { it.category }.distinct().map { it to it }) { category=it }
-        Button(onClick={ vm.search(query,category) }) { Text("搜尋") }
+    Panel(ui(R.string.search_offline_lessons_b65cdf)) {
+        OutlinedTextField(query,{ query=it },label={ Text(ui(R.string.search_text_in_all_three_languages_42f81d)) },modifier=Modifier.fillMaxWidth())
+        Choice(ui(R.string.category_7c6fd7),category,listOf("" to ui(R.string.all_778fc8))+categories.map { it.category }.distinct().map { it to it }) { category=it }
+        Button(onClick={ vm.search(query,category) }) { Text(ui(R.string.search_0a4379)) }
         items.forEach { item ->
             HorizontalDivider()
             Text("${item.zh}\n${item.en}\n${item.id}")
             Text("${item.category} · ${item.type} · ${listOf("zh-TW" to item.zh,"en-US" to item.en,"id-ID" to item.id).filter { it.second.isNotBlank() }.joinToString { it.first }}",style=MaterialTheme.typography.labelMedium)
             Actions {
-                TextButton(onClick={ vm.markLibrary(item,true) }) { Text("已學會") }
-                TextButton(onClick={ vm.markLibrary(item,false) }) { Text("恢復未學") }
+                TextButton(onClick={ vm.markLibrary(item,true) }) { Text(ui(R.string.learned_0f130c)) }
+                TextButton(onClick={ vm.markLibrary(item,false) }) { Text(ui(R.string.reset_to_unlearned_6ddb59)) }
             }
         }
-        if(more) OutlinedButton(onClick={ vm.search(query,category,true) }) { Text("載入下 100 筆") }
+        if(more) OutlinedButton(onClick={ vm.search(query,category,true) }) { Text(ui(R.string.load_next_100_entries_a1e2e1)) }
     }
     AiAuthoringPanel(sources)
-    remove?.let { source -> AlertDialog(onDismissRequest={ remove=null },title={ Text("移除來源？") },
-        text={ Text("${source.name} 的教材將軟刪除；保留學習紀錄及既有場次，未來以相同穩定鍵還原可繼續使用。") },
-        confirmButton={ TextButton(onClick={ vm.removeSource(source.sourceId); remove=null }) { Text("移除") } },
-        dismissButton={ TextButton(onClick={ remove=null }) { Text("取消") } }) }
+    remove?.let { source -> AlertDialog(onDismissRequest={ remove=null },title={ Text(ui(R.string.remove_source_ffd5c8)) },
+        text={ Text(ui(R.string.lessons_from_will_be_soft_deleted_learning_recor_96f485, (source.name))) },
+        confirmButton={ TextButton(onClick={ vm.removeSource(source.sourceId); remove=null }) { Text(ui(R.string.remove_2f752c)) } },
+        dismissButton={ TextButton(onClick={ remove=null }) { Text(ui(R.string.cancel_4d0b46)) } }) }
 }
 
 @UnstableApi @Composable
 private fun SettingsScreen(vm: ListenerViewModel) {
+    val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val settings by vm.settings.collectAsStateWithLifecycle()
     val status by vm.voiceStatus.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
@@ -357,35 +375,34 @@ private fun SettingsScreen(vm: ListenerViewModel) {
     var pendingFull by rememberSaveable { mutableStateOf(true) }
     val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri -> uri?.let { vm.export(it,pendingFull) } }
     val import=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(vm::import) }
-    Panel("備份與換機") {
-        Text("標準 ZIP 格式，不加密。請將備份保存在信任的位置；不包含 API Key、OAuth Token、憑證、合成音訊或 TTS 語音包。")
-        Choice("備份內容",if(full) "full" else "light",listOf("light" to "僅學習紀錄","full" to "完整備份")) { full=it=="full" }
-        Text(if(full) "包含離線教材、來源、學習進度、播放清單與設定。" else "包含來源、學習進度、播放清單與設定；不含教材，換機後需重新同步。")
+    Panel(ui(R.string.backup_and_device_transfer_f1a679)) {
+        Text(ui(R.string.standard_zip_unencrypted_save_backups_only_in_tr_9df06b))
+        Choice(ui(R.string.backup_contents_94ace2),if(full) "full" else "light",listOf("light" to ui(R.string.learning_records_only_d16fb6),"full" to ui(R.string.full_backup_d3d579))) { full=it=="full" }
+        Text(if(full) ui(R.string.includes_offline_lessons_sources_learning_progre_2f38a3) else ui(R.string.includes_sources_learning_progress_queues_and_se_743f52))
         Actions {
-            Button(enabled=!busy,onClick={ pendingFull=full; export.launch("LanguageListener-${System.currentTimeMillis()}.zip") }) { Text("匯出 ZIP") }
-            OutlinedButton(enabled=!busy,onClick={ import.launch(arrayOf("application/zip","application/octet-stream")) }) { Text("匯入與預覽") }
+            Button(enabled=!busy,onClick={ pendingFull=full; export.launch("LanguageListener-${System.currentTimeMillis()}.zip") }) { Text(ui(R.string.export_zip_89f513)) }
+            OutlinedButton(enabled=!busy,onClick={ import.launch(arrayOf("application/zip","application/octet-stream")) }) { Text(ui(R.string.import_and_preview_a8bb8f)) }
         }
-        Text("可透過 USB、Quick Share 或 Google Drive 手動移轉；解壓安全上限為 128 MiB。")
+        Text(ui(R.string.transfer_manually_using_usb_quick_share_or_googl_798d78))
     }
-    Panel("離線語音包") {
-        Text("只有引擎回報已安裝、且不需網路的 voice 才會用於合成。各引擎與裝置支援不同，需在飛航模式實測。")
-        status.forEach { (tag,available) -> Text("$tag：${if(available) "可用離線語音" else "缺少離線語音包"}") }
+    Panel(ui(R.string.offline_voice_packages_8ee771)) {
+        Text(ui(R.string.synthesis_uses_only_voices_the_engine_reports_as_d8dada))
+        status.forEach { (tag,available) -> Text("$tag：${if(available) ui(R.string.offline_voice_available_9b3a3a) else ui(R.string.offline_voice_package_missing_6689f4)}") }
         Actions {
-            Button(onClick=vm::checkVoices,enabled=!busy) { Text("檢查語音包") }
+            Button(onClick=vm::checkVoices,enabled=!busy) { Text(ui(R.string.check_voice_packages_583911)) }
             OutlinedButton(onClick={
                 try { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) }
                 catch(_: android.content.ActivityNotFoundException) { vm.message.value="此裝置未提供語音包安裝畫面，請至系統的文字轉語音設定安裝" }
-            }) { Text("安裝語音包") }
+            }) { Text(ui(R.string.install_voice_packages_4c0ceb)) }
         }
-        Text("耳機播放／暫停、上一筆、下一筆由 MediaSession 提供。特殊手勢依耳機與系統支援；來電等暫時失去音訊焦點時會暫停，焦點恢復後由系統恢復。拔除耳機會暫停。")
+        Text(ui(R.string.mediasession_provides_headset_play_pause_and_pre_4b43a0))
     }
-    Panel("介面與同步") {
-        Toggle("深色模式",settings.dark) { vm.saveSettings(settings.copy(dark=it)) }
-        Toggle("啟動時同步",settings.syncOnLaunch) { vm.saveSettings(settings.copy(syncOnLaunch=it)) }
-        Toggle("同步僅使用 Wi-Fi",settings.wifiOnly) { vm.saveSettings(settings.copy(wifiOnly=it)) }
-        Text("變更同步網路政策會取消舊工作並重新排程；僅 Wi-Fi 模式也要求網路非計量。")
-        Text("介面語言：臺灣繁體中文。English／Bahasa Indonesia 介面於 Phase 2 開放；三語教材與朗讀已支援。")
+    Panel(ui(R.string.interface_and_sync_d92df4)) {
+        Toggle(ui(R.string.dark_mode_750642),settings.dark) { vm.saveSettings(settings.copy(dark=it)) }
+        Toggle(ui(R.string.sync_on_launch_b1fb8c),settings.syncOnLaunch) { vm.saveSettings(settings.copy(syncOnLaunch=it)) }
+        Toggle(ui(R.string.sync_only_on_wi_fi_bdf678),settings.wifiOnly) { vm.saveSettings(settings.copy(wifiOnly=it)) }
+        Text(ui(R.string.changing_the_network_policy_cancels_old_work_and_1b3e74))
+        Choice(ui(R.string.interface_language_c5354a),settings.uiLanguage,listOf("zh-TW" to "繁體中文","en" to "English","id" to "Bahasa Indonesia")) { vm.saveSettings(settings.copy(uiLanguage=it)) }
+        Text(ui(R.string.changing_the_interface_language_does_not_change_06a194))
     }
 }
-
-private fun date(value: Long): String=DateFormat.getDateTimeInstance().format(Date(value))

@@ -39,14 +39,14 @@ class AuthoringMigrationBackupTest {
             old.execSQL("INSERT INTO progress VALUES ('stable-source','item-1',1,1,12345,2,8,999,888)")
             old.version=1
         }
-        val db=Room.databaseBuilder(context,ListenerDatabase::class.java,name).addMigrations(Migrations.V1_TO_V2).allowMainThreadQueries().build()
+        val db=Room.databaseBuilder(context,ListenerDatabase::class.java,name).addMigrations(Migrations.V1_TO_V2,Migrations.V2_TO_V3).allowMainThreadQueries().build()
         try {
             assertEquals("public",db.dao().sources().single().access)
             assertNull(db.dao().settings()?.aiProfile)
             val progress=db.dao().progress("stable-source","item-1")!!
             assertTrue(progress.learned); assertTrue(progress.favorite); assertEquals(8L,progress.playCount); assertEquals(12345L,progress.skipUntil)
             db.dao().putDraft(DraftRecord(payload="draft"))
-            assertEquals(2,db.openHelper.readableDatabase.version)
+            assertEquals(3,db.openHelper.readableDatabase.version)
         } finally { db.close(); context.deleteDatabase(name) }
     }
     @Test fun authorizedDownloadFeedsExistingImporterWithoutResettingProgress() = runBlocking {
@@ -69,7 +69,7 @@ class AuthoringMigrationBackupTest {
             assertEquals(2,repo.createSession(PlaybackOptions(excludeLearned=false,count=20)))
         } finally { db.close(); file.delete() }
     }
-    @Test fun zipV2PreservesAccessModeExcludesCredentialsAndCanReadLegacyV1() = runBlocking {
+    @Test fun zipV3PreservesLanguageExcludesCredentialsAndReadsLegacyV1AndV2() = runBlocking {
         val context=ApplicationProvider.getApplicationContext<Application>()
         val db=Room.inMemoryDatabaseBuilder(context,ListenerDatabase::class.java).allowMainThreadQueries().build()
         val repo=Repository(db); repo.seed()
@@ -79,7 +79,7 @@ class AuthoringMigrationBackupTest {
         try {
             repo.dao.putSources(listOf(Source("private","private","https://docs.google.com/spreadsheets/d/example/export?format=csv&gid=7",access="google")))
             val profile=AiProfile("compatible","https://provider.example/v1","my-model")
-            repo.dao.putSettings(Settings(aiProfile=profile))
+            repo.dao.putSettings(Settings(aiProfile=profile,uiLanguage="id"))
             val draft=AuthoringValidation.parse("""{"items":[{"zh-TW":"未審核","en-US":"Unreviewed","id-ID":"Belum ditinjau"}]}""",AiRequest("private","test",count=1))
             repo.dao.putDraft(DraftRecord(payload=JsonCodec.json.encodeToString(draft)))
             val out=ByteArrayOutputStream(); manager.export(true,out)
@@ -90,26 +90,29 @@ class AuthoringMigrationBackupTest {
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("TEST_SECRET_MUST_NOT_APPEAR_IN_ZIP") })
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("Unreviewed") })
             manager.preview(out.toByteArray().inputStream()).use { preview ->
-                assertEquals(2,preview.manifest.schemaVersion)
+                assertEquals(3,preview.manifest.schemaVersion)
                 assertEquals("google",preview.sources.first { it.sourceId=="private" }.access)
                 manager.restore(preview,true)
                 assertEquals(profile,repo.dao.settings()!!.aiProfile)
+                assertEquals("id",repo.dao.settings()!!.uiLanguage)
             }
-            // Rebuild the actual old format: sources have no access field, manifest version is 1.
+            // Rebuild legacy payloads without language; version 1 also lacks access/profile.
             entries["sources.jsonl"]=entries.getValue("sources.jsonl").toString(Charsets.UTF_8).lineSequence().filter(String::isNotBlank).joinToString("\n",postfix="\n") {
                 JsonObject(Json.parseToJsonElement(it).jsonObject.filterKeys { key -> key!="access" }).toString()
             }.toByteArray()
             entries["settings.jsonl"]=entries.getValue("settings.jsonl").toString(Charsets.UTF_8).lineSequence().filter(String::isNotBlank).joinToString("\n",postfix="\n") {
-                JsonObject(Json.parseToJsonElement(it).jsonObject.filterKeys { key -> key!="aiProfile" }).toString()
+                JsonObject(Json.parseToJsonElement(it).jsonObject.filterKeys { key -> key!="aiProfile" && key!="uiLanguage" }).toString()
             }.toByteArray()
             val manifest=JsonCodec.json.decodeFromString(Manifest.serializer(),entries.getValue("manifest.json").toString(Charsets.UTF_8))
             val checksum=BackupArchive.payloadNames.associateWith { key -> MessageDigest.getInstance("SHA-256").digest(entries.getValue(key)).joinToString("") { "%02x".format(it) } }
-            entries["manifest.json"]=JsonCodec.json.encodeToString(manifest.copy(schemaVersion=1,checksum=checksum)).toByteArray()
-            val legacy=ByteArrayOutputStream()
-            ZipOutputStream(legacy).use { zip -> entries.forEach { (name,bytes) -> zip.putNextEntry(ZipEntry(name)); zip.write(bytes); zip.closeEntry() } }
-            manager.preview(legacy.toByteArray().inputStream()).use { preview ->
-                assertEquals(1,preview.manifest.schemaVersion); assertTrue(preview.sources.all { it.access=="public" })
-                manager.restore(preview,true); assertNull(repo.dao.settings()!!.aiProfile)
+            for(version in 1..2) {
+                entries["manifest.json"]=JsonCodec.json.encodeToString(manifest.copy(schemaVersion=version,checksum=checksum)).toByteArray()
+                val legacy=ByteArrayOutputStream()
+                ZipOutputStream(legacy).use { zip -> entries.forEach { (name,bytes) -> zip.putNextEntry(ZipEntry(name)); zip.write(bytes); zip.closeEntry() } }
+                manager.preview(legacy.toByteArray().inputStream()).use { preview ->
+                    assertEquals(version,preview.manifest.schemaVersion); assertTrue(preview.sources.all { it.access=="public" })
+                    manager.restore(preview,true); assertNull(repo.dao.settings()!!.aiProfile); assertEquals("zh-TW",repo.dao.settings()!!.uiLanguage)
+                }
             }
         } finally { db.close(); cache.deleteRecursively(); marker.delete() }
     }

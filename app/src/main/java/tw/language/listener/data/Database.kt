@@ -67,6 +67,6 @@ interface ListenerDao {
     @Query("DELETE FROM settings") suspend fun clearSettings()
 }
 
-@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class, DraftRecord::class], version = 2, exportSchema = true)
+@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class, DraftRecord::class], version = 3, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class ListenerDatabase : RoomDatabase() { abstract fun dao(): ListenerDao }

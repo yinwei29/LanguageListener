@@ -40,6 +40,7 @@ data class Session(@PrimaryKey val singleton: Int = 1, val position: Int = 0,
 @Serializable @Entity(tableName = "settings")
 data class Settings(@PrimaryKey val singleton: Int = 1, val playback: PlaybackOptions = PlaybackOptions(),
     val wifiOnly: Boolean = false, val syncOnLaunch: Boolean = true,
+    @androidx.room.ColumnInfo(defaultValue = "'zh-TW'") val uiLanguage: String = "zh-TW",
     val dark: Boolean = false, val modifiedAt: Long = 0, val aiProfile: tw.language.listener.authoring.AiProfile? = null)
 
 @Serializable

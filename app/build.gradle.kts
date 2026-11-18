@@ -12,11 +12,13 @@ android {
         applicationId = "tw.language.listener"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
+    // Every language must remain available offline, including future App Bundle installs.
+    bundle { language { enableSplit = false } }
     // Optional stable debug identity for Google OAuth; no credentials are stored in source.
     System.getenv("LL_DEBUG_KEYSTORE_PATH")?.takeIf { it.isNotBlank() }?.let { path ->
         signingConfigs.getByName("debug") {
@@ -43,6 +45,7 @@ android {
 }
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 dependencies {
+    implementation("androidx.appcompat:appcompat:1.7.1")
     implementation(platform("androidx.compose:compose-bom:2025.02.00"))
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.compose.material3:material3")

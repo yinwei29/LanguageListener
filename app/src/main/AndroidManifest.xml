@@ -7,9 +7,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <queries><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>
     <application android:name=".ListenerApp" android:label="Language Listener"
-        android:icon="@drawable/ic_listener" android:theme="@android:style/Theme.Material.Light.NoActionBar"
-        android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@drawable/ic_listener" android:theme="@style/AppTheme"
+        android:localeConfig="@xml/locales_config" android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false" android:supportsRtl="true" android:usesCleartextTraffic="false">
+        <service android:name="androidx.appcompat.app.AppLocalesMetadataHolderService" android:enabled="false" android:exported="false">
+            <meta-data android:name="autoStoreLocales" android:value="true" />
+        </service>
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
         </activity>

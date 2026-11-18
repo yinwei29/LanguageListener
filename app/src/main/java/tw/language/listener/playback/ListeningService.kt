@@ -75,12 +75,14 @@ class ListeningService : MediaSessionService() {
         buildPlayer(saved.options)
         old?.release()
         queue=entries; countedIndex=-1; loadedSessionId=saved.sessionId
+        val localized=createConfigurationContext(android.content.res.Configuration(resources.configuration).apply { setLocale(java.util.Locale.forLanguageTag(repo.dao.settings()?.uiLanguage ?: "zh-TW")) })
+        val ui=tw.language.listener.i18n.UiStrings(localized)
         val media=entries.map { entry ->
             val item=repo.dao.item(entry.sourceId,entry.itemId)
             MediaItem.Builder().setMediaId("${entry.sourceId}/${entry.itemId}")
                 .setUri(Uri.Builder().scheme("speech").authority("local").appendQueryParameter("source",entry.sourceId).appendQueryParameter("item",entry.itemId).build())
-                .setMediaMetadata(MediaMetadata.Builder().setTitle(item?.text(saved.options.target)?.take(160) ?: "尚未下載教材")
-                    .setArtist(item?.category?.take(80) ?: "請同步來源").setAlbumTitle("Language Listener").build()).build()
+                .setMediaMetadata(MediaMetadata.Builder().setTitle(item?.text(saved.options.target)?.take(160) ?: ui.message("尚未下載教材"))
+                    .setArtist(item?.category?.take(80) ?: ui.message("請同步來源")).setAlbumTitle("Language Listener").build()).build()
         }
         if(media.isNotEmpty()) {
             player?.setMediaItems(media,saved.position.coerceIn(media.indices),saved.offsetMs)
