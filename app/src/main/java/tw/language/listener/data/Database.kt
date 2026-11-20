@@ -5,6 +5,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ListenerDao {
+    @Insert(onConflict=OnConflictStrategy.IGNORE) suspend fun putReview(value: ReviewEvent): Long
+    @Query("SELECT * FROM review_events WHERE eventId=:id") suspend fun reviewEvent(id: String): ReviewEvent?
+    @Query("SELECT * FROM review_events ORDER BY eventId LIMIT :limit OFFSET :offset") suspend fun reviewPage(limit: Int,offset: Int): List<ReviewEvent>
+    @Query("DELETE FROM review_events") suspend fun clearReviews()
+    @Query("SELECT epochDay,COUNT(*) AS total,SUM(CASE WHEN rating='AGAIN' THEN 1 ELSE 0 END) AS again FROM review_events WHERE epochDay BETWEEN :first AND :last GROUP BY epochDay ORDER BY epochDay") fun reviewDays(first: Long,last: Long): Flow<List<ReviewDay>>
+    @Query("SELECT COALESCE(SUM(CASE WHEN p.lastReviewedAt>0 AND p.nextReviewAt<=:now AND p.skipUntil<=:now THEN 1 ELSE 0 END),0) AS due, COALESCE(SUM(CASE WHEN p.lastReviewedAt>0 THEN 1 ELSE 0 END),0) AS scheduled FROM items i LEFT JOIN progress p USING(sourceId,itemId) WHERE i.enabled=1 AND i.deleted=0") fun dueSummary(now: Long): Flow<DueSummary>
+
     @Upsert suspend fun putDocument(value: tw.language.listener.documents.LocalDocument)
     @Query("SELECT * FROM local_documents") suspend fun documents(): List<tw.language.listener.documents.LocalDocument>
     @Query("SELECT * FROM local_documents") fun observeDocuments(): Flow<List<tw.language.listener.documents.LocalDocument>>
@@ -55,11 +62,12 @@ interface ListenerDao {
         WHERE i.enabled=1 AND i.deleted=0 AND COALESCE(p.skipUntil,0)<=:now
           AND (:excludeLearned=0 OR COALESCE(p.learned,0)=0)
           AND (:category='' OR i.category=:category) AND (:type='' OR i.type=:type) AND (:level='' OR i.level=:level)
-          AND (:state='all' OR (:state='learned' AND p.learned=1) OR (:state='favorite' AND p.favorite=1) OR (:state='review' AND p.reviewPriority>0))
+          AND (:state='all' OR (:state='learned' AND p.learned=1) OR (:state='favorite' AND p.favorite=1) OR (:state='review' AND p.reviewPriority>0) OR (:state='due' AND p.lastReviewedAt>0 AND p.nextReviewAt<=:now))
           AND COALESCE(p.lastPlayedAt,0)<=:recentCutoff
           AND (CASE :nativeLanguage WHEN 'zh-TW' THEN i.zh WHEN 'en-US' THEN i.en ELSE i.`id` END)!=''
           AND (CASE :target WHEN 'zh-TW' THEN i.zh WHEN 'en-US' THEN i.en ELSE i.`id` END)!=''
         ORDER BY CASE WHEN :reviewFirst THEN COALESCE(p.reviewPriority,0) ELSE 0 END DESC,
+          CASE WHEN :state='due' THEN p.nextReviewAt ELSE 0 END,
           CASE WHEN :random THEN RANDOM() ELSE 0 END,i.sourceId,i.itemId
         LIMIT :limit""")
     suspend fun fillQueue(now: Long, recentCutoff: Long, excludeLearned: Boolean, category: String,
@@ -72,6 +80,6 @@ interface ListenerDao {
     @Query("DELETE FROM settings") suspend fun clearSettings()
 }
 
-@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, Settings::class, DraftRecord::class,tw.language.listener.documents.LocalDocument::class], version = 4, exportSchema = true)
+@Database(entities = [Source::class, Item::class, Progress::class, QueueEntry::class, StudyDay::class, Session::class, ReviewEvent::class, Settings::class, DraftRecord::class,tw.language.listener.documents.LocalDocument::class], version = 5, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class ListenerDatabase : RoomDatabase() { abstract fun dao(): ListenerDao }

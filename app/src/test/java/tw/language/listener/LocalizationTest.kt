@@ -84,7 +84,7 @@ class LocalizationTest {
             old.execSQL("INSERT INTO ai_drafts VALUES (1,'durable-draft')")
             old.version=2
         }
-        val db=Room.databaseBuilder(base,ListenerDatabase::class.java,name).addMigrations(Migrations.V2_TO_V3,Migrations.V3_TO_V4).allowMainThreadQueries().build()
+        val db=Room.databaseBuilder(base,ListenerDatabase::class.java,name).addMigrations(Migrations.V2_TO_V3,Migrations.V3_TO_V4,Migrations.V4_TO_V5).allowMainThreadQueries().build()
         try {
             val settings=db.dao().settings()!!
             assertEquals("zh-TW",settings.uiLanguage); assertTrue(settings.dark); assertTrue(settings.wifiOnly)

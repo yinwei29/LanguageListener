@@ -16,9 +16,9 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 @Serializable
-data class Manifest(val schemaVersion: Int = 5, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
+data class Manifest(val schemaVersion: Int = 6, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
     val full: Boolean, val itemCount: Int, val progressCount: Int, val sourceCount: Int,
-    val checksum: Map<String,String>, val dayCount: Int = 0)
+    val checksum: Map<String,String>, val dayCount: Int = 0,val reviewCount: Int=0)
 class BackupPreview(val directory: File, val manifest: Manifest, val sources: List<Source>) : Closeable {
     override fun close() { directory.deleteRecursively() }
 }
@@ -26,7 +26,7 @@ class BackupPreview(val directory: File, val manifest: Manifest, val sources: Li
 /** Nothing is extracted by name; only these flat, allowlisted entries can enter staging. */
 object BackupArchive {
     const val MAX_BYTES=128L*1024*1024
-    val payloadNames=setOf("sources.jsonl","items.jsonl","progress.jsonl","queue.jsonl","session.jsonl","settings.jsonl","days.jsonl")
+    val payloadNames=setOf("sources.jsonl","items.jsonl","progress.jsonl","queue.jsonl","session.jsonl","settings.jsonl","days.jsonl","reviews.jsonl")
     fun digest(file: File): String {
         val md=MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->
@@ -59,11 +59,13 @@ object BackupArchive {
                     zip.closeEntry() // validates CRC as well as SHA-256 below
                 }
             }
-            require(seen==payloadNames+"manifest.json") { "備份檔案不完整" }
+            require("manifest.json" in seen) { "備份檔案不完整" }
             val manifest=JsonCodec.json.decodeFromString<Manifest>(File(dir,"manifest.json").readText())
-            require(manifest.schemaVersion in 1..5) { "不支援的備份版本" }
+            require(manifest.schemaVersion in 1..6) { "不支援的備份版本" }
             require(manifest.createdAt>0 && manifest.appVersion.isNotBlank()) { "備份資訊不合法" }
-            require(manifest.checksum.keys==payloadNames) { "缺少完整性檢查資料" }
+            val expected=if(manifest.schemaVersion>=6) payloadNames else payloadNames-"reviews.jsonl"
+            require(seen==expected+"manifest.json") { "備份檔案不完整" }
+            require(manifest.checksum.keys==expected) { "缺少完整性檢查資料" }
             manifest.checksum.forEach { (name,sha) -> require(digest(File(dir,name))==sha) { "備份校驗失敗：$name" } }
             val sources=readLines<Source>(dir,"sources.jsonl").toList()
             require(sources.size==manifest.sourceCount && sources.map { it.sourceId }.distinct().size==sources.size)
@@ -87,6 +89,7 @@ object BackupArchive {
             readLines<Progress>(dir,"progress.jsonl").forEach {
                 validateKey(it.sourceId,it.itemId)
                 require(progressKeys.add(it.sourceId to it.itemId)) { "進度主鍵重複" }
+                tw.language.listener.review.ReviewScheduler.validate(it)
                 require(it.playCount>=0 && it.lastPlayedAt>=0 && it.skipUntil>=0 && it.modifiedAt>=0 && it.reviewPriority in 0..100)
                 count++
             }
@@ -110,6 +113,14 @@ object BackupArchive {
             val days=readLines<StudyDay>(dir,"days.jsonl").toList()
             require(days.size==manifest.dayCount && days.map { it.epochDay }.distinct().size==days.size)
             require(days.all { it.epochDay in -365000L..365000L })
+            if(manifest.schemaVersion<6) File(dir,"reviews.jsonl").writeText("")
+            val reviewIds=HashSet<String>();var reviews=0
+            readLines<ReviewEvent>(dir,"reviews.jsonl").forEach {
+                require(reviewIds.add(it.eventId)) { "複習紀錄重複" }
+                java.util.UUID.fromString(it.eventId);validateKey(it.sourceId,it.itemId)
+                require(it.reviewedAt>0 && it.epochDay in -365000L..365000L) { "複習紀錄不合法" };reviews++
+            }
+            require(reviews==manifest.reviewCount) { "複習紀錄筆數不符" }
             return BackupPreview(dir,manifest,sources)
         } catch(e: Exception) { dir.deleteRecursively(); throw e }
     }
@@ -157,6 +168,13 @@ class BackupManager(private val repo: Repository, private val cache: File) {
                             page.forEach { writer.appendLine(JsonCodec.json.encodeToString(it)) }; progress+=page.size
                         }
                     }
+                    var reviews=0
+                    File(dir,"reviews.jsonl").bufferedWriter().use { writer ->
+                        while(true) {
+                            val page=repo.dao.reviewPage(250,reviews);if(page.isEmpty()) break
+                            page.forEach { writer.appendLine(JsonCodec.json.encodeToString(it)) };reviews+=page.size
+                        }
+                    }
                     write(dir,"queue.jsonl",repo.dao.queue())
                     write(dir,"session.jsonl",listOfNotNull(repo.dao.session()))
                     write(dir,"settings.jsonl",listOf(repo.dao.settings() ?: Settings()))
@@ -164,7 +182,7 @@ class BackupManager(private val repo: Repository, private val cache: File) {
                     write(dir,"days.jsonl",days)
                     require(BackupArchive.payloadNames.sumOf { File(dir,it).length() }<=BackupArchive.MAX_BYTES) { "備份超過 128 MiB 安全上限" }
                     Manifest(createdAt=System.currentTimeMillis(),full=full,itemCount=items,progressCount=progress,
-                        sourceCount=sources.size,checksum=BackupArchive.payloadNames.associateWith { BackupArchive.digest(File(dir,it)) },dayCount=days.size)
+                        sourceCount=sources.size,checksum=BackupArchive.payloadNames.associateWith { BackupArchive.digest(File(dir,it)) },dayCount=days.size,reviewCount=reviews)
                 }
             }
             File(dir,"manifest.json").writeText(JsonCodec.json.encodeToString(manifest))
@@ -183,7 +201,7 @@ class BackupManager(private val repo: Repository, private val cache: File) {
             repo.db.withTransaction {
                 val dao=repo.dao
                 if(replace) {
-                    dao.clearQueue(); dao.clearSession(); dao.clearProgress(); dao.clearItems(); dao.clearSources(); dao.clearSettings(); dao.clearDocuments(); dao.clearDays(); dao.clearDraft()
+                    dao.clearQueue(); dao.clearSession(); dao.clearProgress(); dao.clearItems(); dao.clearSources(); dao.clearSettings(); dao.clearDocuments(); dao.clearDays(); dao.clearDraft(); dao.clearReviews()
                 }
                 val existing=dao.sources().associateBy { it.sourceId }
                 dao.putSources(preview.sources.filter { replace || it.sourceId !in existing })
@@ -192,7 +210,17 @@ class BackupManager(private val repo: Repository, private val cache: File) {
                     dao.putItems(if(replace) batch else batch.filter { dao.item(it.sourceId,it.itemId)==null })
                 }
                 BackupArchive.readLines<Progress>(preview.directory,"progress.jsonl").chunked(250).forEach { batch ->
-                    dao.putProgress(if(replace) batch else batch.filter { it.modifiedAt>(dao.progress(it.sourceId,it.itemId)?.modifiedAt ?: -1) })
+                    dao.putProgress(if(replace) batch else batch.mapNotNull { incoming ->
+                        val local=dao.progress(incoming.sourceId,incoming.itemId)
+                        if(incoming.modifiedAt<=(local?.modifiedAt ?: -1)) null
+                        else if(preview.manifest.schemaVersion<6 && local!=null) incoming.copy(nextReviewAt=local.nextReviewAt,lastReviewedAt=local.lastReviewedAt,intervalDays=local.intervalDays,ease=local.ease,repetitions=local.repetitions,lapses=local.lapses)
+                        else incoming
+                    })
+                }
+                BackupArchive.readLines<ReviewEvent>(preview.directory,"reviews.jsonl").forEach { event ->
+                    val old=dao.reviewEvent(event.eventId)
+                    require(old==null || old==event) { "複習紀錄衝突，還原已取消" }
+                    dao.putReview(event)
                 }
                 val importedSettings=BackupArchive.readLines<Settings>(preview.directory,"settings.jsonl").single()
                 if(replace || importedSettings.modifiedAt>(dao.settings()?.modifiedAt ?: -1)) dao.putSettings(importedSettings)

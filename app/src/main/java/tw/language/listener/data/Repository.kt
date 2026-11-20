@@ -62,6 +62,25 @@ class Repository(val db: ListenerDatabase) {
             dao.queueCount()
         }
     }
+    suspend fun rate(source: String,id: String,rating: tw.language.listener.review.Rating,eventId: String,
+        now: Long=System.currentTimeMillis(),zone: java.time.ZoneId=java.time.ZoneId.systemDefault()): Progress = mutation.withLock {
+        UUID.fromString(eventId)
+        db.withTransaction {
+            val previous=dao.reviewEvent(eventId)
+            if(previous!=null) {
+                require(previous.sourceId==source && previous.itemId==id && previous.rating==rating) { "複習紀錄衝突，未重複評分" }
+                checkNotNull(dao.progress(source,id))
+            } else {
+                val item=checkNotNull(dao.item(source,id)) { "教材不存在，無法安排複習" }
+                check(item.enabled && !item.deleted) { "教材已停用或刪除，未記錄評分" }
+                val value=tw.language.listener.review.ReviewScheduler.schedule(dao.progress(source,id) ?: Progress(source,id),rating,now,zone)
+                dao.putProgress(listOf(value))
+                dao.putReview(ReviewEvent(eventId,source,id,now,java.time.Instant.ofEpochMilli(now).atZone(zone).toLocalDate().toEpochDay(),rating))
+                dao.putDays(listOf(StudyDay(java.time.Instant.ofEpochMilli(now).atZone(zone).toLocalDate().toEpochDay())))
+                value
+            }
+        }
+    }
     suspend fun updateProgress(source: String, id: String, transform: (Progress)->Progress) = mutation.withLock {
         db.withTransaction {
             val old = dao.progress(source,id) ?: Progress(source,id)
