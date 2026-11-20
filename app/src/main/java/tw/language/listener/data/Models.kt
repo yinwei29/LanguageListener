@@ -24,7 +24,19 @@ data class Item(val sourceId: String, val itemId: String, val category: String =
 @Serializable @Entity(tableName = "progress", primaryKeys = ["sourceId", "itemId"])
 data class Progress(val sourceId: String, val itemId: String, val learned: Boolean = false,
     val favorite: Boolean = false, val skipUntil: Long = 0, val reviewPriority: Int = 0,
-    val playCount: Long = 0, val lastPlayedAt: Long = 0, val modifiedAt: Long = 0)
+    val playCount: Long = 0, val lastPlayedAt: Long = 0, val modifiedAt: Long = 0,
+    @ColumnInfo(defaultValue="0") val nextReviewAt: Long=0,
+    @ColumnInfo(defaultValue="0") val lastReviewedAt: Long=0,
+    @ColumnInfo(defaultValue="0") val intervalDays: Int=0,
+    @ColumnInfo(defaultValue="2.5") val ease: Double=2.5,
+    @ColumnInfo(defaultValue="0") val repetitions: Int=0,
+    @ColumnInfo(defaultValue="0") val lapses: Int=0)
+
+@Serializable @Entity(tableName="review_events",indices=[Index("epochDay")])
+data class ReviewEvent(@PrimaryKey val eventId: String,val sourceId: String,val itemId: String,
+    val reviewedAt: Long,val epochDay: Long,val rating: tw.language.listener.review.Rating)
+data class DueSummary(val due: Int=0,val scheduled: Int=0)
+data class ReviewDay(val epochDay: Long,val total: Int,val again: Int)
 
 @Serializable @Entity(tableName = "queue")
 data class QueueEntry(@PrimaryKey(autoGenerate = true) val position: Int, val sourceId: String, val itemId: String)
@@ -62,7 +74,7 @@ data class PlaybackOptions(val native: String = "zh-TW", val target: String = "e
         require(direction in listOf("native-target", "target-native", "target"))
         require(listOf(zhRate, enRate, idRate).all { it.isFinite() && it in .25f..2f })
         require(repeats in 1..10 && gapSeconds in 0..30 && count >= 0 && avoidRecentDays in 0..365)
-        require(state in listOf("all", "learned", "favorite", "review"))
+        require(state in listOf("all", "learned", "favorite", "review", "due"))
     }
     companion object { val LANGUAGES = listOf("zh-TW", "en-US", "id-ID") }
 }

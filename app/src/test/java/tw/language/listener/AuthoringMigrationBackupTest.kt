@@ -39,14 +39,14 @@ class AuthoringMigrationBackupTest {
             old.execSQL("INSERT INTO progress VALUES ('stable-source','item-1',1,1,12345,2,8,999,888)")
             old.version=1
         }
-        val db=Room.databaseBuilder(context,ListenerDatabase::class.java,name).addMigrations(Migrations.V1_TO_V2,Migrations.V2_TO_V3,Migrations.V3_TO_V4).allowMainThreadQueries().build()
+        val db=Room.databaseBuilder(context,ListenerDatabase::class.java,name).addMigrations(Migrations.V1_TO_V2,Migrations.V2_TO_V3,Migrations.V3_TO_V4,Migrations.V4_TO_V5).allowMainThreadQueries().build()
         try {
             assertEquals("public",db.dao().sources().single().access)
             assertNull(db.dao().settings()?.aiProfile)
             val progress=db.dao().progress("stable-source","item-1")!!
             assertTrue(progress.learned); assertTrue(progress.favorite); assertEquals(8L,progress.playCount); assertEquals(12345L,progress.skipUntil)
             db.dao().putDraft(DraftRecord(payload="draft"))
-            assertEquals(4,db.openHelper.readableDatabase.version)
+            assertEquals(5,db.openHelper.readableDatabase.version)
         } finally { db.close(); context.deleteDatabase(name) }
     }
     @Test fun authorizedDownloadFeedsExistingImporterWithoutResettingProgress() = runBlocking {
@@ -90,7 +90,7 @@ class AuthoringMigrationBackupTest {
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("TEST_SECRET_MUST_NOT_APPEAR_IN_ZIP") })
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("Unreviewed") })
             manager.preview(out.toByteArray().inputStream()).use { preview ->
-                assertEquals(5,preview.manifest.schemaVersion)
+                assertEquals(6,preview.manifest.schemaVersion)
                 assertEquals("google",preview.sources.first { it.sourceId=="private" }.access)
                 manager.restore(preview,true)
                 assertEquals(profile,repo.dao.settings()!!.aiProfile)
@@ -103,8 +103,9 @@ class AuthoringMigrationBackupTest {
             entries["settings.jsonl"]=entries.getValue("settings.jsonl").toString(Charsets.UTF_8).lineSequence().filter(String::isNotBlank).joinToString("\n",postfix="\n") {
                 JsonObject(Json.parseToJsonElement(it).jsonObject.filterKeys { key -> key!="aiProfile" && key!="uiLanguage" }).toString()
             }.toByteArray()
+            entries.remove("reviews.jsonl")
             val manifest=JsonCodec.json.decodeFromString(Manifest.serializer(),entries.getValue("manifest.json").toString(Charsets.UTF_8))
-            val checksum=BackupArchive.payloadNames.associateWith { key -> MessageDigest.getInstance("SHA-256").digest(entries.getValue(key)).joinToString("") { "%02x".format(it) } }
+            val checksum=BackupArchive.payloadNames.filter { it in entries }.associateWith { key -> MessageDigest.getInstance("SHA-256").digest(entries.getValue(key)).joinToString("") { "%02x".format(it) } }
             for(version in 1..3) {
                 entries["manifest.json"]=JsonCodec.json.encodeToString(manifest.copy(schemaVersion=version,checksum=checksum)).toByteArray()
                 val legacy=ByteArrayOutputStream()

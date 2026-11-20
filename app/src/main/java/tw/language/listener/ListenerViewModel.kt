@@ -31,6 +31,12 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     val backup=BackupManager(repo,app.cacheDir)
     val language=repo.dao.observeSettings().map { it?.uiLanguage }.stateIn(viewModelScope,SharingStarted.Eagerly,null)
     val settings=repo.dao.observeSettings().map { it ?: Settings() }.stateIn(viewModelScope,SharingStarted.Eagerly,Settings())
+    val reviewClock=flow { while(true) { emit(System.currentTimeMillis());delay(60_000) } }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),System.currentTimeMillis())
+    val due=reviewClock.flatMapLatest { repo.dao.dueSummary(it) }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),DueSummary())
+    val reviewDays=reviewClock.flatMapLatest { val today=java.time.LocalDate.now().toEpochDay();repo.dao.reviewDays(today-6,today) }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),emptyList())
+    val reviewRecorded=MutableStateFlow(false)
+    private var reviewCardKey=""
+    private var reviewActionId=java.util.UUID.randomUUID().toString()
     val stats=repo.dao.stats().stateIn(viewModelScope,SharingStarted.Eagerly,Stats(0,0,0))
     val sources=repo.dao.observeSources().stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val syncStatus=androidx.work.WorkManager.getInstance(app).getWorkInfosForUniqueWorkFlow(SyncWorker.WORK_NAME)
@@ -102,8 +108,13 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
     private suspend fun refreshItem() {
-        val entry=repo.dao.queueAt(index.value)
-        item.value=entry?.let { repo.dao.item(it.sourceId,it.itemId) }
+        val expectedIndex=index.value;val expectedSession=session.value?.sessionId
+        val entry=repo.dao.queueAt(expectedIndex)
+        val value=entry?.let { repo.dao.item(it.sourceId,it.itemId) }
+        if(index.value!=expectedIndex || session.value?.sessionId!=expectedSession) return
+        val key="$expectedSession/$expectedIndex/${entry?.sourceId}/${entry?.itemId}"
+        if(key!=reviewCardKey) { reviewCardKey=key;reviewRecorded.value=false;reviewActionId=java.util.UUID.randomUUID().toString() }
+        item.value=value
     }
     fun chooseTab(value: Int) { viewModelScope.launch { getApplication<Application>().uiStore.edit { it[intPreferencesKey("tab")]=value } } }
     fun runTask(block: suspend ()->Unit) {
@@ -160,6 +171,22 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
             else -> old
         } }
         if(action in listOf("learned","7","30")) next()
+    }
+    fun startDue()=start(settings.value.playback.copy(state="due",excludeLearned=false,category="",type="",level="",avoidRecentDays=0,random=false,reviewFirst=true))
+    fun rate(rating: tw.language.listener.review.Rating,source: String,id: String)=runTask {
+        if(reviewRecorded.value) return@runTask
+        val current=item.value ?: return@runTask
+        if(current.sourceId!=source || current.itemId!=id) { message.value="教材已切換，請確認目前教材後再評分";return@runTask }
+        val key=reviewCardKey
+        repo.rate(current.sourceId,current.itemId,rating,reviewActionId)
+        if(key==reviewCardKey) reviewRecorded.value=true
+        message.value="已記錄評分並安排下次複習"
+    }
+    fun clearReview(source: String,id: String)=runTask {
+        val key=reviewCardKey
+        repo.updateProgress(source,id) { tw.language.listener.review.ReviewScheduler.clear(it,System.currentTimeMillis()) }
+        if(key==reviewCardKey && item.value?.let { it.sourceId==source && it.itemId==id }==true) { reviewRecorded.value=false;reviewActionId=java.util.UUID.randomUUID().toString() }
+        message.value="此筆複習排程已清除，其他學習狀態與歷史紀錄保留"
     }
     fun sync() { SyncWorker.enqueue(getApplication(),settings.value.wifiOnly); message.value="已排入同步工作；離線時會等待網路" }
     private var libraryQuery=""

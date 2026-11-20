@@ -160,6 +160,7 @@ private fun Home(vm: ListenerViewModel) {
     Panel(ui(R.string.listen_a_little_every_day_let_languages_feel_nat_79d6bf)) {
         Text(ui(R.string.lessons_learned_favorites_learning_streak_days_20e9df, (stats.total), (stats.learned), (stats.favorite), (streak)))
     }
+    ReviewDashboard(vm)
     Panel(ui(R.string.continue_learning_66b50b)) {
         Text(ui(R.string.entries_1b770f, (current?.category ?: ui(R.string.no_session_yet_ab52a9)), (if(total>0) (saved?.position ?: 0)+1 else 0), (total)))
         LinearProgressIndicator(progress={ if(total==0) 0f else ((saved?.position ?: 0)+1f)/total },modifier=Modifier.fillMaxWidth())
@@ -221,6 +222,7 @@ private fun PlayerScreen(vm: ListenerViewModel) {
         }
         Text(ui(R.string.played_times_79b9e3, (progress?.playCount ?: 0), (if(progress?.learned==true) ui(R.string.learned_0f130c) else ui(R.string.not_learned_2a214f))))
     }
+    ReviewControls(vm)
     OptionsEditor(settings.playback,onSave={ vm.saveSettings(settings.copy(playback=it)) },onStart=vm::start)
 }
 
@@ -277,7 +279,7 @@ private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Uni
         OutlinedTextField(options.category,{ options=options.copy(category=it) },label={ Text(ui(R.string.category_blank_for_all_33af15)) },modifier=Modifier.fillMaxWidth())
         Choice(ui(R.string.lesson_type_f0ab97),options.type,listOf("" to ui(R.string.all_778fc8),"word" to ui(R.string.words_d34b56),"phrase" to ui(R.string.phrases_155650),"sentence" to ui(R.string.sentences_8cfcfc))) { options=options.copy(type=it) }
         OutlinedTextField(options.level,{ options=options.copy(level=it) },label={ Text(ui(R.string.level_blank_for_all_f722d1)) },modifier=Modifier.fillMaxWidth())
-        Choice(ui(R.string.status_452935),options.state,listOf("all" to ui(R.string.all_778fc8),"learned" to ui(R.string.learned_0f130c),"favorite" to ui(R.string.favorite_d07cee),"review" to ui(R.string.needs_review_d00608))) { options=options.copy(state=it,excludeLearned=if(it=="learned") false else options.excludeLearned) }
+        Choice(ui(R.string.status_452935),options.state,listOf("all" to ui(R.string.all_778fc8),"learned" to ui(R.string.learned_0f130c),"favorite" to ui(R.string.favorite_d07cee),"review" to ui(R.string.needs_review_d00608),"due" to ui.message("到期複習"))) { options=options.copy(state=it,excludeLearned=if(it in listOf("learned","due")) false else options.excludeLearned) }
         Choice(ui(R.string.avoid_recently_played_entries_b9e9d4),options.avoidRecentDays.toString(),listOf("0" to ui(R.string.do_not_exclude_e78264),"1" to ui(R.string.last_day_1442e5),"7" to ui(R.string.last_7_days_2a0a05),"30" to ui(R.string.last_30_days_279e4c))) { options=options.copy(avoidRecentDays=it.toInt()) }
         languages.forEach { (tag,label) ->
             Text(ui(R.string.speech_rate_0959eb, (label), (ui.decimal(options.rate(tag)))))
