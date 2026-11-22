@@ -86,7 +86,7 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         if(action!=null) action(checkNotNull(result.accessToken)) else notice.value="授權完成，請重新選擇初始化或寫入操作"
     }
     fun useGoogle(action: suspend (String)->Unit)=task { withGoogle(true,action) }
-    fun inspect(name: String, url: String)=task { withGoogle { token -> plan.value=app.sheets.inspect(name,url,token) } }
+    fun inspect(name: String, url: String)=task { withGoogle { token -> plan.value=app.sheets.inspect(name,url,token,GoogleSheets.ALL_HEADERS) } }
     fun readOnly(name: String, url: String)=task {
         withGoogle(false) { token ->
             val value=app.sheets.inspect(name,url,token)
@@ -133,6 +133,10 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         } catch(e: CancellationException) { throw e } catch(e: Exception) { aiError.value=e.message;throw e }
     }
     fun clearKey()=task { preferences.clear(profile.value); hasKey.value=false; notice.value="此供應商的本機 API 金鑰已移除" }
+    fun generateNewSource(name: String,request: AiRequest)=task {
+        val initial=AiSourceDrafts.pending(name,request,profile.value)
+        generateWithCheckpoints(initial.request,initial)
+    }
     fun generate(request: AiRequest)=task { generateWithCheckpoints(request,null) }
     fun resumeGeneration()=task {
         val value=checkNotNull(draft.value) { "沒有可繼續的草稿" }
@@ -144,10 +148,13 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         try {
             request.validate()
             val settings=profile.value
-            check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "請先建立本機教材或連接檔案／Google Sheets 來源" }
+            val generationEpoch=repo.syncEpoch.get()
+            if(resume?.pendingSource!=null) AiSourceDrafts.validate(resume)
+            else check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file","local") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "請先建立本機教材或連接檔案／Google Sheets 來源" }
             val result=AiBatchGenerator().generate(settings,preferences.key(settings),request,resume,checkpoint={ value ->
-                repo.mutation.withLock {
-                    check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "來源已移除，未保存草稿" }
+                if(value.pendingSource!=null) AiSourceDrafts(repo).saveCheckpoint(value,generationEpoch) else repo.mutation.withLock {
+                    check(repo.syncEpoch.get()==generationEpoch) { "來源或備份狀態已改變，尚未寫入，請重新審核" }
+                    check(repo.dao.sources().any { it.sourceId==request.sourceId && (it.access in listOf("google","file","local") || it.sourceId==Repository.LOCAL_SOURCE_ID) }) { "來源已移除，未保存草稿" }
                     saveDraft(value)
                 }
                 generationProgress.value=value.generatedCount to request.count
@@ -169,9 +176,14 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
     fun writeReviewed(value: AiDraft, selected: List<Item>)=task {
         AuthoringValidation.validateReview(value,selected)
         val saved=value.copy(items=value.items.map { old -> selected.find { it.itemId==old.itemId } ?: old },selectedIds=selected.map { it.itemId })
+        if(value.pendingSource!=null) {
+            AiSourceDrafts(repo).publish(value,selected)
+            notice.value="AI 本機來源已建立，可直接開始離線學習或匯出 CSV"
+            return@task
+        }
         saveDraft(saved) // Stable IDs and edited text survive ambiguous network failures/process death.
         val destination=checkNotNull(repo.dao.sources().find { it.sourceId==value.request.sourceId }) { "來源已移除或改變，未寫入" }
-        if(destination.access=="file" || destination.sourceId==Repository.LOCAL_SOURCE_ID) {
+        if(destination.access in listOf("file","local") || destination.sourceId==Repository.LOCAL_SOURCE_ID) {
             repo.mutation.withLock { repo.db.withTransaction {
                 check(repo.dao.sources().any { it==destination }) { "來源已移除或改變，未寫入" }
                 selected.forEach { item ->

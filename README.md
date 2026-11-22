@@ -17,6 +17,8 @@ Phase 2 同步可靠性與效能見 [進度紀錄](docs/PHASE2_PROGRESS.md)。�
 
 0.5.0 加入離線間隔複習、到期場次與七天評分紀錄，見 [間隔複習說明](docs/SPACED_REVIEW.md)。
 
+0.6.0 整合 AI 建立本機來源、審核後直接學習、CSV 連接及日文／韓文完整資料流程，見 [離線學習操作](docs/OFFLINE_SOURCES.md)。
+
 ## 取得與建置 APK
 
 Android 8.0（API 26）以上，compile／target SDK 35，JDK 17。
@@ -33,11 +35,11 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 
 ## 首次使用
 
-建議先從「教材庫 → 本機 Excel／CSV」建立 CSV 或選取檔案，不需 Google 授權就能新增教材與離線播放。需要雲端時，再連接原本的 Sheets。
+可從「教材庫 → AI 新增來源與教材」審核建立本機來源，或從「本機 Excel／CSV」建立 CSV／選取檔案；來源卡片可直接開始學習。兩者都不需 Google 授權。需要雲端時，再連接原本的 Sheets。
 
 雲端教材也可直接在 App 完成：**貼上原始 Sheets 網址 → Google 授權 → 預覽並初始化缺少欄位 → 設定自己的 AI API key → 產生 → 分頁審核／修改／選取 → 確認寫回 → 依政策同步 → 離線播放**。首次 Google 連接需開發者在 Cloud 啟用 Sheets API、登記 APK 套件及簽章，詳見 [必要設定](docs/GOOGLE_AI_SETUP.md)。AI 產生不等於已搜尋或查證，未審核不寫回。
 
-1. 設定頁檢查離線語音包；缺少時安裝所需的繁中、英文或印尼文 voice。不同 Android TTS 引擎及裝置支援不同。
+1. 設定頁檢查離線語音包；缺少時安裝所需的繁中、英文、印尼文、日文或韓文 voice。不同 Android TTS 引擎及裝置支援不同。
 2. 可用內建三語示範教材、授權連接並初始化 Sheets，或新增公開 CSV 來源後同步。格式見 [Sheets 格式](docs/SHEETS_FORMAT.md)。
 3. 設定母語／目標語、朗讀方向、各語速、重複、間隔、數量及篩選，按「建立新場次」。設定只於新場次生效。
 4. 下載教材與安裝語音包後可在飛航模式播放。TTS 真正合成本機 WAV，由 Media3 前景媒體服務播放，提供背景、鎖屏、通知與耳機標準控制；首次合成會短暫緩衝。
@@ -47,7 +49,7 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 
 - Kotlin、Jetpack Compose、Material 3 四頁，預設臺灣繁體中文，可切換英文／印尼文介面，支援深色模式與可捲動版面。
 - Room 教材／來源／穩定鍵進度／持久佇列／設定／每日學習紀錄；DataStore 保存上次頁籤。
-- 離線 Android TTS voice 驗證、三語切換、方向／語速／重複／靜音間隔、循環。
+- 離線 Android TTS voice 驗證、五語切換、方向／語速／重複／靜音間隔、循環。
 - Media3 ExoPlayer + MediaSessionService，音訊焦點、拔除耳機暫停、播放位置持久化；重啟不自動出聲。
 - SQL 場次篩選、順序／亂數、20／50／100／自訂／全部、避開近期與優先複習；學會／7 或 30 天暫停／收藏／複習／恢復未學。
 - 多來源公開 Sheets CSV、WorkManager 手動與啟動同步、Wi-Fi 政策、批次 upsert、去重／軟刪除與失敗回復。
@@ -61,4 +63,4 @@ CircleCI 連接後，在成功 job 的 **Artifacts → LanguageListener-debug.ap
 - [實機驗收表](docs/DEVICE_ACCEPTANCE.md)：斷網初次合成、鎖屏持續播放、耳機、來電中斷及換機 SAF 還原需實機確認，不能以 UI 原型或 JVM 測試代替。
 - 自動化涵蓋 CSV 引號／多行／BOM／格式錯誤、來源網址、同步去重與交易回復、穩定鍵進度、場次排除／去重／舊位置寫入、Room 重開、ZIP 來回／合併／輕量、惡意路徑／重複項目／校驗／版本／解壓超限，以及 PCM 音訊與靜音。
 
-未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3／4／5 與 1→2→3→4→5 migration 已納入版本控制；ZIP schema 6 保留來源模式、模型與介面設定、複習排程及評分歷史，並可讀取舊版 schema 1–5。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。
+未提交任何私有教材、憑證、備份或簽章金鑰。`local.properties`、建置產物、ZIP、keystore 都已排除版本控制。Room schema 1／2／3／4／5／6 與 1→2→3→4→5→6 migration 已納入版本控制；ZIP schema 7 保留五語教材、來源篩選、來源模式、模型與介面設定、複習排程及評分歷史，並可讀取舊版 schema 1–6。未審核草稿不納入 ZIP，完整覆蓋會清除草稿，換機後須重新授權並設定 API key。

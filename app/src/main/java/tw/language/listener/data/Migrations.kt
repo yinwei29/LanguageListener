@@ -4,6 +4,12 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 object Migrations {
+    val V5_TO_V6=object: Migration(5,6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE items ADD COLUMN ja TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE items ADD COLUMN ko TEXT NOT NULL DEFAULT ''")
+        }
+    }
     val V4_TO_V5=object: Migration(4,5) {
         override fun migrate(db: SupportSQLiteDatabase) {
             for((name,type,value) in listOf(Triple("nextReviewAt","INTEGER","0"),Triple("lastReviewedAt","INTEGER","0"),Triple("intervalDays","INTEGER","0"),Triple("ease","REAL","2.5"),Triple("repetitions","INTEGER","0"),Triple("lapses","INTEGER","0")))

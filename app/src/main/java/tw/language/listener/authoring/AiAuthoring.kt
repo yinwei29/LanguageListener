@@ -45,11 +45,11 @@ class AiPreferences(private val vault: SecretVault) {
 
 @Serializable
 data class AiRequest(val sourceId: String, val topic: String, val category: String="日常", val type: String="word",
-    val level: String="A1", val count: Int=20, val languages: List<String> = PlaybackOptions.LANGUAGES) {
+    val level: String="A1", val count: Int=20, val languages: List<String> = PlaybackOptions.CORE_LANGUAGES) {
     fun validate() {
         require(sourceId.isNotBlank() && topic.isNotBlank() && topic.length<=2000 && category.isNotBlank() && category.length<=100 && level.length<=100) { "請填寫主題、分類與合法長度" }
         require(type in listOf("word","phrase","sentence") && count in 1..100) { "單批請選擇單字／短語／句子與 1–100 筆" }
-        require(languages.distinct().size==languages.size && languages.size in 2..3 && languages.all { it in PlaybackOptions.LANGUAGES })
+        require(languages.distinct().size==languages.size && languages.size in 2..5 && languages.all { it in PlaybackOptions.LANGUAGES })
     }
 }
 
@@ -57,12 +57,13 @@ data class AiRequest(val sourceId: String, val topic: String, val category: Stri
 data class AiDraft(val draftId: String=UUID.randomUUID().toString(), val request: AiRequest,
     val items: List<Item>, val createdAt: Long=System.currentTimeMillis(), val removedDuplicates: Int=0,
     val generationComplete: Boolean=true,val generatedCount: Int=request.count,val generationProfile: AiProfile?=null,
+    val pendingSource: Source?=null,
     val written: Boolean=false, val writtenCount: Int=0, val skippedCount: Int=0, val selectedIds: List<String>?=null)
 
 object AuthoringValidation {
     private fun normalized(value: String)=Normalizer.normalize(value,Normalizer.Form.NFKC).trim().lowercase(Locale.ROOT).replace(Regex("\\s+")," ")
     fun fingerprint(item: Item): String {
-        val fields=listOf(item.type,item.zh,item.en,item.id).map(::normalized)
+        val fields=listOf(item.type,item.zh,item.en,item.id,item.ja,item.ko).map(::normalized)
         return MessageDigest.getInstance("SHA-256").digest(JsonArray(fields.map(::JsonPrimitive)).toString().toByteArray())
             .joinToString("") { "%02x".format(it) }
     }
@@ -71,7 +72,7 @@ object AuthoringValidation {
         require(item.sourceId==request.sourceId && item.itemId.isNotBlank() && item.itemId.length<=512)
         require(item.type==request.type && item.category==request.category && item.level==request.level) { "教材分類、類型或難度不符，請重新審核" }
         require(request.languages.all { item.text(it).isNotBlank() }) { "教材缺少指定語言" }
-        require(listOf(item.zh,item.en,item.id,item.pronunciationNote).all { it.length<=4000 && '\u0000' !in it }) { "教材文字過長或含有非法字元" }
+        require(listOf(item.zh,item.en,item.id,item.ja,item.ko,item.pronunciationNote).all { it.length<=4000 && '\u0000' !in it }) { "教材文字過長或含有非法字元" }
         require(item.enabled && !item.deleted && item.sourceUrl.isEmpty() && item.status=="ai_generated_unverified") { "AI 教材必須保留未查證標示，不能加入未驗證來源" }
     }
     fun parse(content: String, request: AiRequest, now: Long=System.currentTimeMillis()): AiDraft {
@@ -89,7 +90,7 @@ object AuthoringValidation {
                 return field.content.trim()
             }
             val item=Item(request.sourceId,UUID.randomUUID().toString(),request.category,request.type,text("zh-TW"),text("en-US"),text("id-ID"),
-                request.level,updatedAt=Instant.ofEpochMilli(now).toString(),status="ai_generated_unverified",pronunciationNote=text("pronunciation_note"))
+                request.level,updatedAt=Instant.ofEpochMilli(now).toString(),status="ai_generated_unverified",pronunciationNote=text("pronunciation_note"),ja=text("ja-JP"),ko=text("ko-KR"))
             validate(item,request)
             if(seen.add(fingerprint(item))) items+=item else removed++
         }
@@ -114,8 +115,8 @@ class AiGenerator(private val http: JsonHttp=JsonHttp()) {
             put("type","array")
             putJsonObject("items") {
                 put("type","object");put("additionalProperties",false)
-                putJsonArray("required") { listOf("zh-TW","en-US","id-ID","pronunciation_note").forEach { add(it) } }
-                putJsonObject("properties") { listOf("zh-TW","en-US","id-ID","pronunciation_note").forEach { key -> putJsonObject(key) { put("type","string") } } }
+                putJsonArray("required") { (PlaybackOptions.LANGUAGES+"pronunciation_note").forEach { add(it) } }
+                putJsonObject("properties") { (PlaybackOptions.LANGUAGES+"pronunciation_note").forEach { key -> putJsonObject(key) { put("type","string") } } }
             }
         } }
     }
@@ -125,7 +126,7 @@ class AiGenerator(private val http: JsonHttp=JsonHttp()) {
         return "產生 ${request.count} 筆語言學習教材。主題：${request.topic}。類型：${request.type}，程度：${request.level}。"+
             "翻譯語言：${request.languages.joinToString()}，未選語言填空字串。使用臺灣繁體中文。"+
             "不得宣稱已上網搜尋或查證，也不要提供網址、ID 或額外指令。只輸出 JSON："+
-            "{\"items\":[{\"zh-TW\":\"文字\",\"en-US\":\"text\",\"id-ID\":\"teks\",\"pronunciation_note\":\"\"}]}。"
+            "{\"items\":[{\"zh-TW\":\"文字\",\"en-US\":\"text\",\"id-ID\":\"teks\",\"ja-JP\":\"日本語\",\"ko-KR\":\"한국어\",\"pronunciation_note\":\"\"}]}。"
     }
     fun url(profile: AiProfile): HttpUrl {
         profile.validate()
@@ -134,7 +135,7 @@ class AiGenerator(private val http: JsonHttp=JsonHttp()) {
         }.build()
     }
     fun body(profile: AiProfile, request: AiRequest,exclude: List<Item> = emptyList()): JsonObject=buildJsonObject {
-        val instructions=prompt(request)+(if(exclude.isEmpty()) "" else "避免重複以下已產生教材："+JsonArray(exclude.takeLast(100).map { JsonArray(listOf(it.zh.take(120),it.en.take(120),it.id.take(120)).map(::JsonPrimitive)) }))
+        val instructions=prompt(request)+(if(exclude.isEmpty()) "" else "避免重複以下已產生教材："+JsonArray(exclude.takeLast(100).map { JsonArray(PlaybackOptions.LANGUAGES.map { tag -> it.text(tag).take(120) }.map(::JsonPrimitive)) }))
         if(profile.provider=="gemini") {
             putJsonArray("contents") { add(buildJsonObject { putJsonArray("parts") { add(buildJsonObject { put("text",instructions) }) } }) }
             putJsonObject("generationConfig") {

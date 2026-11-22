@@ -40,7 +40,7 @@ class ReviewMigrationTest {
             old.execSQL("INSERT INTO local_documents VALUES ('stable','content://test/lesson.csv','','hash','[]','[]')")
             old.execSQL("INSERT INTO ai_drafts VALUES (1,'draft')");old.version=4
         }
-        val db=Room.databaseBuilder(app,ListenerDatabase::class.java,name).addMigrations(Migrations.V4_TO_V5).allowMainThreadQueries().build()
+        val db=Room.databaseBuilder(app,ListenerDatabase::class.java,name).addMigrations(Migrations.V4_TO_V5,Migrations.V5_TO_V6).allowMainThreadQueries().build()
         try {
             val p=db.dao().progress("stable","one")!!
             assertTrue(p.favorite);assertTrue(p.learned);assertEquals(7L,p.playCount);assertEquals(0L,p.nextReviewAt);assertEquals(2.5,p.ease,0.0)
@@ -48,6 +48,28 @@ class ReviewMigrationTest {
             assertEquals("draft",db.dao().observeDraft().first()!!.payload)
             db.dao().putReview(ReviewEvent(UUID.randomUUID().toString(),"stable","one",123,1,Rating.GOOD))
             assertEquals(1,db.dao().reviewPage(10,0).size)
+        } finally { db.close();app.deleteDatabase(name) }
+    }
+    @Test fun v5UpgradeRetainsLegacyTextsProgressAndAddsEmptyJapaneseKorean()=runBlocking {
+        val name="language-migration-${System.nanoTime()}.db";val file=app.getDatabasePath(name).apply { parentFile!!.mkdirs() }
+        val schema=Json.parseToJsonElement(javaClass.classLoader!!.getResourceAsStream("tw.language.listener.data.ListenerDatabase/5.json")!!.bufferedReader().use { it.readText() }).jsonObject["database"]!!.jsonObject
+        SQLiteDatabase.openOrCreateDatabase(file,null).use { old ->
+            schema["entities"]!!.jsonArray.forEach { entity -> val e=entity.jsonObject
+                old.execSQL(e["createSql"]!!.jsonPrimitive.content.replace("\${TABLE_NAME}",e["tableName"]!!.jsonPrimitive.content))
+                e["indices"]!!.jsonArray.forEach { index -> old.execSQL(index.jsonObject["createSql"]!!.jsonPrimitive.content.replace("\${TABLE_NAME}",e["tableName"]!!.jsonPrimitive.content)) }
+            }
+            schema["setupQueries"]!!.jsonArray.forEach { old.execSQL(it.jsonPrimitive.content) }
+            old.execSQL("INSERT INTO sources VALUES ('stable','Legacy','',123,NULL,'file')")
+            old.execSQL("INSERT INTO items VALUES ('stable','one','Travel','word','你好','Hello','Halo','A1','',1,0,'','','','')")
+            old.execSQL("INSERT INTO progress VALUES ('stable','one',1,1,0,3,7,999,1000,9999,8888,10,2.6,3,1)")
+            old.version=5
+        }
+        val db=Room.databaseBuilder(app,ListenerDatabase::class.java,name).addMigrations(Migrations.V5_TO_V6).allowMainThreadQueries().build()
+        try {
+            val item=db.dao().item("stable","one")!!;assertEquals("Hello",item.en);assertEquals("Halo",item.id);assertEquals("",item.ja);assertEquals("",item.ko)
+            val progress=db.dao().progress("stable","one")!!;assertTrue(progress.favorite);assertEquals(9999L,progress.nextReviewAt);assertEquals(3,progress.repetitions)
+            db.dao().putItems(listOf(item.copy(ja="こんにちは",ko="안녕하세요")))
+            assertEquals(progress,db.dao().progress("stable","one"))
         } finally { db.close();app.deleteDatabase(name) }
     }
     private fun unpack(bytes: ByteArray): LinkedHashMap<String,ByteArray> {

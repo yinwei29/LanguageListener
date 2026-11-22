@@ -32,13 +32,13 @@ class Repository(val db: ListenerDatabase) {
     /** Device-owned lessons never participate in a remote snapshot. */
     suspend fun saveLocalItem(value: Item) = mutation.withLock {
         val selected=dao.sources().find { it.sourceId==value.sourceId }
-        require((value.sourceId==LOCAL_SOURCE_ID || selected?.access=="file") && value.itemId.isNotBlank() && value.itemId.length<=512)
-        require(listOf(value.zh,value.en,value.id).count { it.isNotBlank() }>=2) { "請至少填寫兩種語言的教材文字" }
-        require(listOf(value.zh,value.en,value.id).all { it.length<=100_000 } && value.category.length<=512 && value.level.length<=512) { "教材欄位過長" }
+        require((value.sourceId==LOCAL_SOURCE_ID || selected?.access in listOf("file","local")) && value.itemId.isNotBlank() && value.itemId.length<=512)
+        require(listOf(value.zh,value.en,value.id,value.ja,value.ko).count { it.isNotBlank() }>=2) { "請至少填寫兩種語言的教材文字" }
+        require(listOf(value.zh,value.en,value.id,value.ja,value.ko).all { it.length<=100_000 } && value.category.length<=512 && value.level.length<=512) { "教材欄位過長" }
         require(value.type in listOf("word","phrase","sentence"))
         db.withTransaction {
             val source=selected
-            require(source==null || source.access=="file" || (source.sourceId==LOCAL_SOURCE_ID && source.url.isEmpty() && source.access=="public")) { "本機教材來源不合法" }
+            require(source==null || source.access in listOf("file","local") || (source.sourceId==LOCAL_SOURCE_ID && source.url.isEmpty() && source.access=="public")) { "本機教材來源不合法" }
             if(source==null) dao.putSources(listOf(Source(LOCAL_SOURCE_ID,"我的本機教材","")))
             syncEpoch.incrementAndGet()
             dao.putItems(listOf(value.copy(zh=value.zh.trim(),en=value.en.trim(),id=value.id.trim(),category=value.category.trim().ifBlank { "日常" },enabled=true,deleted=false)))
@@ -57,7 +57,7 @@ class Repository(val db: ListenerDatabase) {
             dao.fillQueue(now, if(options.avoidRecentDays==0) now else now-options.avoidRecentDays*86_400_000L,
                 options.excludeLearned, options.category, options.type, options.level, options.state,
                 options.native, options.target, options.reviewFirst, options.random,
-                if(options.count==0) -1 else options.count)
+                if(options.count==0) -1 else options.count,options.sourceId)
             dao.putSession(Session(options=options))
             dao.queueCount()
         }
@@ -104,6 +104,13 @@ class Repository(val db: ListenerDatabase) {
         val normalized = tw.language.listener.sync.SheetUrl.normalize(url)
         require(dao.sources().none { it.url == normalized }) { "此來源已存在" }
         dao.putSources(listOf(Source(UUID.nameUUIDFromBytes(normalized.toByteArray(Charsets.UTF_8)).toString(),name.ifBlank { "Google Sheets" },normalized)))
+        syncEpoch.incrementAndGet()
+    }
+    suspend fun renameSource(id: String,name: String)=mutation.withLock {
+        val cleaned=name.trim()
+        require(cleaned.isNotEmpty() && cleaned.length<=100 && cleaned.none(Char::isISOControl)) { "請輸入 1–100 字的來源名稱" }
+        val source=checkNotNull(dao.sources().find { it.sourceId==id }) { "來源已移除" }
+        dao.putSources(listOf(source.copy(name=cleaned)))
         syncEpoch.incrementAndGet()
     }
     suspend fun removeSource(id: String) = mutation.withLock {

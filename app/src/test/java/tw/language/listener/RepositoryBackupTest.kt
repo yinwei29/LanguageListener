@@ -173,7 +173,7 @@ class RepositoryBackupTest {
             if(from.indices.all { duplicate[i+it]==from[it] }) to.copyInto(duplicate,i)
         }
         try { manager.preview(duplicate.inputStream()); fail("accepted duplicate entry") } catch(_: IllegalArgumentException) { }
-        val version=entries.map { (name,data) -> name to if(name=="manifest.json") data.toString(Charsets.UTF_8).replace("\"schemaVersion\":6","\"schemaVersion\":99").toByteArray() else data }
+        val version=entries.map { (name,data) -> name to if(name=="manifest.json") data.toString(Charsets.UTF_8).replace("\"schemaVersion\":7","\"schemaVersion\":99").toByteArray() else data }
         try { manager.preview(zip(version).inputStream()); fail("accepted future schema") } catch(_: IllegalArgumentException) { }
         val bomb=ByteArrayOutputStream()
         ZipOutputStream(bomb).use { zip ->

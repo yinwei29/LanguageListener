@@ -17,8 +17,9 @@ data class Item(val sourceId: String, val itemId: String, val category: String =
     val type: String = "word", val zh: String, val en: String, val id: String,
     val level: String = "", val tags: String = "", val enabled: Boolean = true,
     val deleted: Boolean = false, val updatedAt: String = "", val status: String = "",
-    val sourceUrl: String = "", val pronunciationNote: String = "") {
-    fun text(language: String) = when(language) { "zh-TW" -> zh; "en-US" -> en; "id-ID" -> id; else -> "" }
+    val sourceUrl: String = "", val pronunciationNote: String = "",
+    @ColumnInfo(defaultValue="''") val ja: String="",@ColumnInfo(defaultValue="''") val ko: String="") {
+    fun text(language: String) = when(language) { "zh-TW" -> zh; "en-US" -> en; "id-ID" -> id; "ja-JP"->ja; "ko-KR"->ko;else -> "" }
 }
 
 @Serializable @Entity(tableName = "progress", primaryKeys = ["sourceId", "itemId"])
@@ -62,8 +63,9 @@ data class PlaybackOptions(val native: String = "zh-TW", val target: String = "e
     val repeats: Int = 1, val gapSeconds: Int = 2, val loop: Boolean = false,
     val count: Int = 20, val random: Boolean = false, val excludeLearned: Boolean = true,
     val category: String = "", val type: String = "", val level: String = "",
+    val sourceId: String="",val jaRate: Float=.85f,val koRate: Float=.85f,
     val state: String = "all", val avoidRecentDays: Int = 0, val reviewFirst: Boolean = true) {
-    fun rate(language: String) = when(language) { "zh-TW" -> zhRate; "en-US" -> enRate; else -> idRate }
+    fun rate(language: String) = when(language) { "zh-TW" -> zhRate; "en-US" -> enRate; "ja-JP"->jaRate;"ko-KR"->koRate;else -> idRate }
     fun languages() = when(direction) {
         "target-native" -> listOf(target, native)
         "target" -> listOf(target)
@@ -72,11 +74,12 @@ data class PlaybackOptions(val native: String = "zh-TW", val target: String = "e
     fun validate() {
         require(native in LANGUAGES && target in LANGUAGES && native != target) { "請選擇不同的母語及目標語" }
         require(direction in listOf("native-target", "target-native", "target"))
-        require(listOf(zhRate, enRate, idRate).all { it.isFinite() && it in .25f..2f })
+        require(listOf(zhRate, enRate, idRate,jaRate,koRate).all { it.isFinite() && it in .25f..2f })
         require(repeats in 1..10 && gapSeconds in 0..30 && count >= 0 && avoidRecentDays in 0..365)
+        require(sourceId.length<=512 && sourceId.none(Char::isISOControl))
         require(state in listOf("all", "learned", "favorite", "review", "due"))
     }
-    companion object { val LANGUAGES = listOf("zh-TW", "en-US", "id-ID") }
+    companion object { val CORE_LANGUAGES=listOf("zh-TW", "en-US", "id-ID");val LANGUAGES=CORE_LANGUAGES+listOf("ja-JP","ko-KR");val LANGUAGE_LABELS=listOf("zh-TW" to "繁體中文","en-US" to "English","id-ID" to "Bahasa Indonesia","ja-JP" to "日本語","ko-KR" to "한국어") }
 }
 
 class Converters {

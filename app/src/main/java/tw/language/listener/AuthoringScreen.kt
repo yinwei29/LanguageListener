@@ -67,7 +67,7 @@ internal fun GoogleAuthoringPanel(report: (String)->Unit, vm: AuthoringViewModel
 }
 
 @Composable
-internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=viewModel()) {
+internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onVoices: ()->Unit, vm: AuthoringViewModel=viewModel()) {
     val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val busy by vm.busy.collectAsStateWithLifecycle()
     val saved by vm.profile.collectAsStateWithLifecycle()
@@ -77,12 +77,16 @@ internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=view
     val aiError by vm.aiError.collectAsStateWithLifecycle()
     val generationProgress by vm.generationProgress.collectAsStateWithLifecycle()
     val draft by vm.draft.collectAsStateWithLifecycle()
+    var showSettings by rememberSaveable { mutableStateOf(true) }
+    LaunchedEffect(hasKey,keySaved) { if(hasKey) showSettings=false }
     var profile by remember(saved) { mutableStateOf(saved) }
     // API keys intentionally do not use rememberSaveable or a ViewModel saved-state bundle.
     var key by remember { mutableStateOf("") }
     LaunchedEffect(keySaved) { key="" }
+    var newSource by rememberSaveable { mutableStateOf(true) }
+    var sourceName by rememberSaveable { mutableStateOf("") }
     var sourceId by rememberSaveable { mutableStateOf("") }
-    val writable=sources.filter { it.access in listOf("google","file") || it.sourceId==Repository.LOCAL_SOURCE_ID }
+    val writable=sources.filter { it.access in listOf("google","file","local") || it.sourceId==Repository.LOCAL_SOURCE_ID }
     LaunchedEffect(writable) { if(writable.none { it.sourceId==sourceId }) sourceId=writable.firstOrNull()?.sourceId ?: "" }
     var topic by rememberSaveable { mutableStateOf("") }
     var category by rememberSaveable { mutableStateOf("日常") }
@@ -90,16 +94,24 @@ internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=view
     var level by rememberSaveable { mutableStateOf("A1") }
     var count by rememberSaveable { mutableStateOf("20") }
     var languages by rememberSaveable { mutableStateOf("all") }
+    var customLanguages by rememberSaveable { mutableStateOf(PlaybackOptions.CORE_LANGUAGES) }
     var regenerate by remember { mutableStateOf(false) }
     fun generate() {
         val number=count.toIntOrNull()
         if(number==null || number !in 1..100) { vm.notice.value="單批數量請輸入 1–100"; return }
-        vm.generate(AiRequest(sourceId,topic,category,type,level,number,when(languages) {
-            "zh-en"->listOf("zh-TW","en-US"); "zh-id"->listOf("zh-TW","id-ID"); else->PlaybackOptions.LANGUAGES
-        }))
+        val request=AiRequest(if(newSource) "new-source" else sourceId,topic,category,type,level,number,when(languages) {
+            "zh-en"->listOf("zh-TW","en-US"); "zh-id"->listOf("zh-TW","id-ID");"zh-ja"->listOf("zh-TW","ja-JP");"zh-ko"->listOf("zh-TW","ko-KR");"ja-ko"->listOf("ja-JP","ko-KR");"five"->PlaybackOptions.LANGUAGES;"custom"->PlaybackOptions.LANGUAGES.filter { it in customLanguages };else->PlaybackOptions.CORE_LANGUAGES
+        })
+        if(newSource) vm.generateNewSource(sourceName,request) else vm.generate(request)
     }
-    Panel(ui(R.string.ai_lessons_setup_and_generation_cdeefa)) {
+    Panel(ui.message("AI 新增來源與教材")) {
+        Text(ui.message("選 ChatGPT／OpenAI API 並儲存金鑰與模型，輸入主題產生草稿；審核後才建立本機來源，可直接離線學習。"))
+        Choice(ui.message("新增方式"),if(newSource) "new" else "existing",listOf("new" to ui.message("用 AI 建立新來源"),"existing" to ui.message("加入既有來源"))) { if(!busy) newSource=it=="new" }
+        if(newSource) OutlinedTextField(sourceName,{ sourceName=it },label={ Text(ui.message("新來源名稱，例如日文旅遊單字")) },enabled=!busy,modifier=Modifier.fillMaxWidth())
         Text(ui(R.string.use_your_own_api_key_your_provider_charges_for_u_2160a9))
+        TextButton(onClick={ showSettings=!showSettings }) { Text(ui.message("顯示／收起 AI 設定")) }
+        Text((when(profile.provider) { "openai"->"ChatGPT／OpenAI API";"gemini"->"Gemini";else->ui(R.string.openai_compatible_api_fd90fc) })+" · "+profile.model)
+        if(showSettings) {
         Choice(ui(R.string.provider_46ea7f),profile.provider,listOf("gemini" to "Gemini","openai" to "ChatGPT／OpenAI API","compatible" to ui(R.string.openai_compatible_api_fd90fc))) {
             if(!busy) { profile=when(it) {
                 "gemini"->AiProfile()
@@ -123,13 +135,18 @@ internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=view
             Button(enabled=!busy,onClick={ vm.saveProfile(profile,key) }) { Text(ui(R.string.save_ai_settings_70dc45)) }
             TextButton(enabled=!busy,onClick=vm::clearKey) { Text(ui(R.string.remove_the_saved_key_e3ab12)) }
         }
-        if(writable.isEmpty()) Text(ui(R.string.first_connect_and_initialize_a_writable_sheets_s_de7a05))
-        else Choice(ui(R.string.destination_source_e40e7f),sourceId,writable.map { it.sourceId to it.name }) { sourceId=it }
+        }
+        if(!newSource && writable.isEmpty()) Text(ui.message("沒有可加入的來源；請切換成用 AI 建立新來源。"))
+        else if(!newSource) Choice(ui(R.string.destination_source_e40e7f),sourceId,writable.map { it.sourceId to it.name }) { sourceId=it }
         OutlinedTextField(topic,{ topic=it },label={ Text(ui(R.string.topic_e_g_hotel_check_in_vocabulary_586e44)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
         OutlinedTextField(category,{ category=it },label={ Text(ui(R.string.category_7c6fd7)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
         Choice(ui(R.string.lesson_type_f0ab97),type,listOf("word" to ui(R.string.words_d34b56),"phrase" to ui(R.string.phrases_155650),"sentence" to ui(R.string.sentences_8cfcfc))) { type=it }
         OutlinedTextField(level,{ level=it },label={ Text(ui(R.string.level_e_g_a1_a2_b1_95dafc)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
-        Choice(ui(R.string.language_78be3c),languages,listOf("all" to ui(R.string.traditional_chinese_english_indonesian_e2e999),"zh-en" to ui(R.string.traditional_chinese_english_c3b3d3),"zh-id" to ui(R.string.traditional_chinese_indonesian_b57055))) { languages=it }
+        Choice(ui(R.string.language_78be3c),languages,listOf("all" to ui(R.string.traditional_chinese_english_indonesian_e2e999),"zh-en" to ui(R.string.traditional_chinese_english_c3b3d3),"zh-id" to ui(R.string.traditional_chinese_indonesian_b57055),"zh-ja" to ui.message("繁中／日文"),"zh-ko" to ui.message("繁中／韓文"),"ja-ko" to ui.message("日文／韓文"),"five" to ui.message("繁中／英文／印尼文／日文／韓文"),"custom" to ui.message("自訂語言（至少兩種）"))) { if(!busy) languages=it }
+        if(languages=="custom") {
+            Actions { PlaybackOptions.LANGUAGE_LABELS.forEach { (tag,label) -> FilterChip(selected=tag in customLanguages,enabled=!busy,onClick={ customLanguages=if(tag in customLanguages) customLanguages-tag else customLanguages+tag },label={ Text(label) }) } }
+            if(customLanguages.size<2) Text(ui.message("請至少選擇兩種語言"),color=MaterialTheme.colorScheme.error)
+        }
         OutlinedTextField(count,{ count=it },label={ Text(ui(R.string.entries_per_batch_1_100_more_batches_can_be_adde_e59fc7)) },enabled=!busy,singleLine=true,modifier=Modifier.fillMaxWidth())
         Text(ui.message("每次 API 請求最多 10 筆；100 筆會分批產生並逐批保存。失敗或取消後可繼續已保存草稿，API 可能按請求計費。"))
         generationProgress?.let { (done,total) -> Text(ui.message("已完成的請求量：")+"$done / $total"); LinearProgressIndicator(Modifier.fillMaxWidth()) }
@@ -140,7 +157,7 @@ internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=view
             Button(enabled=!busy && hasKey && profile==saved && draft?.generationProfile==saved,onClick=vm::resumeGeneration) { Text(ui.message("繼續產生剩餘批次")) }
         }
         if(profile!=saved) Text(ui(R.string.save_the_current_ai_settings_before_generating_00bd57))
-        Button(enabled=!busy && hasKey && profile==saved && sourceId.isNotBlank() && topic.isNotBlank(),onClick={
+        Button(enabled=!busy && hasKey && profile==saved && (if(newSource) sourceName.trim().isNotEmpty() else sourceId.isNotBlank()) && topic.isNotBlank() && (languages!="custom" || customLanguages.size>=2),onClick={
             if(draft?.written==false) regenerate=true else generate()
         }) { Text(ui(R.string.generate_a_review_draft_526d40)) }
     }
@@ -148,23 +165,26 @@ internal fun AiAuthoringPanel(sources: List<Source>, vm: AuthoringViewModel=view
         text={ Text(ui(R.string.a_successfully_generated_batch_will_replace_the_3db38e)) },
         confirmButton={ TextButton(onClick={ regenerate=false; generate() }) { Text(ui(R.string.generate_again_2f2f5e)) } },
         dismissButton={ TextButton(onClick={ regenerate=false }) { Text(ui(R.string.cancel_4d0b46)) } })
-    draft?.let { if(it.items.isNotEmpty()) DraftReview(it,sources,busy,vm::writeReviewed) else Text(ui.message("目前沒有新的待審核教材；請繼續批次或更換主題。")) }
+    draft?.let { if(it.items.isNotEmpty()) DraftReview(it,sources,busy,vm::writeReviewed,onStudy,onVoices) else Text(ui.message("目前沒有新的待審核教材；請繼續批次或更換主題。")) }
 }
 
 @Composable
-private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, write: (AiDraft,List<Item>)->Unit) {
+private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, write: (AiDraft,List<Item>)->Unit,onStudy: (AiDraft)->Unit,onVoices: ()->Unit) {
     val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     var edited by remember(draft.draftId,draft.written,draft.generatedCount) { mutableStateOf(draft.items) }
     var selected by remember(draft.draftId,draft.written,draft.generatedCount) { mutableStateOf(draft.selectedIds?.toSet() ?: emptySet()) }
     var page by remember(draft.draftId) { mutableStateOf(0) }
     var confirm by remember { mutableStateOf(false) }
-    val source=sources.find { it.sourceId==draft.request.sourceId }
-    val local=source?.access=="file" || source?.sourceId==Repository.LOCAL_SOURCE_ID
+    val source=sources.find { it.sourceId==draft.request.sourceId } ?: draft.pendingSource?.takeIf { !draft.written }
+    val local=source?.access in listOf("file","local") || source?.sourceId==Repository.LOCAL_SOURCE_ID
     Panel(if(draft.written) ui(R.string.batch_write_result_025023) else ui(R.string.review_not_yet_written_0c4c42)) {
         Text(ui(R.string.topic_source_this_batch_entries_duplicates_remov_e9c7b2, (draft.request.topic), (source?.name ?: ui(R.string.source_removed_or_not_reconnected_880136)), (draft.items.size), (draft.removedDuplicates)))
         Text(ui(R.string.ai_generated_without_web_search_or_fact_checking_78767f))
-        if(draft.written) Text(if(local) ui.message("已儲存到 App 的教材筆數：")+draft.writtenCount else ui(R.string.confirmed_new_entries_already_present_and_skippe_76c2bd, (draft.writtenCount), (draft.skippedCount)))
-        else {
+        if(draft.written) {
+            Button(enabled=source!=null,onClick={ onStudy(draft) }) { Text(ui.message("開始學習這個來源")) }
+            TextButton(onClick=onVoices) { Text(ui.message("檢查／安裝離線語音包")) }
+            Text(if(local) ui.message("已儲存到 App 的教材筆數：")+draft.writtenCount else ui(R.string.confirmed_new_entries_already_present_and_skippe_76c2bd, (draft.writtenCount), (draft.skippedCount)))
+        } else {
             val pageItems=edited.withIndex().drop(page*10).take(10)
             Text(ui(R.string.review_page_10_entries_per_page_select_entries_i_6510f0, (page+1), ((edited.size+9)/10)))
             Actions {
@@ -180,13 +200,15 @@ private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, wr
                 OutlinedTextField(item.zh,{ update(item.copy(zh=it)) },label={ Text("繁體中文") },enabled=!busy,modifier=Modifier.fillMaxWidth())
                 OutlinedTextField(item.en,{ update(item.copy(en=it)) },label={ Text("English") },enabled=!busy,modifier=Modifier.fillMaxWidth())
                 OutlinedTextField(item.id,{ update(item.copy(id=it)) },label={ Text("Bahasa Indonesia") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                OutlinedTextField(item.ja,{ update(item.copy(ja=it)) },label={ Text("日本語") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                OutlinedTextField(item.ko,{ update(item.copy(ko=it)) },label={ Text("한국어") },enabled=!busy,modifier=Modifier.fillMaxWidth())
                 OutlinedTextField(item.pronunciationNote,{ update(item.copy(pronunciationNote=it)) },label={ Text(ui(R.string.pronunciation_note_optional_8c42ba)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
             }
             Text(ui(R.string.writing_rechecks_stable_ids_and_duplicate_text_i_3cb7d4))
             Button(enabled=!busy && selected.isNotEmpty() && source!=null,onClick={ confirm=true }) { Text(ui(R.string.confirm_writing_selected_entries_df53ff, (selected.size))) }
         }
     }
-    if(confirm) AlertDialog(onDismissRequest={ confirm=false },title={ Text(if(local) ui.message("儲存審核教材到 App") else ui(R.string.write_to_google_sheets_ce59c6)) },
+    if(confirm) AlertDialog(onDismissRequest={ confirm=false },title={ Text(if(draft.pendingSource!=null) ui.message("建立來源並儲存審核教材") else if(local) ui.message("儲存審核教材到 App") else ui(R.string.write_to_google_sheets_ce59c6)) },
         text={ Text(if(local) ui.message("確認儲存選取的教材到 App；檔案與 Sheets 請使用檔案同步按鈕寫回。") else ui(R.string.destination_add_reviewed_entries_without_overwri_04cd4d, (source?.name), (source?.url), (selected.size))) },
         confirmButton={ TextButton(enabled=!busy,onClick={ confirm=false; write(draft,edited.filter { it.itemId in selected }) }) { Text(ui(R.string.confirm_addition_f2a275)) } },
         dismissButton={ TextButton(onClick={ confirm=false }) { Text(ui(R.string.cancel_4d0b46)) } })

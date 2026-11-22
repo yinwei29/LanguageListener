@@ -11,6 +11,6 @@ class ListenerApp : Application() {
     val sheets by lazy { tw.language.listener.authoring.GoogleSheets() }
     val speech by lazy { tw.language.listener.playback.OfflineSpeech(this) }
     val repository by lazy {
-        Repository(Room.databaseBuilder(this, ListenerDatabase::class.java, "listener.db").addMigrations(tw.language.listener.data.Migrations.V1_TO_V2,tw.language.listener.data.Migrations.V2_TO_V3,tw.language.listener.data.Migrations.V3_TO_V4,tw.language.listener.data.Migrations.V4_TO_V5).build())
+        Repository(Room.databaseBuilder(this, ListenerDatabase::class.java, "listener.db").addMigrations(tw.language.listener.data.Migrations.V1_TO_V2,tw.language.listener.data.Migrations.V2_TO_V3,tw.language.listener.data.Migrations.V3_TO_V4,tw.language.listener.data.Migrations.V4_TO_V5,tw.language.listener.data.Migrations.V5_TO_V6).build())
     }
 }

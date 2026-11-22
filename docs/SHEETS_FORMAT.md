@@ -1,6 +1,6 @@
 # 公開 Google Sheets 教材格式
 
-Phase 1 不需要 API Key 或 Google 登入。將試算表設定為可公開讀取，或使用「檔案 → 共用 → 發布到網路」發布指定工作表的 CSV，將網址貼到教材庫。勿將私人教材公開，若需要私人來源請等待 Phase 2 OAuth。
+Phase 1 不需要 API Key 或 Google 登入。將試算表設定為可公開讀取，或使用「檔案 → 共用 → 發布到網路」發布指定工作表的 CSV，將網址貼到教材庫。勿將私人教材公開，私人來源可使用已實作的 Google OAuth 連接，見 [設定](GOOGLE_AI_SETUP.md)。
 
 範例（全部為非私人示範文字）：
 
@@ -10,7 +10,7 @@ hello,日常,word,你好,Hello,Halo,A1,greeting,true,2026-11-15,,,
 hotel-1,酒店,sentence,我想辦理入住。,I would like to check in.,Saya ingin check-in.,A1,travel,true,2026-11-15,,,
 ```
 
-- 必要欄位為 `ID`、`zh-TW`、`en-US`、`id-ID`，欄名大小寫不影響解析。每列 ID 必須非空，至少一種文字非空；場次會篩選所選母語及目標語皆有文字的教材。
+- 讀取必要欄位為 `ID` 及至少一個支援語言欄位（`zh-TW`、`en-US`、`id-ID`、`ja-JP`、`ko-KR`）；App 新來源初始化為含兩個新語言的 15 欄，欄名大小寫不影響解析。每列 ID 必須非空，至少一種文字非空；場次會篩選所選母語及目標語皆有文字的教材。
 - `ID` 必須持續相同，修改翻譯、分類、難度時不可換 ID。不同來源相同 ID 是不同教材。
 - `Category` 自訂；`Type` 建議 `word`、`phrase`、`sentence`；`level`、`tags` 可空白。
 - `enabled` 可為空白（啟用）、true／false、1／0、yes／no。`status` 為 deleted／removed 表示軟刪除。

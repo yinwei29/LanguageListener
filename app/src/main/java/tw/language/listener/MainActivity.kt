@@ -189,6 +189,7 @@ private fun PlayerScreen(vm: ListenerViewModel) {
     val duration by vm.duration.collectAsStateWithLifecycle()
     val saved by vm.session.collectAsStateWithLifecycle()
     val settings by vm.settings.collectAsStateWithLifecycle()
+    val sources by vm.sources.collectAsStateWithLifecycle()
     val options=saved?.options ?: settings.playback
     Panel(ui(R.string.entry_71375b, (if(size==0) 0 else index+1), (size), (item?.category ?: ui(R.string.no_lessons_yet_1ad296)))) {
         Text("${options.native} → ${options.target} · ${directionLabel(options.direction,ui)}")
@@ -196,7 +197,7 @@ private fun PlayerScreen(vm: ListenerViewModel) {
         if(current!=null) {
             Text(current.text(options.native),style=MaterialTheme.typography.headlineSmall)
             Text(current.text(options.target),style=MaterialTheme.typography.headlineLarge,fontWeight=FontWeight.Bold)
-            if(options.thirdLanguage) Text(PlaybackOptions.LANGUAGES.filter { it!=options.native && it!=options.target }.joinToString { current.text(it) })
+            if(options.thirdLanguage) Text(PlaybackOptions.LANGUAGES.filter { it!=options.native && it!=options.target && current.text(it).isNotBlank() }.joinToString("\n") { current.text(it) })
             if(current.pronunciationNote.isNotBlank()) Text(current.pronunciationNote)
         } else Text(ui(R.string.add_public_google_sheets_or_create_a_session_wit_dcfde8))
         if(buffering) Text(ui(R.string.synthesizing_offline_audio_the_first_playback_ma_4a780a))
@@ -223,7 +224,7 @@ private fun PlayerScreen(vm: ListenerViewModel) {
         Text(ui(R.string.played_times_79b9e3, (progress?.playCount ?: 0), (if(progress?.learned==true) ui(R.string.learned_0f130c) else ui(R.string.not_learned_2a214f))))
     }
     ReviewControls(vm)
-    OptionsEditor(settings.playback,onSave={ vm.saveSettings(settings.copy(playback=it)) },onStart=vm::start)
+    OptionsEditor(settings.playback,onSave={ vm.saveSettings(settings.copy(playback=it)) },onStart=vm::start,sourceChoices=sources)
 }
 
 private fun directionLabel(value: String, ui: tw.language.listener.i18n.UiStrings)=when(value) { "target-native"->ui(R.string.target_native_9fb69a); "target"->ui(R.string.target_language_only_f1e468); else->ui(R.string.native_target_632dc2) }
@@ -252,7 +253,7 @@ private fun Toggle(label: String, checked: Boolean, onChange: (Boolean)->Unit) {
 }
 
 @Composable
-private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Unit, onStart: (PlaybackOptions)->Unit) {
+private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Unit, onStart: (PlaybackOptions)->Unit,sourceChoices: List<Source>) {
     val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     var options by remember(saved) { mutableStateOf(saved) }
     var count by remember(saved) { mutableStateOf(if(saved.count==0) "全部" else saved.count.toString()) }
@@ -265,11 +266,12 @@ private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Uni
     }
     Panel(ui(R.string.session_and_speech_settings_8673cd)) {
         Text(ui(R.string.changes_below_apply_when_creating_the_next_sessi_20ffb6))
-        val languages=listOf("zh-TW" to "繁體中文", "en-US" to "English", "id-ID" to "Bahasa Indonesia")
+        val languages=PlaybackOptions.LANGUAGE_LABELS
+        Choice(ui.message("教材來源"),options.sourceId,listOf("" to ui(R.string.all_778fc8))+sourceChoices.map { it.sourceId to it.name }) { options=options.copy(sourceId=it) }
         Choice(ui(R.string.native_language_9bbc85),options.native,languages) { options=options.copy(native=it) }
         Choice(ui(R.string.target_language_651506),options.target,languages) { options=options.copy(target=it) }
         Choice(ui(R.string.speech_order_cfb84b),options.direction,listOf("native-target","target-native","target").map { it to directionLabel(it,ui) }) { options=options.copy(direction=it) }
-        Toggle(ui(R.string.show_the_third_language_3450d3),options.thirdLanguage) { options=options.copy(thirdLanguage=it) }
+        Toggle(ui.message("顯示其他語言"),options.thirdLanguage) { options=options.copy(thirdLanguage=it) }
         Choice(ui(R.string.session_size_666f5b),count,listOf("20","50","100","全部").map { it to if(it=="全部") ui(R.string.all_778fc8) else it }) { count=it }
         OutlinedTextField(value=if(count=="全部") ui(R.string.all_778fc8) else count,onValueChange={ count=if(it==ui(R.string.all_778fc8)) "全部" else it },label={ Text(ui(R.string.custom_positive_integer_or_all_7a1c42)) },singleLine=true,modifier=Modifier.fillMaxWidth())
         Toggle(ui(R.string.shuffle_no_repeats_within_a_session_61e644),options.random) { options=options.copy(random=it) }
@@ -284,7 +286,7 @@ private fun OptionsEditor(saved: PlaybackOptions, onSave: (PlaybackOptions)->Uni
         languages.forEach { (tag,label) ->
             Text(ui(R.string.speech_rate_0959eb, (label), (ui.decimal(options.rate(tag)))))
             Slider(value=options.rate(tag),valueRange=.25f..2f,onValueChange={ value -> options=when(tag) {
-                "zh-TW"->options.copy(zhRate=value); "en-US"->options.copy(enRate=value); else->options.copy(idRate=value)
+                "zh-TW"->options.copy(zhRate=value); "en-US"->options.copy(enRate=value); "ja-JP"->options.copy(jaRate=value);"ko-KR"->options.copy(koRate=value);else->options.copy(idRate=value)
             } })
         }
         Text(ui(R.string.repeat_each_entry_times_4a864c, (options.repeats)))
@@ -314,6 +316,7 @@ private fun LibraryScreen(vm: ListenerViewModel) {
     var remove by remember { mutableStateOf<Source?>(null) }
     var editingLocal by remember { mutableStateOf<Item?>(null) }
     LaunchedEffect(Unit) { vm.search(query,category) }
+    AiAuthoringPanel(sources,onStudy=vm::studyDraft,onVoices={ vm.checkVoices();vm.chooseTab(3) })
     DocumentPanel(vm,report={ vm.message.value=it })
     LocalLessonsPanel(vm)
     GoogleAuthoringPanel(report={ vm.message.value=it })
@@ -335,8 +338,8 @@ private fun LibraryScreen(vm: ListenerViewModel) {
         }
         sources.forEach { source ->
             HorizontalDivider()
-            Text(if(source.sourceId==Repository.LOCAL_SOURCE_ID) ui.message("我的本機教材") else source.name,style=MaterialTheme.typography.titleMedium)
-            Text(if(source.access=="file") ui.message("本機 Excel／CSV 來源；請使用上方檔案同步功能") else if(source.url.isEmpty()) ui.message("本機教材，不會從 Google Sheets 同步") else if(source.access=="google") ui(R.string.google_source_writing_requires_valid_authorizati_949627) else ui(R.string.public_read_only_source_664e30))
+            Text(if(source.sourceId==Repository.LOCAL_SOURCE_ID && source.name=="我的本機教材") ui.message("我的本機教材") else source.name,style=MaterialTheme.typography.titleMedium)
+            Text(if(source.access=="local") ui.message("AI 建立的本機來源；不用 Google 授權即可學習") else if(source.access=="file") ui.message("本機 Excel／CSV 來源；請使用上方檔案同步功能") else if(source.url.isEmpty()) ui.message("本機教材，不會從 Google Sheets 同步") else if(source.access=="google") ui(R.string.google_source_writing_requires_valid_authorizati_949627) else ui(R.string.public_read_only_source_664e30))
             Text(if(source.access=="file") ui.message("本機 Excel／CSV 來源；請使用上方檔案同步功能") else if(source.url.isEmpty()) ui.message("儲存在這台裝置；請使用完整 ZIP 備份保存教材文字") else source.url)
             Text(ui(R.string.last_sync_0620ac, (if(source.lastSync==0L) ui(R.string.not_synced_yet_eeee89) else ui.date(source.lastSync))))
             source.error?.let { Text(ui(R.string.sync_failed_cache_retained_2f0d91, (ui.message(it))),color=MaterialTheme.colorScheme.error) }
@@ -344,6 +347,7 @@ private fun LibraryScreen(vm: ListenerViewModel) {
                 val authoring: tw.language.listener.authoring.AuthoringViewModel=viewModel()
                 TextButton(onClick={ authoring.inspect(source.name,source.url) }) { Text(ui.message("初始化這個工作表／授權新增教材")) }
             }
+            SourceManagement(source,vm)
             TextButton(onClick={ remove=source }) { Text(ui(R.string.remove_source_0e4e14)) }
         }
     }
@@ -357,10 +361,10 @@ private fun LibraryScreen(vm: ListenerViewModel) {
         Button(onClick={ vm.search(query,category) }) { Text(ui(R.string.search_0a4379)) }
         items.forEach { item ->
             HorizontalDivider()
-            Text("${item.zh}\n${item.en}\n${item.id}")
-            Text("${item.category} · ${item.type} · ${listOf("zh-TW" to item.zh,"en-US" to item.en,"id-ID" to item.id).filter { it.second.isNotBlank() }.joinToString { it.first }}",style=MaterialTheme.typography.labelMedium)
+            Text(PlaybackOptions.LANGUAGES.map { item.text(it) }.filter(String::isNotBlank).joinToString("\n"))
+            Text("${item.category} · ${item.type} · ${PlaybackOptions.LANGUAGES.map { it to item.text(it) }.filter { it.second.isNotBlank() }.joinToString { it.first }}",style=MaterialTheme.typography.labelMedium)
             Actions {
-                if(item.sourceId==Repository.LOCAL_SOURCE_ID || sources.any { it.sourceId==item.sourceId && it.access=="file" }) {
+                if(item.sourceId==Repository.LOCAL_SOURCE_ID || sources.any { it.sourceId==item.sourceId && it.access in listOf("file","local") }) {
                     TextButton(onClick={ editingLocal=item }) { Text(ui.message("編輯本機教材")) }
                 }
                 TextButton(onClick={ vm.markLibrary(item,true) }) { Text(ui(R.string.learned_0f130c)) }
@@ -370,7 +374,6 @@ private fun LibraryScreen(vm: ListenerViewModel) {
         if(more) OutlinedButton(onClick={ vm.search(query,category,true) }) { Text(ui(R.string.load_next_100_entries_a1e2e1)) }
     }
     editingLocal?.let { LocalLessonDialog(it,vm) { editingLocal=null } }
-    AiAuthoringPanel(sources)
     remove?.let { source -> AlertDialog(onDismissRequest={ remove=null },title={ Text(ui(R.string.remove_source_ffd5c8)) },
         text={ Text(ui(R.string.lessons_from_will_be_soft_deleted_learning_recor_96f485, (source.name))) },
         confirmButton={ TextButton(onClick={ vm.removeSource(source.sourceId); remove=null }) { Text(ui(R.string.remove_2f752c)) } },
