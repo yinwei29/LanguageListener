@@ -44,7 +44,7 @@ class DocumentViewModel(application: Application): AndroidViewModel(application)
     fun create(uri: Uri,sourceId: String?=null)=task {
         store.persist(uri)
         check(store.bytes(uri.toString()).isEmpty()) { "選取的位置已有資料，請使用選擇檔案而非建立新檔" }
-        val table=DocumentCodec.decode(byteArrayOf());table.initialize()
+        val table=DocumentCodec.decode(byteArrayOf());table.initialize();table.headers+=GoogleSheets.EXTRA_HEADERS
         checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { it.write(table.encode()) }
         plan.value=store.prepare(uri,sourceId)
     }
@@ -57,6 +57,16 @@ class DocumentViewModel(application: Application): AndroidViewModel(application)
         val table=DocumentCodec.decode(byteArrayOf());table.initialize();table.update(store.cached(sourceId))
         checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { it.write(table.encode()) }
         notice.value="CSV 已匯出，可用 Excel 開啟"
+    }
+    fun exportAndConnect(uri: Uri,sourceId: String)=task {
+        val original=checkNotNull(repo.dao.sources().find { it.sourceId==sourceId }) { "來源已移除" }
+        store.persist(uri)
+        check(store.bytes(uri.toString()).isEmpty()) { "選取的位置已有資料，請使用選擇檔案而非建立新檔" }
+        val table=DocumentCodec.decode(byteArrayOf());table.initialize();table.update(store.cached(sourceId))
+        checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { it.write(table.encode()) }
+        check(repo.dao.sources().any { it==original }) { "來源或備份狀態已改變，尚未寫入，請重新審核" }
+        store.initialize(store.prepare(uri,sourceId))
+        notice.value="CSV 已建立並連接此來源，可離線同步檔案或連接 Google Sheets"
     }
     fun recover(uri: Uri,sourceId: String)=task {
         val backup=java.io.File(app.noBackupFilesDir,"document-recovery/$sourceId.bak")
@@ -74,11 +84,13 @@ class DocumentViewModel(application: Application): AndroidViewModel(application)
     private suspend fun prepareCloud(source: Source,url: String,token: String) {
         cloudPlan.value=null
         require(url.isNotBlank()) { "請輸入要同步的 Google Sheets 網址" }
-        val inspected=app.sheets.inspect(source.name,url,token)
+        val local=store.prepareSync(source)
+        val required=GoogleSheets.HEADERS+GoogleSheets.EXTRA_HEADERS.filter { h -> local.merged.any { it.text(h).isNotBlank() } }
+        val inspected=app.sheets.inspect(source.name,url,token,required)
         val linked=source.copy(url=inspected.url,access="file")
         check(repo.dao.sources().none { it.sourceId!=source.sourceId && it.url==linked.url }) { "此 Sheets 已連接其他來源，請先選擇該既有來源再連接本機檔案" }
         if(inspected.missing.isNotEmpty() && inspected.headers.isNotEmpty()) { cloudInitialization.value=source to inspected;return }
-        val file=store.prepareSync(source).let { f -> f.copy(source=linked,binding=if(source.url==linked.url) f.binding else f.binding.copy(cloudBase="[]")) }
+        val file=local.let { f -> f.copy(source=linked,binding=if(source.url==linked.url) f.binding else f.binding.copy(cloudBase="[]")) }
         val snapshot=if(inspected.headers.isEmpty()) null else app.sheets.snapshot(linked,token)
         val merged=DocumentMerge.merge(DocumentMerge.decode(file.binding.cloudBase),file.merged,snapshot?.items ?: emptyList())
         cloudPlan.value=CloudFilePlan(file,inspected,snapshot,merged)

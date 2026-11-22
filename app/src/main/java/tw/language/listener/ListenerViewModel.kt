@@ -126,12 +126,33 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
             finally { busy.value=false }
         }
     }
+    fun renameSource(source: Source,name: String)=runTask { repo.renameSource(source.sourceId,name);message.value="來源名稱已更新，教材與學習進度保留" }
+    fun studySource(sourceId: String,native: String=settings.value.playback.native,target: String=settings.value.playback.target)=runTask {
+        var after: String?=null;var candidate: Item?=null;var matched=false
+        while(true) {
+            val page=repo.dao.sourcePage(sourceId,after,250);if(page.isEmpty()) break
+            for(entry in page) if(entry.enabled && !entry.deleted) {
+                if(entry.text(native).isNotBlank() && entry.text(target).isNotBlank()) { candidate=entry;matched=true;break }
+                if(candidate==null && PlaybackOptions.LANGUAGES.count { entry.text(it).isNotBlank() }>=2) candidate=entry
+            }
+            if(matched) break
+            after=page.last().itemId
+        }
+        val languages=PlaybackOptions.LANGUAGES.filter { candidate?.text(it)?.isNotBlank()==true }
+        val first=if(native in languages) native else languages.firstOrNull() ?: native
+        val second=if(target in languages && target!=first) target else languages.firstOrNull { it!=first } ?: target
+        startSession(settings.value.playback.copy(sourceId=sourceId,native=first,target=second,category="",type="",level="",state="all",excludeLearned=false,avoidRecentDays=0))
+    }
+    fun studyDraft(value: tw.language.listener.authoring.AiDraft) {
+        if(value.written) studySource(value.request.sourceId,value.request.languages[0],value.request.languages[1])
+    }
     fun saveSettings(value: Settings) = runTask {
         val previous=repo.dao.settings()
         repo.saveSettings(value)
         if(previous?.wifiOnly!=value.wifiOnly) SyncWorker.enqueue(getApplication(),value.wifiOnly,replace=true)
     }
-    fun start(options: PlaybackOptions=settings.value.playback) = runTask {
+    fun start(options: PlaybackOptions=settings.value.playback) = runTask { startSession(options) }
+    private suspend fun startSession(options: PlaybackOptions) {
         controller?.pause(); controller?.stop()
         val count=repo.createSession(options)
         index.value=0; refreshItem()
@@ -172,7 +193,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         } }
         if(action in listOf("learned","7","30")) next()
     }
-    fun startDue()=start(settings.value.playback.copy(state="due",excludeLearned=false,category="",type="",level="",avoidRecentDays=0,random=false,reviewFirst=true))
+    fun startDue()=start(settings.value.playback.copy(sourceId="",state="due",excludeLearned=false,category="",type="",level="",avoidRecentDays=0,random=false,reviewFirst=true))
     fun rate(rating: tw.language.listener.review.Rating,source: String,id: String)=runTask {
         if(reviewRecorded.value) return@runTask
         val current=item.value ?: return@runTask

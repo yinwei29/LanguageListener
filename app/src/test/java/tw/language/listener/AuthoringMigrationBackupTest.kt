@@ -39,14 +39,14 @@ class AuthoringMigrationBackupTest {
             old.execSQL("INSERT INTO progress VALUES ('stable-source','item-1',1,1,12345,2,8,999,888)")
             old.version=1
         }
-        val db=Room.databaseBuilder(context,ListenerDatabase::class.java,name).addMigrations(Migrations.V1_TO_V2,Migrations.V2_TO_V3,Migrations.V3_TO_V4,Migrations.V4_TO_V5).allowMainThreadQueries().build()
+        val db=Room.databaseBuilder(context,ListenerDatabase::class.java,name).addMigrations(Migrations.V1_TO_V2,Migrations.V2_TO_V3,Migrations.V3_TO_V4,Migrations.V4_TO_V5,Migrations.V5_TO_V6).allowMainThreadQueries().build()
         try {
             assertEquals("public",db.dao().sources().single().access)
             assertNull(db.dao().settings()?.aiProfile)
             val progress=db.dao().progress("stable-source","item-1")!!
             assertTrue(progress.learned); assertTrue(progress.favorite); assertEquals(8L,progress.playCount); assertEquals(12345L,progress.skipUntil)
             db.dao().putDraft(DraftRecord(payload="draft"))
-            assertEquals(5,db.openHelper.readableDatabase.version)
+            assertEquals(6,db.openHelper.readableDatabase.version)
         } finally { db.close(); context.deleteDatabase(name) }
     }
     @Test fun authorizedDownloadFeedsExistingImporterWithoutResettingProgress() = runBlocking {
@@ -90,7 +90,7 @@ class AuthoringMigrationBackupTest {
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("TEST_SECRET_MUST_NOT_APPEAR_IN_ZIP") })
             assertFalse(entries.values.any { it.toString(Charsets.UTF_8).contains("Unreviewed") })
             manager.preview(out.toByteArray().inputStream()).use { preview ->
-                assertEquals(6,preview.manifest.schemaVersion)
+                assertEquals(7,preview.manifest.schemaVersion)
                 assertEquals("google",preview.sources.first { it.sourceId=="private" }.access)
                 manager.restore(preview,true)
                 assertEquals(profile,repo.dao.settings()!!.aiProfile)

@@ -65,6 +65,21 @@ class GoogleSheetsAuthoringTest {
             assertEquals(plan.missing.size,update["rows"]!!.jsonArray.single().jsonObject["values"]!!.jsonArray.size)
         }
     }
+    @Test fun japaneseKoreanSheetsInitializeAllColumnsAndKeepExistingHeaderCells()=runBlocking {
+        AuthoringFixture().use { api ->
+            val headers=listOf("ID","ja-JP","ko-KR","Custom")
+            inspect(api,headers)
+            val plan=api.sheets.inspect("Japanese Korean",link,"token",GoogleSheets.ALL_HEADERS)
+            assertEquals(GoogleSheets.ALL_HEADERS.filter { it !in headers },plan.missing)
+            inspect(api,headers);api.json("{}");inspect(api,headers+plan.missing)
+            api.sheets.initialize(plan,"token")
+            val post=(1..7).map { api.server.takeRequest() }.single { it.method=="POST" }
+            val update=Json.parseToJsonElement(post.body.readUtf8()).jsonObject["requests"]!!.jsonArray.single().jsonObject["updateCells"]!!.jsonObject
+            assertEquals(4,update["range"]!!.jsonObject["startColumnIndex"]!!.jsonPrimitive.int)
+            val appended=update["rows"]!!.jsonArray.single().jsonObject["values"]!!.jsonArray.map { it.jsonObject["userEnteredValue"]!!.jsonObject["stringValue"]!!.jsonPrimitive.content }
+            assertEquals(plan.missing,appended);assertFalse("ja-JP" in appended);assertFalse("ko-KR" in appended)
+        }
+    }
     @Test fun refusesUnrelatedHeadersAndChangedHeaderSnapshotBeforeAnyWrite() = runBlocking {
         AuthoringFixture().use { api ->
             inspect(api,listOf("Name","Budget"))

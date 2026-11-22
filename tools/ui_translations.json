@@ -3070,5 +3070,221 @@
     "zh": "教材已切換，請確認目前教材後再評分",
     "en": "The entry changed. Check the current entry before rating",
     "id": "Entri telah berubah. Periksa entri aktif sebelum menilai"
+  },
+  {
+    "key": "source_9068e433e3cb",
+    "zh": "AI 來源草稿不合法",
+    "en": "Invalid AI source draft",
+    "id": "Draf sumber AI tidak valid"
+  },
+  {
+    "key": "source_a4e2e6748939",
+    "zh": "AI 建立的本機來源；不用 Google 授權即可學習",
+    "en": "Local source created with AI; no Google authorization needed to study",
+    "id": "Sumber lokal dibuat dengan AI; belajar tanpa otorisasi Google"
+  },
+  {
+    "key": "source_6871007d460a",
+    "zh": "AI 新增來源與教材",
+    "en": "Create sources and lessons with AI",
+    "id": "Buat sumber dan materi dengan AI"
+  },
+  {
+    "key": "source_62e7d7eabb89",
+    "zh": "AI 本機來源已建立，可直接開始離線學習或匯出 CSV",
+    "en": "AI local source created. Start offline study or export CSV.",
+    "id": "Sumber lokal AI dibuat. Mulai belajar offline atau ekspor CSV."
+  },
+  {
+    "key": "source_a14aa238acd7",
+    "zh": "CSV 已建立並連接此來源，可離線同步檔案或連接 Google Sheets",
+    "en": "CSV created and connected to this source. Sync the file offline or connect Google Sheets.",
+    "id": "CSV dibuat dan terhubung ke sumber ini. Sinkronkan file offline atau hubungkan Google Sheets."
+  },
+  {
+    "key": "source_63f0e5e27964",
+    "zh": "來源已移除",
+    "en": "Source removed",
+    "id": "Sumber dihapus"
+  },
+  {
+    "key": "source_0e4cb8d13e82",
+    "zh": "來源已移除，未重新建立",
+    "en": "Source was removed and has not been recreated",
+    "id": "Sumber telah dihapus dan belum dibuat ulang"
+  },
+  {
+    "key": "source_cb277b7898b0",
+    "zh": "儲存名稱",
+    "en": "Save name",
+    "id": "Simpan nama"
+  },
+  {
+    "key": "source_8e0e4ec60797",
+    "zh": "加入既有來源",
+    "en": "Add to an existing source",
+    "id": "Tambahkan ke sumber yang ada"
+  },
+  {
+    "key": "source_0d49dfc8c29b",
+    "zh": "另存並連接 CSV",
+    "en": "Save as and connect CSV",
+    "id": "Simpan sebagai dan hubungkan CSV"
+  },
+  {
+    "key": "source_312c5425d32f",
+    "zh": "工作表缺少日文或韓文欄位，請先重新初始化",
+    "en": "The sheet is missing Japanese or Korean columns. Initialize it again first.",
+    "id": "Sheet tidak memiliki kolom Jepang atau Korea. Inisialisasi ulang terlebih dahulu."
+  },
+  {
+    "key": "source_467585fdf3f7",
+    "zh": "建立來源並儲存審核教材",
+    "en": "Create source and save reviewed lessons",
+    "id": "Buat sumber dan simpan materi yang ditinjau"
+  },
+  {
+    "key": "source_e4e1e4aaee57",
+    "zh": "教材來源",
+    "en": "Lesson source",
+    "id": "Sumber materi"
+  },
+  {
+    "key": "source_9f5d11a12d18",
+    "zh": "新來源名稱，例如日文旅遊單字",
+    "en": "New source name, e.g. Japanese travel vocabulary",
+    "id": "Nama sumber baru, misalnya kosakata perjalanan Jepang"
+  },
+  {
+    "key": "source_cb4b93bf885c",
+    "zh": "新增方式",
+    "en": "Creation method",
+    "id": "Cara pembuatan"
+  },
+  {
+    "key": "source_0b8927ff12c4",
+    "zh": "日文／韓文",
+    "en": "Japanese / Korean",
+    "id": "Jepang / Korea"
+  },
+  {
+    "key": "source_161ebc6bc62a",
+    "zh": "檢查／安裝離線語音包",
+    "en": "Check / install offline voices",
+    "id": "Periksa / pasang suara offline"
+  },
+  {
+    "key": "source_5d584c5d6d50",
+    "zh": "此來源已建立或被變更，請重新開啟審核結果",
+    "en": "This source was created or changed. Reopen the review results.",
+    "id": "Sumber ini telah dibuat atau diubah. Buka kembali hasil tinjauan."
+  },
+  {
+    "key": "source_57e40aa85a8a",
+    "zh": "沒有可加入的來源；請切換成用 AI 建立新來源。",
+    "en": "No source is available. Switch to creating a new source with AI.",
+    "id": "Tidak ada sumber tersedia. Pilih membuat sumber baru dengan AI."
+  },
+  {
+    "key": "source_daa48d8e121b",
+    "zh": "沒有待建立的 AI 來源",
+    "en": "No pending AI source",
+    "id": "Tidak ada sumber AI tertunda"
+  },
+  {
+    "key": "source_38419a662fee",
+    "zh": "用 AI 建立新來源",
+    "en": "Create a new source with AI",
+    "id": "Buat sumber baru dengan AI"
+  },
+  {
+    "key": "source_3ef9c5686b4e",
+    "zh": "繁中／日文",
+    "en": "Traditional Chinese / Japanese",
+    "id": "Mandarin Tradisional / Jepang"
+  },
+  {
+    "key": "source_72fc044f48df",
+    "zh": "繁中／英文／印尼文／日文／韓文",
+    "en": "Traditional Chinese / English / Indonesian / Japanese / Korean",
+    "id": "Mandarin Tradisional / Inggris / Indonesia / Jepang / Korea"
+  },
+  {
+    "key": "source_965fa9414cc8",
+    "zh": "繁中／韓文",
+    "en": "Traditional Chinese / Korean",
+    "id": "Mandarin Tradisional / Korea"
+  },
+  {
+    "key": "source_26a97f686e8a",
+    "zh": "缺少 ID 或支援的語言欄位",
+    "en": "Missing ID or supported language columns",
+    "id": "Kolom ID atau bahasa yang didukung tidak ada"
+  },
+  {
+    "key": "source_d55f3d40f257",
+    "zh": "自訂語言（至少兩種）",
+    "en": "Custom languages (at least two)",
+    "id": "Bahasa kustom (minimal dua)"
+  },
+  {
+    "key": "source_6bf4a9e377a6",
+    "zh": "草稿已移除，未建立來源",
+    "en": "Draft removed; source was not created",
+    "id": "Draf dihapus; sumber tidak dibuat"
+  },
+  {
+    "key": "source_b9501768953e",
+    "zh": "草稿已變更，未建立來源",
+    "en": "Draft changed; source was not created",
+    "id": "Draf berubah; sumber tidak dibuat"
+  },
+  {
+    "key": "source_00b4cf0c115a",
+    "zh": "請至少選擇兩種語言",
+    "en": "Select at least two languages",
+    "id": "Pilih minimal dua bahasa"
+  },
+  {
+    "key": "source_6cf3c541f6e5",
+    "zh": "請輸入 1–100 字的來源名稱",
+    "en": "Enter a source name of 1–100 characters",
+    "id": "Masukkan nama sumber sepanjang 1–100 karakter"
+  },
+  {
+    "key": "source_5bcf4403c5e4",
+    "zh": "選 ChatGPT／OpenAI API 並儲存金鑰與模型，輸入主題產生草稿；審核後才建立本機來源，可直接離線學習。",
+    "en": "Choose ChatGPT / OpenAI API and save your key and model. Enter a topic to generate a draft. Review it to create a local source for offline study.",
+    "id": "Pilih ChatGPT / OpenAI API dan simpan kunci serta model. Masukkan topik untuk membuat draf. Tinjau draf untuk membuat sumber lokal bagi belajar offline."
+  },
+  {
+    "key": "source_7e894239da83",
+    "zh": "重新命名來源",
+    "en": "Rename source",
+    "id": "Ganti nama sumber"
+  },
+  {
+    "key": "source_6732fee203e3",
+    "zh": "開始學習這個來源",
+    "en": "Study this source",
+    "id": "Pelajari sumber ini"
+  },
+  {
+    "key": "source_d15b0c8affe3",
+    "zh": "顯示其他語言",
+    "en": "Show other languages",
+    "id": "Tampilkan bahasa lain"
+  },
+  {
+    "key": "source_bc77426c8d73",
+    "zh": "顯示／收起 AI 設定",
+    "en": "Show / hide AI settings",
+    "id": "Tampilkan / sembunyikan pengaturan AI"
+  },
+  {
+    "key": "source_renamed_progress_retained",
+    "zh": "來源名稱已更新，教材與學習進度保留",
+    "en": "Source renamed; lessons and study progress retained",
+    "id": "Nama sumber diperbarui; materi dan kemajuan belajar tetap tersimpan"
   }
 ]

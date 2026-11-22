@@ -36,11 +36,13 @@ internal fun LocalLessonDialog(original: Item?, vm: ListenerViewModel, sourceId:
     var zh by rememberSaveable(itemId) { mutableStateOf(original?.zh ?: "") }
     var en by rememberSaveable(itemId) { mutableStateOf(original?.en ?: "") }
     var id by rememberSaveable(itemId) { mutableStateOf(original?.id ?: "") }
+    var ja by rememberSaveable(itemId) { mutableStateOf(original?.ja ?: "") }
+    var ko by rememberSaveable(itemId) { mutableStateOf(original?.ko ?: "") }
     var category by rememberSaveable(itemId) { mutableStateOf(original?.category ?: "日常") }
     var type by rememberSaveable(itemId) { mutableStateOf(original?.type ?: "word") }
     var level by rememberSaveable(itemId) { mutableStateOf(original?.level ?: "") }
-    val enoughLanguages=listOf(zh,en,id).count { it.isNotBlank() }>=2
-    val fieldsFit=listOf(zh,en,id).all { it.length<=100_000 } && category.length<=512 && level.length<=512
+    val enoughLanguages=listOf(zh,en,id,ja,ko).count { it.isNotBlank() }>=2
+    val fieldsFit=listOf(zh,en,id,ja,ko).all { it.length<=100_000 } && category.length<=512 && level.length<=512
     val valid=enoughLanguages && fieldsFit
     AlertDialog(onDismissRequest={ if(!busy) close() },title={ Text(ui(if(original==null) R.string.add_lesson else R.string.edit_local_lesson)) },
         text={ Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -48,13 +50,15 @@ internal fun LocalLessonDialog(original: Item?, vm: ListenerViewModel, sourceId:
             OutlinedTextField(zh,{ zh=it },label={ Text("繁體中文") },enabled=!busy,modifier=Modifier.fillMaxWidth())
             OutlinedTextField(en,{ en=it },label={ Text("English") },enabled=!busy,modifier=Modifier.fillMaxWidth())
             OutlinedTextField(id,{ id=it },label={ Text("Bahasa Indonesia") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+            OutlinedTextField(ja,{ ja=it },label={ Text("日本語") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+            OutlinedTextField(ko,{ ko=it },label={ Text("한국어") },enabled=!busy,modifier=Modifier.fillMaxWidth())
             OutlinedTextField(category,{ category=it },label={ Text(ui(R.string.category_7c6fd7)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
             Choice(ui(R.string.lesson_type_f0ab97),type,listOf("word" to ui(R.string.words_d34b56),"phrase" to ui(R.string.phrases_155650),"sentence" to ui(R.string.sentences_8cfcfc))) { if(!busy) type=it }
             OutlinedTextField(level,{ level=it },label={ Text(ui(R.string.level_e_g_a1_a2_b1_95dafc)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
             if(!fieldsFit) Text(ui(R.string.lesson_fields_too_long),color=MaterialTheme.colorScheme.error)
             if(!enoughLanguages) Text(ui(R.string.two_languages_required),color=MaterialTheme.colorScheme.error)
         } },confirmButton={ TextButton(enabled=valid && !busy,onClick={
-            val value=(original ?: Item(sourceId,itemId,zh="",en="",id="")).copy(zh=zh,en=en,id=id,category=category,type=type,level=level)
+            val value=(original ?: Item(sourceId,itemId,zh="",en="",id="")).copy(zh=zh,en=en,id=id,category=category,type=type,level=level,ja=ja,ko=ko)
             vm.saveLocalItem(value,close)
         }) { Text(ui(R.string.save_lesson)) } },
         dismissButton={ TextButton(enabled=!busy,onClick=close) { Text(ui(R.string.cancel_4d0b46)) } })

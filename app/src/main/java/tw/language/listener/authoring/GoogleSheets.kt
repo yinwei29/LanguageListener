@@ -27,10 +27,10 @@ data class SheetLink(val spreadsheetId: String, val gid: Int?) {
 }
 
 data class SheetPlan(val spreadsheetId: String, val sheetId: Int, val title: String,
-    val headers: List<String>, val columns: Int, val rows: Int, val name: String) {
+    val headers: List<String>, val columns: Int, val rows: Int, val name: String,val requiredHeaders: List<String> = GoogleSheets.HEADERS) {
     val url get()="https://docs.google.com/spreadsheets/d/$spreadsheetId/export?format=csv&gid=$sheetId"
     val sourceId get()=UUID.nameUUIDFromBytes(url.toByteArray(Charsets.UTF_8)).toString()
-    val missing get()=GoogleSheets.HEADERS.filter { required -> headers.none { it.equals(required,true) } }
+    val missing get()=requiredHeaders.filter { required -> headers.none { it.equals(required,true) } }
     val rangeTitle get()="'${title.replace("'","''")}'"
     fun source()=Source(sourceId,name.ifBlank { title },url,access="google")
 }
@@ -46,7 +46,8 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
     }
     private suspend fun get(url: HttpUrl, token: String)=http.request(url,"Google Sheets",mapOf("Authorization" to "Bearer $token"))
     private suspend fun post(url: HttpUrl, token: String, body: JsonObject)=http.request(url,"Google Sheets",mapOf("Authorization" to "Bearer $token"),"POST",body)
-    suspend fun inspect(name: String, url: String, token: String): SheetPlan {
+    suspend fun inspect(name: String, url: String, token: String,requiredHeaders: List<String> = HEADERS): SheetPlan {
+        require(requiredHeaders.all { it in ALL_HEADERS })
         val link=SheetLink.parse(url)
         val metadata=get(endpoint(link.spreadsheetId).newBuilder().addQueryParameter("fields","sheets(properties(sheetId,title,gridProperties))").build(),token)
         val sheets=metadata["sheets"]?.jsonArray.orEmpty().map { it.jsonObject.getValue("properties").jsonObject }
@@ -59,11 +60,11 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
         val headerResult=get(endpoint(link.spreadsheetId,"values").newBuilder().addPathSegment("${plan.rangeTitle}!A1:${columnName(minOf(plan.columns,100))}1").build(),token)
         val headers=headerResult["values"]?.jsonArray?.firstOrNull()?.jsonArray.orEmpty().map { it.jsonPrimitive.content.trim().removePrefix("\uFEFF") }
         require(headers.size<=100 && headers.none { it.isBlank() } && headers.map { it.lowercase(java.util.Locale.ROOT) }.distinct().size==headers.size) { "欄位含空白、重複名稱或超過 100 欄，請先修正" }
-        require(headers.isEmpty() || (headers.any { it.equals("ID",true) } && headers.any { h -> listOf("zh-TW","en-US","id-ID").any { it.equals(h,true) } })) {
+        require(headers.isEmpty() || (headers.any { it.equals("ID",true) } && headers.any { h -> PlaybackOptions.LANGUAGES.any { it.equals(h,true) } })) {
             "此工作表已有其他用途的欄位，請選擇空白工作表或既有教材工作表；不會覆寫原內容"
         }
         if(headers.isEmpty()) ensureEmpty(plan,token)
-        return plan.copy(headers=headers)
+        return plan.copy(headers=headers,requiredHeaders=requiredHeaders)
     }
     private suspend fun ensureEmpty(plan: SheetPlan, token: String) {
         require(plan.columns<=100) { "請使用 100 欄以內的空白工作表初始化" }
@@ -84,7 +85,7 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
         }
     }
     suspend fun initialize(plan: SheetPlan, token: String): Source {
-        val fresh=inspect(plan.name,plan.url,token)
+        val fresh=inspect(plan.name,plan.url,token,plan.requiredHeaders)
         check(fresh.headers==plan.headers) { "工作表欄位已改變，請重新檢查再初始化" }
         if(fresh.missing.isNotEmpty()) {
             val end=fresh.headers.size+fresh.missing.size
@@ -101,7 +102,7 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
             }
             post(endpoint(fresh.spreadsheetId,":batchUpdate"),token,buildJsonObject { put("requests",requests) })
         }
-        val verified=inspect(plan.name,plan.url,token)
+        val verified=inspect(plan.name,plan.url,token,plan.requiredHeaders)
         check(verified.headers==fresh.headers+fresh.missing) { "欄位初始化結果不符，請重新檢查工作表" }
         SheetColumns(verified.headers)
         return verified.source()
@@ -145,6 +146,7 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
         require(items.all { it.sourceId==source.sourceId } && items.map { it.itemId }.distinct().size==items.size)
         val plan=inspect(source.name,source.url,token)
         val columns=SheetColumns(plan.headers)
+        require(EXTRA_HEADERS.none { header -> items.any { it.text(header).isNotBlank() } && plan.headers.none { it.equals(header,true) } }) { "工作表缺少日文或韓文欄位，請先重新初始化" }
         val wanted=items.associateBy { it.itemId }
         val desiredKeys=items.map { AuthoringValidation.fingerprint(it) }.toSet()
         val foundIds=mutableMapOf<String,String>(); val foundKeys=mutableSetOf<String>()
@@ -213,7 +215,7 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
                 updates+=buildJsonObject { putJsonObject("appendDimension") { put("sheetId",plan.sheetId);put("dimension","ROWS");put("length",row+1-allocatedRows) } }
                 allocatedRows=row+1
             }
-            plan.headers.forEachIndexed { col,header -> if(HEADERS.any { it.equals(header,true) }) {
+            plan.headers.forEachIndexed { col,header -> if(ALL_HEADERS.any { it.equals(header,true) }) {
                 val request=buildJsonObject { putJsonObject("updateCells") {
                     putJsonObject("range") { put("sheetId",plan.sheetId);put("startRowIndex",row);put("endRowIndex",row+1);put("startColumnIndex",col);put("endColumnIndex",col+1) }
                     putJsonArray("rows") { add(buildJsonObject { putJsonArray("values") { add(buildJsonObject { putJsonObject("userEnteredValue") { put("stringValue",cell(item,header)) } }) } }) }
@@ -230,6 +232,8 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
     }
     companion object {
         val HEADERS=listOf("ID","Category","Type","zh-TW","en-US","id-ID","level","tags","enabled","updated_at","status","source_url","pronunciation_note")
+        val EXTRA_HEADERS=listOf("ja-JP","ko-KR")
+        val ALL_HEADERS=HEADERS+EXTRA_HEADERS
         fun columnName(number: Int): String {
             require(number in 1..100)
             var n=number; var result=""
@@ -238,7 +242,7 @@ class GoogleSheets(private val http: JsonHttp=JsonHttp(), private val base: Http
         }
         fun csv(values: List<String>)=values.joinToString(",") { "\"${it.replace("\"","\"\"")}\"" }
         fun cell(item: Item, header: String)=when(header.lowercase(java.util.Locale.ROOT)) {
-            "id"->item.itemId; "category"->item.category; "type"->item.type; "zh-tw"->item.zh; "en-us"->item.en; "id-id"->item.id
+            "id"->item.itemId; "category"->item.category; "type"->item.type; "zh-tw"->item.zh; "en-us"->item.en; "id-id"->item.id;"ja-jp"->item.ja;"ko-kr"->item.ko
             "level"->item.level; "tags"->item.tags; "enabled"->item.enabled.toString(); "updated_at"->item.updatedAt; "status"->item.status
             "source_url"->item.sourceUrl; "pronunciation_note"->item.pronunciationNote; else->""
         }

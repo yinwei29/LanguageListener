@@ -33,7 +33,7 @@ class DocumentStore(private val context: Context,private val repo: Repository) {
         val id=sourceId ?: old?.sourceId ?: UUID.nameUUIDFromBytes((uri.toString()+"#"+table.sheet).toByteArray()).toString()
         require(old==null || old.sourceId==id) { "這個工作表已連接另一個來源" }
         val existing=repo.dao.sources().find { it.sourceId==id }
-        require(existing==null || existing.sourceId!in listOf("demo",Repository.LOCAL_SOURCE_ID)) { "請選擇本機檔案來源重新連接" }
+        require(existing==null || existing.sourceId!="demo") { "請選擇本機檔案來源重新連接" }
         val binding=repo.dao.documents().find { it.sourceId==id } ?: LocalDocument(id,uri.toString(),selector,DocumentCodec.hash(raw))
         val app=cached(id);val merged=DocumentMerge.merge(DocumentMerge.decode(binding.fileBase),if(existing==null) emptyList() else app,table.items(id))
         return FilePlan(existing?.copy(access="file") ?: Source(id,title,"",access="file"),binding.copy(uri=uri.toString(),sheet=selector,fileHash=DocumentCodec.hash(raw)),table,raw,missing,generated,DocumentMerge.digest(app),merged)

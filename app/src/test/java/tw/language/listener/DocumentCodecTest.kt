@@ -43,12 +43,13 @@ class DocumentCodecTest {
         val xml="""<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData><row r="1"><c r="A1" t="inlineStr"><is><t>ID</t></is></c><c r="B1" t="inlineStr"><is><t>zh-TW</t></is></c><c r="C1" t="inlineStr"><is><t>en-US</t></is></c><c r="D1" t="inlineStr"><is><t>Custom</t></is></c></row><row r="2"><c r="A2" t="inlineStr"><is><t>stable</t></is></c><c r="B2" t="inlineStr"><is><t>你好</t></is></c><c r="C2" t="inlineStr"><is><t>Hello</t></is></c><c r="D2" s="3"><f>1+1</f><v>2</v></c></row></sheetData></worksheet>"""
         val bytes=workbook(xml);val table=DocumentCodec.decode(bytes,"name:Lessons");
         assertThrows(IllegalArgumentException::class.java) { DocumentCodec.decode(bytes,"name:Renamed") };assertEquals(2,table.sheets.size);table.initialize()
-        table.update(listOf(table.items("s").single().copy(en="Edited")))
+        table.update(listOf(table.items("s").single().copy(en="Edited",ja="こんにちは",ko="안녕하세요")))
         val encoded=table.encode();val old=parts(bytes);val fresh=parts(encoded)
         assertArrayEquals(old["xl/worksheets/sheet2.xml"],fresh["xl/worksheets/sheet2.xml"])
         assertArrayEquals(old["xl/styles.xml"],fresh["xl/styles.xml"])
         assertTrue(fresh.getValue("xl/worksheets/sheet1.xml").toString(Charsets.UTF_8).contains("<f>1+1</f>"))
-        assertEquals("Edited",DocumentCodec.decode(encoded).items("s").single().en)
+        val restored=DocumentCodec.decode(encoded).items("s").single()
+        assertEquals("Edited",restored.en);assertEquals("こんにちは",restored.ja);assertEquals("안녕하세요",restored.ko)
     }
     @Test fun maliciousArchivesAndExternalEntitiesAreRejected() {
         assertThrows(IllegalArgumentException::class.java) { DocumentCodec.decode(zip(mapOf("../escape" to "bad"))) }

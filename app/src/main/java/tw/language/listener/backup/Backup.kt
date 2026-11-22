@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 @Serializable
-data class Manifest(val schemaVersion: Int = 6, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
+data class Manifest(val schemaVersion: Int = 7, val createdAt: Long, val appVersion: String = tw.language.listener.BuildConfig.VERSION_NAME,
     val full: Boolean, val itemCount: Int, val progressCount: Int, val sourceCount: Int,
     val checksum: Map<String,String>, val dayCount: Int = 0,val reviewCount: Int=0)
 class BackupPreview(val directory: File, val manifest: Manifest, val sources: List<Source>) : Closeable {
@@ -61,7 +61,7 @@ object BackupArchive {
             }
             require("manifest.json" in seen) { "備份檔案不完整" }
             val manifest=JsonCodec.json.decodeFromString<Manifest>(File(dir,"manifest.json").readText())
-            require(manifest.schemaVersion in 1..6) { "不支援的備份版本" }
+            require(manifest.schemaVersion in 1..7) { "不支援的備份版本" }
             require(manifest.createdAt>0 && manifest.appVersion.isNotBlank()) { "備份資訊不合法" }
             val expected=if(manifest.schemaVersion>=6) payloadNames else payloadNames-"reviews.jsonl"
             require(seen==expected+"manifest.json") { "備份檔案不完整" }
@@ -71,7 +71,8 @@ object BackupArchive {
             require(sources.size==manifest.sourceCount && sources.map { it.sourceId }.distinct().size==sources.size)
             sources.forEach {
                 require(it.sourceId.isNotBlank() && it.sourceId.length<=512 && it.name.isNotBlank() && it.lastSync>=0)
-                require(it.access in listOf("public","google","file")) { "不支援的來源存取模式" }
+                require(it.access in listOf("public","google","file","local")) { "不支援的來源存取模式" }
+                if(it.access=="local") require(it.url.isEmpty())
                 if(it.url.isNotEmpty()) require(it.url==SheetUrl.normalize(it.url)) { "來源網址必須為不含憑證的標準 CSV 網址" }
                 if(it.access=="google") tw.language.listener.authoring.SheetLink.parse(it.url)
             }
@@ -80,7 +81,7 @@ object BackupArchive {
             readLines<Item>(dir,"items.jsonl").forEach {
                 validateKey(it.sourceId,it.itemId)
                 require(itemKeys.add(it.sourceId to it.itemId)) { "教材主鍵重複" }
-                require(listOf(it.zh,it.en,it.id).any(String::isNotBlank))
+                require(listOf(it.zh,it.en,it.id,it.ja,it.ko).any(String::isNotBlank))
                 count++
             }
             require(count==manifest.itemCount && (manifest.full || count==0))

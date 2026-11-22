@@ -44,10 +44,10 @@ class CsvReader(reader: Reader) {
 }
 
 class SheetColumns(header: List<String>) {
-    private val names=header.map { it.trim().removePrefix("\uFEFF").lowercase() }
+    private val names=header.map { it.trim().removePrefix("\uFEFF").lowercase(java.util.Locale.ROOT) }
     init {
         require(names.distinct().size==names.size) { "CSV 欄位名稱重複" }
-        require(listOf("id","zh-tw","en-us","id-id").all { it in names }) { "缺少 ID、zh-TW、en-US 或 id-ID 欄位" }
+        require("id" in names && tw.language.listener.data.PlaybackOptions.LANGUAGES.any { it.lowercase(java.util.Locale.ROOT) in names }) { "缺少 ID 或支援的語言欄位" }
     }
     fun item(source: String, row: List<String>): Item {
         require(row.size==names.size) { "CSV 欄位數不符" }
@@ -57,14 +57,14 @@ class SheetColumns(header: List<String>) {
         }
         val id=get("id")
         require(id.isNotBlank() && id.length<=512) { "教材 ID 不可空白或過長" }
-        val enabled=get("enabled").lowercase()
+        val enabled=get("enabled").lowercase(java.util.Locale.ROOT)
         require(enabled in listOf("", "true", "false", "1", "0", "yes", "no")) { "enabled 必須為 true/false" }
         val status=get("status")
         val zh=get("zh-tw"); val en=get("en-us"); val indonesian=get("id-id")
-        require(listOf(zh,en,indonesian).any { it.isNotBlank() }) { "教材至少需有一種語言文字" }
+        require(listOf(zh,en,indonesian,get("ja-jp"),get("ko-kr")).any { it.isNotBlank() }) { "教材至少需有一種語言文字" }
         return Item(source,id,get("category").ifBlank { "日常" },get("type").ifBlank { "word" },
             zh,en,indonesian,get("level"),get("tags"),enabled !in listOf("false","0","no"),
-            status.lowercase() in listOf("deleted","removed"),get("updated_at"),status,get("source_url"),get("pronunciation_note"))
+            status.lowercase(java.util.Locale.ROOT) in listOf("deleted","removed"),get("updated_at"),status,get("source_url"),get("pronunciation_note"),ja=get("ja-jp"),ko=get("ko-kr"))
     }
 }
 

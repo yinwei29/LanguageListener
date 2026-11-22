@@ -22,13 +22,13 @@ class DocumentTable(val headers: MutableList<String>,val rows: MutableList<Mutab
     } ?: emptySet()
     val missing get()=GoogleSheets.HEADERS.filter { required -> headers.none { it.equals(required,true) } }
     fun initialize(): Int {
-        require(headers.size<=100 && headers.none(String::isBlank) && headers.map { it.lowercase() }.distinct().size==headers.size) { "檔案欄名不可空白、重複或超過 100 欄" }
-        require(headers.isEmpty() || headers.any { h -> listOf("ID","zh-TW","en-US","id-ID").any { it.equals(h,true) } }) { "檔案不是教材格式，請建立新的 CSV，避免覆寫原檔" }
+        require(headers.size<=100 && headers.none(String::isBlank) && headers.map { it.lowercase(java.util.Locale.ROOT) }.distinct().size==headers.size) { "檔案欄名不可空白、重複或超過 100 欄" }
+        require(headers.isEmpty() || headers.any { h -> (listOf("ID")+PlaybackOptions.LANGUAGES).any { it.equals(h,true) } }) { "檔案不是教材格式，請建立新的 CSV，避免覆寫原檔" }
         require(headers.isNotEmpty() || rows.all { row -> row.all(String::isBlank) }) { "第一列空白但下方有資料，未初始化" }
         headers+=missing
         require(headers.size<=100)
         val idColumn=headers.indexOfFirst { it.equals("ID",true) }
-        val languageColumns=headers.indices.filter { headers[it].lowercase() in listOf("zh-tw","en-us","id-id") }
+        val languageColumns=headers.indices.filter { headers[it].lowercase(java.util.Locale.ROOT) in PlaybackOptions.LANGUAGES.map { it.lowercase(java.util.Locale.ROOT) } }
         var generated=0
         rows.forEach { row ->
             require(row.size<=headers.size) { "檔案資料欄位超出標題，未寫入" }
@@ -39,23 +39,27 @@ class DocumentTable(val headers: MutableList<String>,val rows: MutableList<Mutab
     }
     fun items(source: String): List<Item> {
         val columns=SheetColumns(headers)
-        val languageColumns=headers.indices.filter { headers[it].lowercase() in listOf("zh-tw","en-us","id-id") }
+        val languageColumns=headers.indices.filter { headers[it].lowercase(java.util.Locale.ROOT) in PlaybackOptions.LANGUAGES.map { it.lowercase(java.util.Locale.ROOT) } }
         return rows.filter { row -> languageColumns.any { row.getOrElse(it) { "" }.isNotBlank() } }.map { columns.item(source,it+List(headers.size-it.size) { "" }) }.also {
             require(it.map(Item::itemId).distinct().size==it.size) { "檔案含重複教材 ID，請先修正再同步" }
         }
     }
     fun update(items: List<Item>) {
+        val extra=GoogleSheets.EXTRA_HEADERS.filter { h -> items.any { it.text(h).isNotBlank() } && headers.none { it.equals(h,true) } }
+        require(headers.size+extra.size<=100)
+        headers+=extra
+        rows.forEach { while(it.size<headers.size) it.add("") }
         val idColumn=headers.indexOfFirst { it.equals("ID",true) }
         val indexed=rows.withIndex().filter { it.value.getOrElse(idColumn) { "" }.isNotBlank() }.associate { it.value[idColumn] to it.index }
         for(item in items) {
             val rowIndex=indexed[item.itemId] ?: rows.size
             if(rowIndex==rows.size) rows.add(MutableList(headers.size) { "" })
             val row=rows[rowIndex]; while(row.size<headers.size) row.add("")
-            headers.forEachIndexed { col,header -> if(GoogleSheets.HEADERS.any { it.equals(header,true) }) {
+            headers.forEachIndexed { col,header -> if(GoogleSheets.ALL_HEADERS.any { it.equals(header,true) }) {
                 val value=GoogleSheets.cell(item,header)
                 if(row[col]!=value) {
                     if(xml!=null) {
-                        val address=GoogleSheets.columnName(col+1)+(rowIndex+2)
+                        val address = "${GoogleSheets.columnName(col+1)}${rowIndex+2}"
                         require(address !in formulaCells) { "教材欄位含 Excel 公式，請另存純值檔案後再同步" }
                     }
                     row[col]=value
@@ -77,7 +81,7 @@ class DocumentTable(val headers: MutableList<String>,val rows: MutableList<Mutab
             }
             val cells=(0 until row.childNodes.length).mapNotNull { row.childNodes.item(it) as? Element }.filter { it.localName=="c" }.associateBy { it.getAttribute("r") }.toMutableMap()
             values.forEachIndexed { col,value ->
-                val address=GoogleSheets.columnName(col+1)+(index+1)
+                val address = "${GoogleSheets.columnName(col+1)}${index+1}"
                 val old=cells[address]
                 // Preserve existing formulas/styles and untouched representations.
                 if(old!=null && DocumentCodec.cellText(old,strings)==value) return@forEachIndexed
