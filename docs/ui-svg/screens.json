@@ -1,0 +1,380 @@
+[
+  {
+    "id": 1,
+    "slug": "01-home",
+    "title": "Language Listener",
+    "subtitle": "你的教材與學習進度都在這台裝置",
+    "desc": ""
+  },
+  {
+    "id": 2,
+    "slug": "02-player",
+    "title": "播放器",
+    "subtitle": "日文旅行  ›  場次設定",
+    "desc": ""
+  },
+  {
+    "id": 3,
+    "slug": "03-library",
+    "title": "教材庫",
+    "subtitle": "所有來源集中管理；離線也能新增與編輯",
+    "desc": ""
+  },
+  {
+    "id": 4,
+    "slug": "04-settings",
+    "title": "設定",
+    "subtitle": "先準備語音，再安心離線學習",
+    "desc": ""
+  },
+  {
+    "id": 5,
+    "slug": "05-offline-start",
+    "title": "開始離線學習",
+    "subtitle": "第一次使用 · 本機優先",
+    "desc": ""
+  },
+  {
+    "id": 6,
+    "slug": "06-source-detail",
+    "title": "日文旅行",
+    "subtitle": "來源詳情 · 教材與進度獨立保存",
+    "desc": ""
+  },
+  {
+    "id": 7,
+    "slug": "07-new-source",
+    "title": "新增來源",
+    "subtitle": "選一種開始方式",
+    "desc": ""
+  },
+  {
+    "id": 8,
+    "slug": "08-local-file",
+    "title": "連接本機檔案",
+    "subtitle": "不需要 Google 授權",
+    "desc": ""
+  },
+  {
+    "id": 9,
+    "slug": "09-file-initialize",
+    "title": "預覽並初始化",
+    "subtitle": "第 2 步 / 2 · 確認後才寫入選取檔案",
+    "desc": ""
+  },
+  {
+    "id": 10,
+    "slug": "10-lesson-edit",
+    "title": "新增 / 編輯教材",
+    "subtitle": "至少輸入兩種語言 · 進度不受文字修改影響",
+    "desc": ""
+  },
+  {
+    "id": 11,
+    "slug": "11-sheets-connect",
+    "title": "連接 Google Sheets",
+    "subtitle": "雲端是選用功能，本機學習不受影響",
+    "desc": ""
+  },
+  {
+    "id": 12,
+    "slug": "12-sheets-initialize",
+    "title": "確認工作表初始化",
+    "subtitle": "你的原本試算表 · 確認後才寫入",
+    "desc": ""
+  },
+  {
+    "id": 13,
+    "slug": "13-sync-preview",
+    "title": "預覽同步",
+    "subtitle": "確認內容後，才寫回本機與雲端",
+    "desc": ""
+  },
+  {
+    "id": 14,
+    "slug": "14-sync-result",
+    "title": "同步結果",
+    "subtitle": "日文旅行 · 本機檔案與雲端",
+    "desc": ""
+  },
+  {
+    "id": 15,
+    "slug": "15-ai-settings",
+    "title": "AI API 與模型",
+    "subtitle": "設定一次，之後可直接產生教材",
+    "desc": ""
+  },
+  {
+    "id": 16,
+    "slug": "16-ai-models",
+    "title": "選擇模型",
+    "subtitle": "ChatGPT / OpenAI API",
+    "desc": ""
+  },
+  {
+    "id": 17,
+    "slug": "17-ai-generate",
+    "title": "用 AI 新增來源",
+    "subtitle": "也可加入已存在的本機或雲端來源",
+    "desc": ""
+  },
+  {
+    "id": 18,
+    "slug": "18-ai-progress",
+    "title": "產生教材中",
+    "subtitle": "日文旅行 · OpenAI",
+    "desc": ""
+  },
+  {
+    "id": 19,
+    "slug": "19-ai-review",
+    "title": "審核教材",
+    "subtitle": "日文旅行 · 可修改翻譯、發音註記與選取",
+    "desc": ""
+  },
+  {
+    "id": 20,
+    "slug": "20-ai-result",
+    "title": "來源建立完成",
+    "subtitle": "審核完成 · 內容已儲存在這台裝置",
+    "desc": ""
+  },
+  {
+    "id": 21,
+    "slug": "21-lesson-search",
+    "title": "所有教材",
+    "subtitle": "搜尋與分類 · 不改變目前播放場次",
+    "desc": ""
+  },
+  {
+    "id": 22,
+    "slug": "22-lesson-detail",
+    "title": "教材詳情",
+    "subtitle": "修改文字會保留學習進度",
+    "desc": ""
+  },
+  {
+    "id": 23,
+    "slug": "23-session",
+    "title": "建立學習場次",
+    "subtitle": "設定將套用到新場次",
+    "desc": ""
+  },
+  {
+    "id": 24,
+    "slug": "24-session-filters",
+    "title": "進階篩選",
+    "subtitle": "保留你選定的來源與語言",
+    "desc": ""
+  },
+  {
+    "id": 25,
+    "slug": "25-speech-settings",
+    "title": "朗讀設定",
+    "subtitle": "套用到下次建立的場次",
+    "desc": ""
+  },
+  {
+    "id": 26,
+    "slug": "26-queue",
+    "title": "目前播放清單",
+    "subtitle": "日文旅行 · 繁中 → 日文",
+    "desc": ""
+  },
+  {
+    "id": 27,
+    "slug": "27-review",
+    "title": "複習與學習紀錄",
+    "subtitle": "依目前語言建立到期場次",
+    "desc": ""
+  },
+  {
+    "id": 28,
+    "slug": "28-offline-voices",
+    "title": "離線語音包",
+    "subtitle": "教材文字與語音包需要分別準備",
+    "desc": ""
+  },
+  {
+    "id": 29,
+    "slug": "29-backup",
+    "title": "備份與換機",
+    "subtitle": "在設定中保存教材與學習紀錄",
+    "desc": ""
+  },
+  {
+    "id": 30,
+    "slug": "30-restore-preview",
+    "title": "預覽備份內容",
+    "subtitle": "先檢查版本、完整性與內容，再還原",
+    "desc": ""
+  },
+  {
+    "id": 31,
+    "slug": "31-restore-result",
+    "title": "還原結果",
+    "subtitle": "完整備份 · 智慧合併",
+    "desc": ""
+  },
+  {
+    "id": 32,
+    "slug": "32-appearance",
+    "title": "語言與外觀",
+    "subtitle": "繁中 / 英文 / 印尼文介面",
+    "desc": ""
+  },
+  {
+    "id": 33,
+    "slug": "33-sync-preferences",
+    "title": "同步與連線偏好",
+    "subtitle": "網路中斷不影響本機教材",
+    "desc": ""
+  },
+  {
+    "id": 34,
+    "slug": "34-ai-advanced",
+    "title": "進階 API 設定",
+    "subtitle": "AI API 與模型  ›  進階",
+    "desc": ""
+  },
+  {
+    "id": 35,
+    "slug": "35-lockscreen",
+    "title": "鎖屏與媒體通知",
+    "subtitle": "Android 系統畫面示意 · 樣式依裝置而異",
+    "desc": ""
+  },
+  {
+    "id": 36,
+    "slug": "36-system-files",
+    "title": "選擇檔案 / 儲存位置",
+    "subtitle": "Android 系統檔案選擇器示意",
+    "desc": ""
+  },
+  {
+    "id": 37,
+    "slug": "37-empty-library",
+    "title": "還沒有教材",
+    "subtitle": "狀態畫面 · 可以先從本機開始。",
+    "desc": ""
+  },
+  {
+    "id": 38,
+    "slug": "38-missing-voice",
+    "title": "尚缺日文離線語音",
+    "subtitle": "狀態畫面 · 目前教材已儲存，不會遺失。",
+    "desc": ""
+  },
+  {
+    "id": 39,
+    "slug": "39-ai-error",
+    "title": "教材尚未產生",
+    "subtitle": "狀態畫面 · 供應商拒絕此請求 · HTTP 400",
+    "desc": ""
+  },
+  {
+    "id": 40,
+    "slug": "40-sync-conflict",
+    "title": "有 1 筆教材修改衝突",
+    "subtitle": "狀態畫面 · 同步已停止，沒有直接覆蓋。",
+    "desc": ""
+  },
+  {
+    "id": 41,
+    "slug": "41-file-permission",
+    "title": "需要重新選擇檔案",
+    "subtitle": "狀態畫面 · 本機教材與學習進度仍在。",
+    "desc": ""
+  },
+  {
+    "id": 42,
+    "slug": "42-restore-error",
+    "title": "無法匯入這份備份",
+    "subtitle": "狀態畫面 · 目前資料沒有被修改。",
+    "desc": ""
+  },
+  {
+    "id": 43,
+    "slug": "43-offline-cloud",
+    "title": "目前沒有網路",
+    "subtitle": "狀態畫面 · 你仍可播放與編輯本機教材。",
+    "desc": ""
+  },
+  {
+    "id": 44,
+    "slug": "44-no-matches",
+    "title": "沒有符合條件的教材",
+    "subtitle": "狀態畫面 · 目前來源與語言配對沒有可播放內容。",
+    "desc": ""
+  },
+  {
+    "id": 45,
+    "slug": "45-dialog-rename",
+    "title": "重新命名來源",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 46,
+    "slug": "46-dialog-remove-source",
+    "title": "移除這個來源？",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 47,
+    "slug": "47-dialog-replace-draft",
+    "title": "重新產生教材？",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 48,
+    "slug": "48-dialog-publish",
+    "title": "建立來源並儲存？",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 49,
+    "slug": "49-dialog-restore-replace",
+    "title": "完整覆蓋目前資料？",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 50,
+    "slug": "50-dialog-clear-review",
+    "title": "清除此筆複習排程？",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 51,
+    "slug": "51-dialog-auth-cancelled",
+    "title": "Google 授權已取消",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 52,
+    "slug": "52-dialog-quota",
+    "title": "API 額度不足",
+    "subtitle": "對話框 · 保留原畫面脈絡",
+    "desc": ""
+  },
+  {
+    "id": 53,
+    "slug": "53-home-dark",
+    "title": "Language Listener",
+    "subtitle": "深色模式 · 四個主頁採相同語意與對比規則",
+    "desc": ""
+  },
+  {
+    "id": 54,
+    "slug": "54-player-dark",
+    "title": "播放器",
+    "subtitle": "深色模式 · 繁中 → 日文",
+    "desc": ""
+  }
+]
