@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
@@ -50,14 +51,16 @@ internal fun ReviewControls(vm: ListenerViewModel) {
     var reset by remember { mutableStateOf<tw.language.listener.data.Item?>(null) }
     val current=item ?: return
     val state=progress ?: Progress(current.sourceId,current.itemId)
-    Panel(ui.message("記憶評分與間隔複習")) {
-        Text(ui.message("選擇記憶程度以安排下次複習；評分後仍可繼續聽目前教材。"))
-        Actions {
+    Panel(ui.message("這一筆記得嗎？")) {
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
             for(rating in Rating.entries) {
                 val next=ReviewScheduler.schedule(state,rating,now)
                 val label=when(rating) { Rating.AGAIN->"重學";Rating.HARD->"困難";Rating.GOOD->"普通";Rating.EASY->"容易" }
-                OutlinedButton(enabled=!busy && !recorded,onClick={ vm.rate(rating,current.sourceId,current.itemId) }) {
-                    Text(ui.message(label)+" · "+if(next.intervalDays==0) ui.message("10 分鐘") else next.intervalDays.toString()+" "+ui.message("天"))
+                OutlinedButton(modifier=Modifier.weight(1f),contentPadding=PaddingValues(horizontal=4.dp,vertical=12.dp),enabled=!busy && !recorded,onClick={ vm.rate(rating,current.sourceId,current.itemId) }) {
+                    Column(horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(ui.message(label),style=MaterialTheme.typography.labelLarge)
+                        Text(if(next.intervalDays==0) ui.message("10 分鐘") else next.intervalDays.toString()+" "+ui.message("天"),style=MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }

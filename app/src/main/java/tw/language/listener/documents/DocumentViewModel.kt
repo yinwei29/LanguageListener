@@ -16,6 +16,9 @@ class DocumentViewModel(application: Application): AndroidViewModel(application)
     private val app=application as ListenerApp
     private val repo=app.repository
     private val store=DocumentStore(app,repo)
+    val dictionary=MutableStateFlow<tw.language.listener.dictionary.DictionaryFile?>(null)
+    fun loadDictionary(sourceId: String)=task { dictionary.value=app.dictionaries.existing(sourceId) }
+    fun buildDictionary(sourceId: String)=task { dictionary.value=app.dictionaries.refresh(sourceId);notice.value="CSV 字典檔已更新，可離線使用或另存到手機" }
     val documents=repo.dao.observeDocuments().stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val sources=repo.dao.observeSources().stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val busy=MutableStateFlow(false)
@@ -54,16 +57,20 @@ class DocumentViewModel(application: Application): AndroidViewModel(application)
         notice.value="App 與本機檔案已同步，學習進度保留"
     }
     fun export(uri: Uri,sourceId: String)=task {
-        val table=DocumentCodec.decode(byteArrayOf());table.initialize();table.update(store.cached(sourceId))
-        checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { it.write(table.encode()) }
+        val snapshot=app.dictionaries.refresh(sourceId)
+        checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { output -> snapshot.file.inputStream().use { it.copyTo(output) } }
+        check(DocumentCodec.hash(store.bytes(uri.toString()))==snapshot.sha256) { "字典檔寫入未確認，App 教材保留，請重新另存" }
+        dictionary.value=snapshot
         notice.value="CSV 已匯出，可用 Excel 開啟"
     }
     fun exportAndConnect(uri: Uri,sourceId: String)=task {
         val original=checkNotNull(repo.dao.sources().find { it.sourceId==sourceId }) { "來源已移除" }
         store.persist(uri)
         check(store.bytes(uri.toString()).isEmpty()) { "選取的位置已有資料，請使用選擇檔案而非建立新檔" }
-        val table=DocumentCodec.decode(byteArrayOf());table.initialize();table.update(store.cached(sourceId))
-        checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { it.write(table.encode()) }
+        val snapshot=app.dictionaries.refresh(sourceId)
+        checkNotNull(app.contentResolver.openOutputStream(uri,"rwt")).use { output -> snapshot.file.inputStream().use { it.copyTo(output) } }
+        check(DocumentCodec.hash(store.bytes(uri.toString()))==snapshot.sha256) { "字典檔寫入未確認，App 教材保留，請重新另存" }
+        dictionary.value=snapshot
         check(repo.dao.sources().any { it==original }) { "來源或備份狀態已改變，尚未寫入，請重新審核" }
         store.initialize(store.prepare(uri,sourceId))
         notice.value="CSV 已建立並連接此來源，可離線同步檔案或連接 Google Sheets"

@@ -177,8 +177,8 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
         AuthoringValidation.validateReview(value,selected)
         val saved=value.copy(items=value.items.map { old -> selected.find { it.itemId==old.itemId } ?: old },selectedIds=selected.map { it.itemId })
         if(value.pendingSource!=null) {
-            AiSourceDrafts(repo).publish(value,selected)
-            notice.value="AI 本機來源已建立，可直接開始離線學習或匯出 CSV"
+            app.dictionaries.publishReviewed(value,selected)
+            notice.value="AI 字典檔已建立，教材可直接離線學習"
             return@task
         }
         saveDraft(saved) // Stable IDs and edited text survive ambiguous network failures/process death.
@@ -194,7 +194,8 @@ class AuthoringViewModel(application: Application) : AndroidViewModel(applicatio
                 saveDraft(saved.copy(written=true,writtenCount=selected.size,skippedCount=0))
                 repo.syncEpoch.incrementAndGet()
             } }
-            notice.value="已儲存審核教材到 App；檔案來源請再按同步本機檔案，或預覽與 Sheets 同步"
+            app.dictionaries.refresh(destination.sourceId)
+            notice.value="AI 字典檔已更新；外部檔案與 Sheets 可另外預覽同步"
             return@task
         }
         withGoogle { token ->
