@@ -19,6 +19,8 @@ Phase 2 同步可靠性與效能見 [進度紀錄](docs/PHASE2_PROGRESS.md)。�
 
 0.6.0 整合 AI 建立本機來源、審核後直接學習、CSV 連接及日文／韓文完整資料流程，見 [離線學習操作](docs/OFFLINE_SOURCES.md)。
 
+0.7.0 套用原生 SVG 介面分區；AI 審核後自動建立本機 CSV 字典，可直接離線學習及另存到手機，見 [新版操作](docs/UI_DICTIONARY_070.md)。
+
 ## 取得與建置 APK
 
 Android 8.0（API 26）以上，compile／target SDK 35，JDK 17。

@@ -21,7 +21,7 @@ import tw.language.listener.documents.*
 import tw.language.listener.i18n.UiStrings
 
 @UnstableApi @Composable
-internal fun DocumentPanel(listener: ListenerViewModel,report: (String)->Unit,vm: DocumentViewModel=viewModel(),auth: AuthoringViewModel=viewModel()) {
+internal fun DocumentPanel(listener: ListenerViewModel,report: (String)->Unit,vm: DocumentViewModel=viewModel(),auth: AuthoringViewModel=viewModel(),sourceFilter: String?=null,showImport: Boolean=true) {
     val ui=UiStrings(LocalContext.current)
     val sources by vm.sources.collectAsStateWithLifecycle()
     val documents by vm.documents.collectAsStateWithLifecycle()
@@ -31,7 +31,7 @@ internal fun DocumentPanel(listener: ListenerViewModel,report: (String)->Unit,vm
     val plan by vm.plan.collectAsStateWithLifecycle()
     val cloudHeaders by vm.cloudInitialization.collectAsStateWithLifecycle()
     val cloud by vm.cloudPlan.collectAsStateWithLifecycle()
-    var target by rememberSaveable { mutableStateOf("") }
+    var target by rememberSaveable(sourceFilter) { mutableStateOf(sourceFilter ?: "") }
     var exportId by rememberSaveable { mutableStateOf("") }
     var recoveryId by rememberSaveable { mutableStateOf("") }
     var adding by remember { mutableStateOf<Source?>(null) }
@@ -39,20 +39,22 @@ internal fun DocumentPanel(listener: ListenerViewModel,report: (String)->Unit,vm
     val create=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri -> uri?.let { vm.create(it,target.ifEmpty { null }) } }
     val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri -> uri?.let { vm.export(it,exportId) } }
     val recover=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri -> uri?.let { vm.recover(it,recoveryId) } }
-    LaunchedEffect(notice) { notice?.let { report(it);vm.notice.value=null } }
+
     val active=busy || authBusy
-    Panel(ui.message("本機 Excel／CSV：離線開始")) {
+    Panel(ui.message(if(showImport) "本機 Excel／CSV：離線開始" else "本機檔案與雲端同步")) {
+        if(showImport) {
         Text(ui.message("先建立 CSV 或選擇 .xlsx／UTF-8 CSV，再預覽初始化。檔案由你選擇儲存位置，不需 Google 授權。"))
         Choice(ui.message("接到既有來源（重新連接或共用 Sheets 進度）"),target,
-            listOf("" to ui.message("建立新來源"))+sources.filter { it.sourceId !in listOf("demo",Repository.LOCAL_SOURCE_ID) }.map { it.sourceId to it.name }) { if(!active) target=it }
+            listOf("" to ui.message("建立新來源"))+sources.filter { it.sourceId!="demo" }.map { it.sourceId to it.name }) { if(!active) target=it }
         Actions {
             Button(enabled=!active,onClick={ create.launch("LanguageListener-lessons.csv") }) { Text(ui.message("建立初始 CSV")) }
             OutlinedButton(enabled=!active,onClick={ pick.launch(arrayOf("text/csv","text/comma-separated-values","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.ms-excel","application/octet-stream")) }) { Text(ui.message("選擇 Excel／CSV")) }
         }
         Text(ui.message("支援 .xlsx 與 UTF-8 CSV；.xls／巨集檔請先轉存。初始化只補教材欄位與缺少的 ID，保留其他欄位及工作表。"))
         Text(ui.message("同步不依缺少的列自動刪除教材；停用請設定 enabled=false。兩邊同時修改同一 ID 時會停止，不直接覆蓋。"))
+        }
         if(active) LinearProgressIndicator(Modifier.fillMaxWidth())
-        sources.filter { it.access=="file" }.forEach { source ->
+        sources.filter { it.access=="file" && it.sourceId==sourceFilter }.forEach { source ->
             key(source.sourceId) {
                 HorizontalDivider();Text(source.name,style=MaterialTheme.typography.titleMedium)
                 val binding=documents.firstOrNull { it.sourceId==source.sourceId }

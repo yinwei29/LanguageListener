@@ -32,6 +32,8 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     val language=repo.dao.observeSettings().map { it?.uiLanguage }.stateIn(viewModelScope,SharingStarted.Eagerly,null)
     val settings=repo.dao.observeSettings().map { it ?: Settings() }.stateIn(viewModelScope,SharingStarted.Eagerly,Settings())
     val reviewClock=flow { while(true) { emit(System.currentTimeMillis());delay(60_000) } }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),System.currentTimeMillis())
+    val sourceSummaries=reviewClock.flatMapLatest { repo.dao.sourceSummaries(it) }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),emptyList())
+    val restored=MutableStateFlow(false)
     val due=reviewClock.flatMapLatest { repo.dao.dueSummary(it) }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),DueSummary())
     val reviewDays=reviewClock.flatMapLatest { val today=java.time.LocalDate.now().toEpochDay();repo.dao.reviewDays(today-6,today) }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5000),emptyList())
     val reviewRecorded=MutableStateFlow(false)
@@ -54,6 +56,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     val progress=item.flatMapLatest { current ->
         if(current==null) flowOf(null) else repo.dao.observeProgress(current.sourceId,current.itemId)
     }.stateIn(viewModelScope,SharingStarted.Eagerly,null)
+    val playbackError=MutableStateFlow<String?>(null)
     val playing=MutableStateFlow(false)
     val buffering=MutableStateFlow(false)
     val index=MutableStateFlow(0)
@@ -63,7 +66,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     val preview=MutableStateFlow<BackupPreview?>(null)
     val library=MutableStateFlow<List<Item>>(emptyList())
     val hasMore=MutableStateFlow(false)
-    val tab=app.uiStore.data.map { it[intPreferencesKey("tab")] ?: 0 }.stateIn(viewModelScope,SharingStarted.Eagerly,0)
+    val tab=app.uiStore.data.map { it[intPreferencesKey("tab")] ?: 0 }.stateIn(viewModelScope,SharingStarted.Eagerly,null)
     private var controller: MediaController?=null
     private val future=MediaController.Builder(app,SessionToken(app,ComponentName(app,ListeningService::class.java))).buildAsync()
     init {
@@ -75,7 +78,8 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
                     override fun onPlayerError(error: PlaybackException) {
                         var cause: Throwable=error
                         while(cause.cause!=null) cause=cause.cause!!
-                        message.value=cause.message ?: "無法播放，請檢查離線語音包"
+                        playbackError.value=cause.message ?: "無法播放，請檢查離線語音包"
+                        message.value=playbackError.value
                     }
                 })
                 updatePlayer()
@@ -153,6 +157,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     }
     fun start(options: PlaybackOptions=settings.value.playback) = runTask { startSession(options) }
     private suspend fun startSession(options: PlaybackOptions) {
+        playbackError.value=null
         controller?.pause(); controller?.stop()
         val count=repo.createSession(options)
         index.value=0; refreshItem()
@@ -169,12 +174,17 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         getApplication<Application>().startService(Intent(getApplication(),ListeningService::class.java)
             .setAction(ListeningService.ACTION_RELOAD).putExtra("play",play))
     }
+    fun toggleIfPaused() { if(controller?.playWhenReady!=true || controller?.playbackState==Player.STATE_ENDED) toggle() }
+    fun jumpTo(position: Int,expectedSession: String)=runTask {
+        if(repo.dao.session()?.sessionId==expectedSession && position in 0 until repo.dao.queueCount()) { controller?.seekToDefaultPosition(position);chooseTab(1) }
+    }
     fun toggle() {
         val player=controller ?: return
         if(player.playWhenReady && player.playbackState in listOf(Player.STATE_READY,Player.STATE_BUFFERING)) player.pause()
         else {
             if(player.mediaItemCount==0) { start(); return }
             if(player.playbackState==Player.STATE_ENDED) player.seekToDefaultPosition(0)
+            playbackError.value=null
             player.prepare(); player.play()
         }
     }
@@ -214,6 +224,7 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
     private var libraryCategory=""
     fun saveLocalItem(value: Item, complete: ()->Unit) = runTask {
         repo.saveLocalItem(value)
+        (getApplication<Application>() as ListenerApp).dictionaries.refresh(value.sourceId)
         library.value=repo.dao.search(libraryQuery,libraryCategory,100,0)
         hasMore.value=library.value.size==100
         message.value="教材已儲存，可建立場次開始離線學習"
@@ -254,7 +265,8 @@ class ListenerViewModel(app: Application) : AndroidViewModel(app) {
         val pending=preview.value ?: return@runTask
         controller?.pause(); controller?.stop()
         backup.restore(pending,replace)
-        dismissPreview(); reload(false); message.value="還原完成；輕量備份的教材需重新同步，TTS 語音包需重新安裝"
+        (getApplication<Application>() as ListenerApp).dictionaries.clear()
+        dismissPreview(); restored.value=true; reload(false); message.value="還原完成；輕量備份的教材需重新同步，TTS 語音包需重新安裝"
     }
     override fun onCleared() {
         MediaController.releaseFuture(future); preview.value?.close(); super.onCleared()

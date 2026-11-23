@@ -92,3 +92,5 @@ object JsonCodec { val json = kotlinx.serialization.json.Json { encodeDefaults =
 
 data class Stats(val total: Int, val learned: Int, val favorite: Int)
 data class CategoryCount(val category: String, val type: String, val total: Int)
+
+data class SourceSummary(val sourceId: String,val total: Int,val learned: Int,val due: Int)

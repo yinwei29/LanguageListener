@@ -2,10 +2,6 @@
 
 package tw.language.listener
 
-import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,18 +24,7 @@ import tw.language.listener.data.*
 internal fun GoogleAuthoringPanel(report: (String)->Unit, vm: AuthoringViewModel=viewModel()) {
     val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val busy by vm.busy.collectAsStateWithLifecycle()
-    val resolution by vm.resolution.collectAsStateWithLifecycle()
-    val notice by vm.notice.collectAsStateWithLifecycle()
     val plan by vm.plan.collectAsStateWithLifecycle()
-    val launcher=rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        vm.authorizationResult(if(result.resultCode==Activity.RESULT_OK) result.data else null)
-    }
-    LaunchedEffect(resolution) { resolution?.let { pending ->
-        vm.launchedResolution()
-        try { launcher.launch(IntentSenderRequest.Builder(pending.intentSender).build()) }
-        catch(_: Exception) { report("無法開啟 Google 授權畫面，請確認 Google Play 服務"); vm.authorizationResult(null) }
-    } }
-    LaunchedEffect(notice) { notice?.let { report(it); vm.notice.value=null } }
     var name by rememberSaveable { mutableStateOf("") }
     var url by rememberSaveable { mutableStateOf("") }
     Panel(ui(R.string.get_started_connect_and_initialize_sheets_14dccc)) {
@@ -67,7 +52,7 @@ internal fun GoogleAuthoringPanel(report: (String)->Unit, vm: AuthoringViewModel
 }
 
 @Composable
-internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onVoices: ()->Unit, vm: AuthoringViewModel=viewModel()) {
+internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onVoices: ()->Unit, vm: AuthoringViewModel=viewModel(),mode: String="generate",onSettings: ()->Unit={},onReview: ()->Unit={}) {
     val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     val busy by vm.busy.collectAsStateWithLifecycle()
     val saved by vm.profile.collectAsStateWithLifecycle()
@@ -77,8 +62,7 @@ internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onV
     val aiError by vm.aiError.collectAsStateWithLifecycle()
     val generationProgress by vm.generationProgress.collectAsStateWithLifecycle()
     val draft by vm.draft.collectAsStateWithLifecycle()
-    var showSettings by rememberSaveable { mutableStateOf(true) }
-    LaunchedEffect(hasKey,keySaved) { if(hasKey) showSettings=false }
+    var showAdvanced by rememberSaveable { mutableStateOf(false) }
     var profile by remember(saved) { mutableStateOf(saved) }
     // API keys intentionally do not use rememberSaveable or a ViewModel saved-state bundle.
     var key by remember { mutableStateOf("") }
@@ -96,22 +80,18 @@ internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onV
     var languages by rememberSaveable { mutableStateOf("all") }
     var customLanguages by rememberSaveable { mutableStateOf(PlaybackOptions.CORE_LANGUAGES) }
     var regenerate by remember { mutableStateOf(false) }
+    var requestedAfter by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(draft?.draftId,busy) { if(mode=="generate" && requestedAfter!=null && !busy && draft!=null && draft?.draftId!=requestedAfter && draft?.items?.isNotEmpty()==true) { requestedAfter=null;onReview() } }
     fun generate() {
         val number=count.toIntOrNull()
         if(number==null || number !in 1..100) { vm.notice.value="單批數量請輸入 1–100"; return }
         val request=AiRequest(if(newSource) "new-source" else sourceId,topic,category,type,level,number,when(languages) {
             "zh-en"->listOf("zh-TW","en-US"); "zh-id"->listOf("zh-TW","id-ID");"zh-ja"->listOf("zh-TW","ja-JP");"zh-ko"->listOf("zh-TW","ko-KR");"ja-ko"->listOf("ja-JP","ko-KR");"five"->PlaybackOptions.LANGUAGES;"custom"->PlaybackOptions.LANGUAGES.filter { it in customLanguages };else->PlaybackOptions.CORE_LANGUAGES
         })
+        requestedAfter=draft?.draftId ?: ""
         if(newSource) vm.generateNewSource(sourceName,request) else vm.generate(request)
     }
-    Panel(ui.message("AI 新增來源與教材")) {
-        Text(ui.message("選 ChatGPT／OpenAI API 並儲存金鑰與模型，輸入主題產生草稿；審核後才建立本機來源，可直接離線學習。"))
-        Choice(ui.message("新增方式"),if(newSource) "new" else "existing",listOf("new" to ui.message("用 AI 建立新來源"),"existing" to ui.message("加入既有來源"))) { if(!busy) newSource=it=="new" }
-        if(newSource) OutlinedTextField(sourceName,{ sourceName=it },label={ Text(ui.message("新來源名稱，例如日文旅遊單字")) },enabled=!busy,modifier=Modifier.fillMaxWidth())
-        Text(ui(R.string.use_your_own_api_key_your_provider_charges_for_u_2160a9))
-        TextButton(onClick={ showSettings=!showSettings }) { Text(ui.message("顯示／收起 AI 設定")) }
-        Text((when(profile.provider) { "openai"->"ChatGPT／OpenAI API";"gemini"->"Gemini";else->ui(R.string.openai_compatible_api_fd90fc) })+" · "+profile.model)
-        if(showSettings) {
+    if(mode=="settings") Panel(ui.message("AI API 與模型")) {
         Choice(ui(R.string.provider_46ea7f),profile.provider,listOf("gemini" to "Gemini","openai" to "ChatGPT／OpenAI API","compatible" to ui(R.string.openai_compatible_api_fd90fc))) {
             if(!busy) { profile=when(it) {
                 "gemini"->AiProfile()
@@ -120,22 +100,34 @@ internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onV
             }
             key="" }
         }
-        OutlinedTextField(profile.endpoint,{ key="";profile=profile.copy(endpoint=it) },label={ Text(ui(R.string.api_base_url_https_no_key_228df9)) },enabled=!busy && profile.provider=="compatible",modifier=Modifier.fillMaxWidth())
-        if(profile.provider!="gemini") Choice(ui.message("API 格式"),profile.protocol,listOf("auto" to ui.message("自動（OpenAI 使用 Responses；相容 API 使用 Chat）"),"responses" to "Responses API","chat" to "Chat Completions")) { if(!busy) profile=profile.copy(protocol=it) }
-        Choice(ui.message("輸出格式"),profile.outputMode,listOf("json" to "JSON","schema" to "JSON Schema","prompt" to ui.message("僅提示詞 JSON（模型不支援格式參數時使用）"))) { if(!busy) profile=profile.copy(outputMode=it) }
         val remoteModels=modelList?.takeIf { it.origin==profile.keySlot() }?.items
         val modelChoices=(remoteModels ?: AiModels.examples(profile.provider)).map { it.id to it.label }
-        if(modelChoices.isNotEmpty()) Choice(ui.message("模型選單"),profile.model,modelChoices) { if(!busy) profile=profile.copy(model=it) }
+        if(modelChoices.isNotEmpty()) ModelPicker(profile.model,modelChoices,!busy) { profile=profile.copy(model=it) }
         Text(if(remoteModels==null) ui.message("目前顯示模型範例，不代表帳號可用；請載入模型清單或輸入自己的模型 ID。") else ui.message("清單由供應商依此金鑰回傳；列出模型不保證可用額度或支援所有輸出格式。"))
         OutlinedTextField(profile.model,{ profile=profile.copy(model=it) },label={ Text(ui(R.string.model_name_4585e1)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
         OutlinedTextField(key,{ key=it;vm.models.value=null },label={ Text(ui(R.string.api_key_leave_blank_to_reuse_the_saved_key_for_t_fab1c0)) },visualTransformation=PasswordVisualTransformation(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password,autoCorrectEnabled=false),enabled=!busy,singleLine=true,modifier=Modifier.fillMaxWidth())
-        Text(if(hasKey) ui(R.string.key_saved_encrypted_on_this_device_and_excluded_65497f) else ui(R.string.no_key_is_configured_for_this_provider_yet_cf1a46))
+        Text(if(hasKey && profile.keySlot()==saved.keySlot()) ui(R.string.key_saved_encrypted_on_this_device_and_excluded_65497f) else ui(R.string.no_key_is_configured_for_this_provider_yet_cf1a46))
         Actions {
             OutlinedButton(enabled=!busy,onClick={ vm.loadModels(profile,key) }) { Text(ui.message("載入模型清單／檢查金鑰")) }
             Button(enabled=!busy,onClick={ vm.saveProfile(profile,key) }) { Text(ui(R.string.save_ai_settings_70dc45)) }
             TextButton(enabled=!busy,onClick=vm::clearKey) { Text(ui(R.string.remove_the_saved_key_e3ab12)) }
         }
+        TextButton(enabled=!busy,onClick={ showAdvanced=!showAdvanced }) { Text(ui.message("進階 API 設定")) }
+        if(showAdvanced) {
+        OutlinedTextField(profile.endpoint,{ key="";profile=profile.copy(endpoint=it) },label={ Text(ui(R.string.api_base_url_https_no_key_228df9)) },enabled=!busy && profile.provider=="compatible",modifier=Modifier.fillMaxWidth())
+        if(profile.provider!="gemini") Choice(ui.message("API 格式"),profile.protocol,listOf("auto" to ui.message("自動（OpenAI 使用 Responses；相容 API 使用 Chat）"),"responses" to "Responses API","chat" to "Chat Completions")) { if(!busy) profile=profile.copy(protocol=it) }
+        Choice(ui.message("輸出格式"),profile.outputMode,listOf("json" to "JSON","schema" to "JSON Schema","prompt" to ui.message("僅提示詞 JSON（模型不支援格式參數時使用）"))) { if(!busy) profile=profile.copy(outputMode=it) }
         }
+        if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+        aiError?.let { Text(ui.message(it),color=MaterialTheme.colorScheme.error) }
+    }
+    if(mode=="generate") Panel(ui.message("用 AI 建立字典")) {
+        Text(ui.message("產生後先審核；確認儲存時會自動建立本機 CSV 字典檔。"))
+        Choice(ui.message("新增方式"),if(newSource) "new" else "existing",listOf("new" to ui.message("用 AI 建立新來源"),"existing" to ui.message("加入既有來源"))) { if(!busy) newSource=it=="new" }
+        if(newSource) OutlinedTextField(sourceName,{ sourceName=it },label={ Text(ui.message("新來源名稱，例如日文旅遊單字")) },enabled=!busy,modifier=Modifier.fillMaxWidth())
+        Text(profile.provider+" · "+profile.model)
+        OutlinedButton(enabled=!busy,onClick=onSettings) { Text(ui.message("設定 API 金鑰與模型")) }
+        if(!hasKey) Text(ui.message("請先設定 API 金鑰；已保存的教材仍可離線使用。"))
         if(!newSource && writable.isEmpty()) Text(ui.message("沒有可加入的來源；請切換成用 AI 建立新來源。"))
         else if(!newSource) Choice(ui(R.string.destination_source_e40e7f),sourceId,writable.map { it.sourceId to it.name }) { sourceId=it }
         OutlinedTextField(topic,{ topic=it },label={ Text(ui(R.string.topic_e_g_hotel_check_in_vocabulary_586e44)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
@@ -160,12 +152,22 @@ internal fun AiAuthoringPanel(sources: List<Source>,onStudy: (AiDraft)->Unit,onV
         Button(enabled=!busy && hasKey && profile==saved && (if(newSource) sourceName.trim().isNotEmpty() else sourceId.isNotBlank()) && topic.isNotBlank() && (languages!="custom" || customLanguages.size>=2),onClick={
             if(draft?.written==false) regenerate=true else generate()
         }) { Text(ui(R.string.generate_a_review_draft_526d40)) }
+        if(draft?.items?.isNotEmpty()==true) OutlinedButton(onClick=onReview) { Text(ui.message("前往草稿審核與字典檔")) }
+    }
+    if(mode=="review") {
+        generationProgress?.let { (done,total) -> Text("$done / $total");LinearProgressIndicator(Modifier.fillMaxWidth()) }
+        aiError?.let { Text(ui.message(it),color=MaterialTheme.colorScheme.error) }
+        if(draft?.generationComplete==false && draft?.written==false) {
+            Button(enabled=!busy && hasKey && saved==draft?.generationProfile,onClick=vm::resumeGeneration) { Text(ui.message("繼續產生剩餘批次")) }
+        }
+        if(busy) LinearProgressIndicator(Modifier.fillMaxWidth())
     }
     if(regenerate) AlertDialog(onDismissRequest={ regenerate=false },title={ Text(ui(R.string.replace_the_unwritten_draft_e61ef4)) },
         text={ Text(ui(R.string.a_successfully_generated_batch_will_replace_the_3db38e)) },
         confirmButton={ TextButton(onClick={ regenerate=false; generate() }) { Text(ui(R.string.generate_again_2f2f5e)) } },
         dismissButton={ TextButton(onClick={ regenerate=false }) { Text(ui(R.string.cancel_4d0b46)) } })
-    draft?.let { if(it.items.isNotEmpty()) DraftReview(it,sources,busy,vm::writeReviewed,onStudy,onVoices) else Text(ui.message("目前沒有新的待審核教材；請繼續批次或更換主題。")) }
+    if(mode=="review" && draft==null) Text(ui.message("目前沒有待審核草稿，請先用 AI 產生教材。"))
+    if(mode=="review") draft?.let { if(it.items.isNotEmpty()) DraftReview(it,sources,busy,vm::writeReviewed,onStudy,onVoices) else Text(ui.message("目前沒有新的待審核教材；請繼續批次或更換主題。")) }
 }
 
 @Composable
@@ -173,6 +175,7 @@ private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, wr
     val ui=tw.language.listener.i18n.UiStrings(androidx.compose.ui.platform.LocalContext.current)
     var edited by remember(draft.draftId,draft.written,draft.generatedCount) { mutableStateOf(draft.items) }
     var selected by remember(draft.draftId,draft.written,draft.generatedCount) { mutableStateOf(draft.selectedIds?.toSet() ?: emptySet()) }
+    var editing by remember { mutableStateOf<String?>(null) }
     var page by remember(draft.draftId) { mutableStateOf(0) }
     var confirm by remember { mutableStateOf(false) }
     val source=sources.find { it.sourceId==draft.request.sourceId } ?: draft.pendingSource?.takeIf { !draft.written }
@@ -197,17 +200,22 @@ private fun DraftReview(draft: AiDraft, sources: List<Source>, busy: Boolean, wr
                 HorizontalDivider()
                 Row { Checkbox(modifier=Modifier.semantics { contentDescription=ui(R.string.select_lesson_f118b9,index+1) },enabled=!busy,checked=item.itemId in selected,onCheckedChange={ checked -> selected=if(checked) selected+item.itemId else selected-item.itemId }); Text(ui(R.string.entry_749064, (index+1))) }
                 fun update(value: Item) { edited=edited.toMutableList().also { it[index]=value } }
-                OutlinedTextField(item.zh,{ update(item.copy(zh=it)) },label={ Text("繁體中文") },enabled=!busy,modifier=Modifier.fillMaxWidth())
-                OutlinedTextField(item.en,{ update(item.copy(en=it)) },label={ Text("English") },enabled=!busy,modifier=Modifier.fillMaxWidth())
-                OutlinedTextField(item.id,{ update(item.copy(id=it)) },label={ Text("Bahasa Indonesia") },enabled=!busy,modifier=Modifier.fillMaxWidth())
-                OutlinedTextField(item.ja,{ update(item.copy(ja=it)) },label={ Text("日本語") },enabled=!busy,modifier=Modifier.fillMaxWidth())
-                OutlinedTextField(item.ko,{ update(item.copy(ko=it)) },label={ Text("한국어") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                draft.request.languages.forEach { language -> Text(item.text(language),style=MaterialTheme.typography.titleMedium) }
+                TextButton(enabled=!busy,onClick={ editing=if(editing==item.itemId) null else item.itemId }) { Text(ui.message("編輯／收起這一筆")) }
+                if(editing==item.itemId) {
+                if("zh-TW" in draft.request.languages || item.zh.isNotBlank()) OutlinedTextField(item.zh,{ update(item.copy(zh=it)) },label={ Text("繁體中文") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                if("en-US" in draft.request.languages || item.en.isNotBlank()) OutlinedTextField(item.en,{ update(item.copy(en=it)) },label={ Text("English") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                if("id-ID" in draft.request.languages || item.id.isNotBlank()) OutlinedTextField(item.id,{ update(item.copy(id=it)) },label={ Text("Bahasa Indonesia") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                if("ja-JP" in draft.request.languages || item.ja.isNotBlank()) OutlinedTextField(item.ja,{ update(item.copy(ja=it)) },label={ Text("日本語") },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                if("ko-KR" in draft.request.languages || item.ko.isNotBlank()) OutlinedTextField(item.ko,{ update(item.copy(ko=it)) },label={ Text("한국어") },enabled=!busy,modifier=Modifier.fillMaxWidth())
                 OutlinedTextField(item.pronunciationNote,{ update(item.copy(pronunciationNote=it)) },label={ Text(ui(R.string.pronunciation_note_optional_8c42ba)) },enabled=!busy,modifier=Modifier.fillMaxWidth())
+                }
             }
             Text(ui(R.string.writing_rechecks_stable_ids_and_duplicate_text_i_3cb7d4))
             Button(enabled=!busy && selected.isNotEmpty() && source!=null,onClick={ confirm=true }) { Text(ui(R.string.confirm_writing_selected_entries_df53ff, (selected.size))) }
         }
     }
+    if(draft.written && local && source!=null) DictionaryActions(source.sourceId)
     if(confirm) AlertDialog(onDismissRequest={ confirm=false },title={ Text(if(draft.pendingSource!=null) ui.message("建立來源並儲存審核教材") else if(local) ui.message("儲存審核教材到 App") else ui(R.string.write_to_google_sheets_ce59c6)) },
         text={ Text(if(local) ui.message("確認儲存選取的教材到 App；檔案與 Sheets 請使用檔案同步按鈕寫回。") else ui(R.string.destination_add_reviewed_entries_without_overwri_04cd4d, (source?.name), (source?.url), (selected.size))) },
         confirmButton={ TextButton(enabled=!busy,onClick={ confirm=false; write(draft,edited.filter { it.itemId in selected }) }) { Text(ui(R.string.confirm_addition_f2a275)) } },

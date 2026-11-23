@@ -56,6 +56,13 @@ interface ListenerDao {
     @Query("SELECT * FROM items WHERE deleted=0 AND enabled=1 AND (:category='' OR category=:category) AND (zh LIKE '%' || :search || '%' OR en LIKE '%' || :search || '%' OR ja LIKE '%' || :search || '%' OR ko LIKE '%' || :search || '%' OR `id` LIKE '%' || :search || '%') ORDER BY category,itemId LIMIT :limit OFFSET :offset")
     suspend fun search(search: String, category: String, limit: Int, offset: Int): List<Item>
 
+    @Query("SELECT i.* FROM items i WHERE deleted=0 AND enabled=1 AND (:source='' OR sourceId=:source) AND (:category='' OR category=:category) AND (zh LIKE '%' || :search || '%' OR en LIKE '%' || :search || '%' OR ja LIKE '%' || :search || '%' OR ko LIKE '%' || :search || '%' OR `id` LIKE '%' || :search || '%') ORDER BY category,itemId LIMIT :limit OFFSET :offset")
+    suspend fun searchSource(source: String,search: String,category: String,limit: Int,offset: Int): List<Item>
+    @Query("SELECT s.sourceId,COUNT(i.itemId) AS total,COALESCE(SUM(p.learned),0) AS learned,COALESCE(SUM(CASE WHEN p.lastReviewedAt>0 AND p.nextReviewAt<=:now AND p.skipUntil<=:now THEN 1 ELSE 0 END),0) AS due FROM sources s LEFT JOIN items i ON i.sourceId=s.sourceId AND i.enabled=1 AND i.deleted=0 LEFT JOIN progress p ON i.sourceId=p.sourceId AND i.itemId=p.itemId GROUP BY s.sourceId")
+    fun sourceSummaries(now: Long): Flow<List<SourceSummary>>
+    @Query("SELECT * FROM queue ORDER BY position LIMIT :limit OFFSET :offset")
+    suspend fun queuePage(limit: Int,offset: Int): List<QueueEntry>
+
     // Only stable keys enter the queue; texts are fetched one item at a time by the audio loader.
     @Query("""INSERT INTO queue(sourceId,itemId)
         SELECT i.sourceId,i.itemId
